@@ -1,0 +1,13 @@
+list:
+  - one
+  - two
+  - three
+nested-list:
+  - inner-list-1:
+      - 1
+      - 2
+      - 3
+  - inner-list-2:
+      - a
+      - b
+      - c
