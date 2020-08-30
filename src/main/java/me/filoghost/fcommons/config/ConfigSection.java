@@ -9,13 +9,28 @@ import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class ConfigSection {
 
 	private final ConfigurationSection yamlSection;
+
+	public ConfigSection() {
+		this.yamlSection = new MemoryConfiguration();
+	}
+
+	public ConfigSection(Map<String, Object> map) {
+		Preconditions.notNull(map, "map");
+		yamlSection = new MemoryConfiguration();
+		for (Entry<String, Object> entry : map.entrySet()) {
+			yamlSection.set(entry.getKey(), entry.getValue());
+		}
+	}
 
 	public ConfigSection(ConfigurationSection yamlSection) {
 		Preconditions.notNull(yamlSection, "yamlSection");
@@ -23,7 +38,7 @@ public class ConfigSection {
 	}
 
 	public ConfigValue get(String path) {
-		return ConfigValue.fromRawConfigValue(getRawValue(path));
+		return ConfigValue.fromRawConfigValue(path, getRawValue(path));
 	}
 
 	public <T> T get(String path, ConfigValueType<T> configValueType) {
@@ -31,7 +46,7 @@ public class ConfigSection {
 	}
 
 	public <T> T getRequired(String path, ConfigValueType<T> configValueType) throws MissingConfigValueException, InvalidConfigValueException {
-		return configValueType.fromConfigValueRequired(getRawValue(path));
+		return configValueType.fromConfigValueRequired(path, getRawValue(path));
 	}
 
 	public <T> T getOrDefault(String path, ConfigValueType<T> configValueType, T defaultValue) {
@@ -43,7 +58,7 @@ public class ConfigSection {
 	}
 
 	public <T> void set(String path, ConfigValueType<T> configValueType, T value) {
-		setRawValue(path, configValueType.toConfigValue(value));
+		setRawValue(path, configValueType.toConfigValueUnchecked(value));
 	}
 
 	public boolean contains(String path) {
@@ -63,11 +78,12 @@ public class ConfigSection {
 	}
 
 	private Object getRawValue(String path) {
+		Preconditions.notEmpty(path, "path");
 		return yamlSection.get(path, null);
 	}
 
 	private void setRawValue(String path, Object value) {
-		Preconditions.checkArgument(!(value instanceof ConfigurationSection), "cannot set ConfigurationSection as value");
+		Preconditions.notEmpty(path, "path");
 		yamlSection.set(path, value);
 	}
 
@@ -100,7 +116,7 @@ public class ConfigSection {
 	}
 
 	public ConfigSection getRequiredConfigSection(String path) throws MissingConfigValueException, InvalidConfigValueException {
-		return getRequired(path, ConfigValueType.CONFIG_SECTION);
+		return getRequired(path, ConfigValueType.SECTION);
 	}
 
 	/*
@@ -127,7 +143,7 @@ public class ConfigSection {
 	}
 
 	public ConfigSection getConfigSection(String path) {
-		return getOrDefault(path, ConfigValueType.CONFIG_SECTION, null);
+		return getOrDefault(path, ConfigValueType.SECTION, null);
 	}
 
 	/*
@@ -154,7 +170,7 @@ public class ConfigSection {
 	}
 
 	public ConfigSection getConfigSection(String path, ConfigSection defaultValue) {
-		return getOrDefault(path, ConfigValueType.CONFIG_SECTION, defaultValue);
+		return getOrDefault(path, ConfigValueType.SECTION, defaultValue);
 	}
 
 
@@ -182,7 +198,13 @@ public class ConfigSection {
 	}
 
 	public void setConfigSection(String path, ConfigSection value) {
-		set(path, ConfigValueType.CONFIG_SECTION, value);
+		set(path, ConfigValueType.SECTION, value);
 	}
 
+	@Override
+	public String toString() {
+		return "ConfigSection{" +
+				"yamlSection=" + yamlSection +
+				"}";
+	}
 }

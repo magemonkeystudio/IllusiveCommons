@@ -5,10 +5,11 @@
  */
 package me.filoghost.fcommons.config.mapped;
 
+import me.filoghost.fcommons.reflection.ReflectionUtils;
+import me.filoghost.fcommons.reflection.TypeInfo;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,54 +19,30 @@ public class MappedField {
 
 	private final Field field;
 	private final String configPath;
-	private final Type[] genericTypes;
+	private final TypeInfo typeInfo;
 	private final List<Annotation> annotations;
 
 
 	public MappedField(Field field) throws ReflectiveOperationException {
 		this.field = field;
-
-		this.configPath = field.getName()
-				.replace("__", ".")
-				.replace("_", "-");
-
-		try {
-			Type genericType = field.getGenericType();
-			if (genericType instanceof ParameterizedType) {
-				this.genericTypes = ((ParameterizedType) genericType).getActualTypeArguments();
-			} else {
-				this.genericTypes = null;
-			}
-
-			annotations = Stream.concat(
-					Arrays.stream(field.getDeclaredAnnotations()),
-					Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
-					.collect(Collectors.toList());
-		} catch (Throwable t) {
-			throw new ReflectiveOperationException(t);
-		}
+		this.configPath = field.getName().replace("__", ".").replace("_", "-");
+		this.typeInfo = TypeInfo.of(field);
+		this.annotations = Stream.concat(
+				Arrays.stream(field.getDeclaredAnnotations()),
+				Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
+				.collect(Collectors.toList());
 	}
 
-	public Object getFromObject(MappedConfig mappedObject) throws ReflectiveOperationException {
-		try {
-			field.setAccessible(true);
-			return field.get(mappedObject);
-		} catch (Throwable t) {
-			throw new ReflectiveOperationException(t);
-		}
+	public Object readFromObject(Object mappedObject) throws ReflectiveOperationException {
+		return ReflectionUtils.getFieldValue(field, mappedObject);
 	}
 
-	public void setToObject(MappedConfig mappedObject, Object fieldValue) throws ReflectiveOperationException {
-		try {
-			field.setAccessible(true);
-			field.set(mappedObject, fieldValue);
-		} catch (Throwable t) {
-			throw new ReflectiveOperationException(t);
-		}
+	public void writeToObject(Object mappedObject, Object fieldValue) throws ReflectiveOperationException {
+		ReflectionUtils.setFieldValue(field, mappedObject, fieldValue);
 	}
 
-	public Type[] getGenericTypes() {
-		return genericTypes;
+	public TypeInfo getTypeInfo() {
+		return typeInfo;
 	}
 
 	public List<Annotation> getAnnotations() {
@@ -76,8 +53,8 @@ public class MappedField {
 		return field.getName();
 	}
 
-	public Class<?> getFieldType() {
-		return field.getType();
+	public Class<?> getDeclaringClass() {
+		return field.getDeclaringClass();
 	}
 
 	public String getConfigPath() {

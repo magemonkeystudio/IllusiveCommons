@@ -9,66 +9,147 @@ import com.google.common.collect.ImmutableList;
 import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
-import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
-import me.filoghost.fcommons.config.exception.ConverterCastException;
-import me.filoghost.fcommons.config.mapped.converter.BooleanConverter;
+import me.filoghost.fcommons.config.exception.ConverterException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
-import me.filoghost.fcommons.config.mapped.converter.DoubleConverter;
-import me.filoghost.fcommons.config.mapped.converter.IntegerConverter;
-import me.filoghost.fcommons.config.mapped.converter.ListConverter;
-import me.filoghost.fcommons.config.mapped.converter.StringConverter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
+import me.filoghost.fcommons.reflection.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-public class ConfigMapper {
-
-	private static final List<Converter> CONVERTERS = ImmutableList.of(
-			new DoubleConverter(),
-			new IntegerConverter(),
-			new BooleanConverter(),
-			new StringConverter(),
-			new ListConverter()
-	);
+public class ConfigMapper<T> {
 
 	private static final List<ValueModifier<?, ?>> VALUE_MODIFIERS = ImmutableList.of(
 			new ChatColorsModifier()
 	);
 
-	private final MappedConfig mappedObject;
-	private final ConfigSection config;
-	private final List<MappedField> mappedFields;
+	private final Class<T> mappedClass;
+	private List<MappedField> mappedFields;
 
-	public ConfigMapper(MappedConfig mappedObject, ConfigSection config) throws ReflectiveOperationException {
-		this.mappedObject = mappedObject;
-		this.config = config;
-		this.mappedFields = getMappableFields(mappedObject.getClass());
+	public ConfigMapper(Class<T> mappedClass) {
+		this.mappedClass = mappedClass;
 	}
 
-	private List<MappedField> getMappableFields(Class<?> type) throws ReflectiveOperationException {
-		Field[] declaredFields;
-		List<MappedField> mappedFields = new ArrayList<>();
-
+	public T newMappedObjectInstance() throws ConfigLoadException {
 		try {
-			declaredFields = type.getDeclaredFields();
-			for (Field field : declaredFields) {
-				if (isMappable(field)) {
-					mappedFields.add(new MappedField(field));
-				}
-			}
+			return ReflectionUtils.newInstance(mappedClass);
+		} catch (NoSuchMethodException e) {
+			throw new ConfigLoadException(ConfigErrors.noEmptyConstructor(mappedClass));
+		} catch (ReflectiveOperationException e) {
+			throw new ConfigLoadException(ConfigErrors.cannotCreateInstance(mappedClass), e);
+		}
+	}
 
-		} catch (Throwable t) {
-			throw new ReflectiveOperationException(t);
+	public List<PathAndConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigLoadException {
+		List<PathAndConfigValue> defaultValues = new ArrayList<>();
+
+		for (MappedField mappedField : getMappedFields()) {
+			try {
+				Object fieldValue = mappedField.readFromObject(mappedObject);
+				Converter<?> converter = ConverterRegistry.find(mappedField.getTypeInfo().getTypeClass());
+
+				ConfigValue configValue;
+				if (fieldValue != null) {
+					configValue = converter.toConfigValueUnchecked(mappedField.getTypeInfo(), fieldValue);
+				} else {
+					configValue = ConfigValue.NULL;
+				}
+
+				defaultValues.add(new PathAndConfigValue(mappedField.getConfigPath(), configValue));
+
+			} catch (ReflectiveOperationException e) {
+				throw new ConfigLoadException(ConfigErrors.fieldReadError(mappedField), e);
+
+			} catch (ConverterException e) {
+				throw new ConfigLoadException(ConfigErrors.conversionFailed(mappedField), e);
+			}
+		}
+
+		return defaultValues;
+	}
+
+	public void setConfigFromFields(T mappedObject, ConfigSection config) throws ConfigLoadException {
+		List<PathAndConfigValue> configValues = getFieldsAsConfigValues(mappedObject);
+
+		for (PathAndConfigValue configValue : configValues) {
+			config.set(configValue.getPath(), configValue.getConfigValue());
+		}
+	}
+
+	public boolean addMissingValuesToConfig(ConfigSection config, List<PathAndConfigValue> defaultValues) {
+		boolean modified = false;
+
+		for (PathAndConfigValue defaultValue : defaultValues) {
+			if (!config.contains(defaultValue.getPath())) {
+				config.set(defaultValue.getPath(), defaultValue.getConfigValue());
+				modified = true;
+			}
+		}
+
+		return modified;
+	}
+
+	public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigLoadException {
+		for (MappedField mappedField : getMappedFields()) {
+			try {
+				setFieldFromConfig(mappedObject, mappedField, config);
+
+			} catch (ConverterException e) {
+				throw new ConfigLoadException(ConfigErrors.conversionFailed(mappedField), e);
+
+			} catch (ReflectiveOperationException e) {
+				throw new ConfigLoadException(ConfigErrors.fieldWriteError(mappedField), e);
+			}
+		}
+	}
+
+	private void setFieldFromConfig(T mappedObject, MappedField mappedField, ConfigSection config)
+			throws ReflectiveOperationException, ConverterException, ConfigLoadException {
+		Converter<?> converter = ConverterRegistry.find(mappedField.getTypeInfo().getTypeClass());
+
+		ConfigValue configValue = config.get(mappedField.getConfigPath());
+		if (configValue == null) {
+			return;
+		}
+
+		Object fieldValue = converter.toFieldValue(mappedField.getTypeInfo(), configValue);
+		if (fieldValue == null) {
+			return;
+		}
+
+		for (Annotation annotation : mappedField.getAnnotations()) {
+			fieldValue = applyValueModifiers(fieldValue, annotation);
+		}
+
+		mappedField.writeToObject(mappedObject, fieldValue);
+	}
+
+	private Object applyValueModifiers(Object fieldValue, Annotation annotation) {
+		for (ValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
+			if (modifier.isApplicable(annotation, fieldValue)) {
+				fieldValue = modifier.transformUnchecked(annotation, fieldValue);
+			}
+		}
+		return fieldValue;
+	}
+
+	private List<MappedField> getMappedFields() throws ConfigLoadException {
+		if (mappedFields == null) {
+			try {
+				mappedFields = new ArrayList<>();
+				for (Field field : ReflectionUtils.getDeclaredFields(mappedClass)) {
+					if (isMappable(field)) {
+						mappedFields.add(new MappedField(field));
+					}
+				}
+			} catch (ReflectiveOperationException e) {
+				throw new ConfigLoadException(ConfigErrors.mapperInitError(mappedClass), e);
+			}
 		}
 
 		return mappedFields;
@@ -84,91 +165,5 @@ public class ConfigMapper {
 				|| !Modifier.isFinal(modifiers);
 	}
 
-	public Map<MappedField, Object> getFieldValues() throws ReflectiveOperationException {
-		Map<MappedField, Object> mappedFieldValues = new HashMap<>();
-
-		for (MappedField mappedField : mappedFields) {
-			Object defaultValue = mappedField.getFromObject(mappedObject);
-
-			if (defaultValue == null) {
-				throw new ReflectiveOperationException(ConfigErrors.mapperFieldCannotBeNull(mappedField));
-			}
-
-			mappedFieldValues.put(mappedField, defaultValue);
-		}
-
-		return mappedFieldValues;
-	}
-
-	public Map<String, ConfigValue> toConfigValues(Map<MappedField, Object> fieldValues) throws ConfigLoadException {
-		Map<String, ConfigValue> configValues = new HashMap<>();
-
-		for (Entry<MappedField, Object> entry : fieldValues.entrySet()) {
-			MappedField mappedField = entry.getKey();
-			Object defaultValue = entry.getValue();
-
-			Converter converter = findConverter(mappedField.getFieldType());
-
-			try {
-				configValues.put(mappedField.getConfigPath(), converter.toConfigValue(mappedField, defaultValue));
-			} catch (ConverterCastException e) {
-				throw new ConfigLoadException("error while converting field \"" + mappedField.getFieldName() + "\"", e);
-			}
-		}
-
-		return configValues;
-	}
-
-	public boolean addMissingConfigValues(Map<String, ConfigValue> defaultValues) {
-		boolean modified = false;
-
-		for (Entry<String, ConfigValue> entry : defaultValues.entrySet()) {
-			String path = entry.getKey();
-			ConfigValue defaultValue = entry.getValue();
-
-			if (!config.contains(path)) {
-				modified = true;
-				config.set(path, defaultValue);
-			}
-		}
-
-		return modified;
-	}
-
-	public void injectObjectFields() throws ReflectiveOperationException {
-		for (MappedField mappedField : mappedFields) {
-			injectObjectField(mappedField);
-		}
-	}
-
-	private void injectObjectField(MappedField mappedField) throws ReflectiveOperationException {
-		Type[] genericTypes = mappedField.getGenericTypes();
-		Converter converter = findConverter(mappedField.getFieldType());
-
-		ConfigValueType<?> configValueType = converter.getConfigValueType(genericTypes);
-		Object fieldValue = config.get(mappedField.getConfigPath(), configValueType);
-
-		for (Annotation annotation : mappedField.getAnnotations()) {
-			fieldValue = applyValueModifiers(fieldValue, annotation);
-		}
-
-		mappedField.setToObject(mappedObject, fieldValue);
-	}
-
-	private Object applyValueModifiers(Object fieldValue, Annotation annotation) {
-		for (ValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
-			if (modifier.isApplicable(annotation, fieldValue)) {
-				fieldValue = modifier.transform(annotation, fieldValue);
-			}
-		}
-		return fieldValue;
-	}
-
-	private Converter findConverter(Class<?> type) {
-		return CONVERTERS.stream()
-				.filter(converter -> converter.matches(type))
-				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("cannot find converter for type " + type));
-	}
 
 }

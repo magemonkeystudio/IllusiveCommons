@@ -5,9 +5,7 @@
  */
 package me.filoghost.fcommons.config;
 
-import me.filoghost.fcommons.config.mapped.MappedConfig;
 import me.filoghost.fcommons.config.mapped.MappedField;
-import me.filoghost.fcommons.config.mapped.converter.Converter;
 
 import java.nio.file.Path;
 
@@ -17,6 +15,7 @@ public class ConfigErrors {
 	public static final String createDefaultIOException = "I/O exception while creating default file";
 	public static final String writeDataIOException = "I/O exception while writing data to file";
 	public static final String invalidYamlSyntax = "invalid YAML syntax";
+	public static final String nullMappedConfigFromSupplier = "MappedConfig supplier returned null";
 
 	public static final String valueNotSet = "value is not set";
 	public static final String valueNotList = "value is not a list";
@@ -29,24 +28,28 @@ public class ConfigErrors {
 		return "I/O exception while creating parent directory \"" + formatPath(rootDataFolder, folder) + "\"";
 	}
 
-	public static String mapperInitError(MappedConfig mappedConfig) {
-		return "couldn't initialize config mapper for class \"" + mappedConfig.getClass() + "\"";
+	public static String mapperInitError(Class<?> clazz) {
+		return "couldn't initialize config mapper for class \"" + clazz + "\"";
 	}
 
-	public static String fieldReadError(MappedConfig mappedConfig) {
-		return "couldn't read field values from class \"" + mappedConfig.getClass() + "\"";
+	public static <T> String noEmptyConstructor(Class<T> mappedClass) {
+		return "mapped class \"" + mappedClass + "\" has no constructor without parameters";
 	}
 
-	public static String fieldInjectError(MappedConfig mappedConfig) {
-		return "couldn't inject fields values in class \"" + mappedConfig.getClass() + "\"";
+	public static <T> String cannotCreateInstance(Class<T> mappedClass) {
+		return "couldn't create new instance of mapped class \"" + mappedClass + "\"";
 	}
 
-	public static String mapperFieldCannotBeNull(MappedField mappedField) {
-		return "mapped field \"" + mappedField.getFieldName() + "\" cannot be null by default";
+	public static String fieldReadError(MappedField mappedField) {
+		return "error while reading field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
 	}
 
-	public static String converterFailed(Object value, Converter converter) {
-		return "value of type \"" + value.getClass() + "\" couldn't be converted by \"" + converter.getClass() + "\"";
+	public static String fieldWriteError(MappedField mappedField) {
+		return "error while writing field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
+	}
+
+	public static String conversionFailed(MappedField mappedField) {
+		return "error while converting field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
 	}
 
 	public static String formatPath(Path rootDataFolder, Path path) {

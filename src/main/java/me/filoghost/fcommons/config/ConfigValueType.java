@@ -10,7 +10,10 @@ import me.filoghost.fcommons.config.exception.MissingConfigValueException;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -37,21 +40,54 @@ public class ConfigValueType<T> {
 	public static final ConfigValueType<Double> DOUBLE = newNumberType(Number::doubleValue);
 	public static final ConfigValueType<Float> FLOAT = newNumberType(Number::floatValue);
 
-	public static final ConfigValueType<List<String>> STRING_LIST = newListType(STRING);
-	public static final ConfigValueType<List<Integer>> INTEGER_LIST = newListType(INTEGER);
+	public static final ConfigValueType<ConfigSection> SECTION = new ConfigValueType<>(
+			(Object value) -> value instanceof ConfigurationSection || value instanceof Map,
+			(Object value) -> {
+				if (value instanceof Map) {
+					Map<String, Object> result = new LinkedHashMap<>();
 
-	public static final ConfigValueType<List<?>> LIST = new ConfigValueType<>(
-			(Object value) -> value instanceof List,
-			(Object value) -> (List<?>) value,
-			(List<?> value) -> value,
-			ConfigErrors.valueNotList
-	);
+					for (Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+						String key = ConfigValueType.STRING.fromConfigValueOrNull(entry.getKey());
 
-	public static final ConfigValueType<ConfigSection> CONFIG_SECTION = new ConfigValueType<>(
-			(Object value) -> value instanceof ConfigurationSection,
-			(Object value) -> new ConfigSection((ConfigurationSection) value),
+						if (key != null) {
+							result.put(key, entry.getValue());
+						}
+					}
+
+					return new ConfigSection(result);
+				} else {
+					return new ConfigSection((ConfigurationSection) value);
+				}
+			},
 			(ConfigSection value) -> value.getInternalYamlSection(),
 			ConfigErrors.valueNotSection
+	);
+
+	public static final ConfigValueType<List<String>> STRING_LIST = newListType(STRING);
+	public static final ConfigValueType<List<Integer>> INTEGER_LIST = newListType(INTEGER);
+	public static final ConfigValueType<List<ConfigSection>> SECTION_LIST = newListType(SECTION);
+
+	public static final ConfigValueType<List<ConfigValue>> LIST = new ConfigValueType<>(
+			(Object value) -> value instanceof List,
+			(Object value) -> {
+				List<ConfigValue> result = new ArrayList<>();
+
+				for (Object element : (List<?>) value) {
+					result.add(ConfigValue.fromRawConfigValue(null, element));
+				}
+
+				return result;
+			},
+			(List<ConfigValue> value) -> {
+				List<Object> result = new ArrayList<>();
+
+				for (ConfigValue element : value) {
+					result.add(element.getRawConfigValue());
+				}
+
+				return result;
+			},
+			ConfigErrors.valueNotList
 	);
 
 	private final Predicate<Object> isValidConfigValueFunction;
@@ -74,16 +110,20 @@ public class ConfigValueType<T> {
 		return rawConfigValue != null && isValidConfigValueFunction.test(rawConfigValue);
 	}
 
-	protected T fromConfigValueRequired(Object rawConfigValue) throws MissingConfigValueException, InvalidConfigValueException {
+	protected T fromConfigValueRequired(String path, Object rawConfigValue) throws MissingConfigValueException, InvalidConfigValueException {
 		if (rawConfigValue == null) {
-			throw new MissingConfigValueException(ConfigErrors.valueNotSet);
+			throw new MissingConfigValueException(ConfigErrors.valueNotSet, path);
 		}
 
 		if (isValidConfigValueFunction.test(rawConfigValue)) {
 			return fromConfigValueFunction.apply(rawConfigValue);
 		} else {
-			throw new InvalidConfigValueException(notConvertibleErrorMessage);
+			throw new InvalidConfigValueException(path, notConvertibleErrorMessage);
 		}
+	}
+
+	private T fromConfigValueOrNull(Object rawConfigValue) {
+		return fromConfigValueOrDefault(rawConfigValue, null);
 	}
 
 	protected T fromConfigValueOrDefault(Object rawConfigValue, T defaultValue) {
@@ -98,7 +138,7 @@ public class ConfigValueType<T> {
 		}
 	}
 
-	protected Object toConfigValue(T value) {
+	protected Object toConfigValueUnchecked(T value) {
 		if (value != null) {
 			return toConfigValueFunction.apply(value);
 		} else {

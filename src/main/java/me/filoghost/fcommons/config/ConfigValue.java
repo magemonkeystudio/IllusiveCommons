@@ -11,25 +11,23 @@ import me.filoghost.fcommons.config.exception.MissingConfigValueException;
 
 public class ConfigValue {
 
-	private static final ConfigValue EMPTY = new ConfigValue(null);
+	public static final ConfigValue NULL = new ConfigValue(null, null);
 
+	private final String path;
 	private final Object rawConfigValue;
 
 	public static <T> ConfigValue of(ConfigValueType<T> valueType, T value) {
 		Preconditions.notNull(valueType, "valueType");
 		Preconditions.notNull(value, "value");
-		return new ConfigValue(valueType.toConfigValue(value));
+		return new ConfigValue(null, valueType.toConfigValueUnchecked(value));
 	}
 
-	protected static ConfigValue fromRawConfigValue(Object rawConfigValue) {
-		if (rawConfigValue != null) {
-			return new ConfigValue(rawConfigValue);
-		} else {
-			return EMPTY;
-		}
+	protected static ConfigValue fromRawConfigValue(String path, Object rawConfigValue) {
+		return new ConfigValue(path, rawConfigValue);
 	}
 
-	private ConfigValue(Object rawConfigValue) {
+	private ConfigValue(String path, Object rawConfigValue) {
+		this.path = path;
 		this.rawConfigValue = rawConfigValue;
 	}
 
@@ -42,15 +40,23 @@ public class ConfigValue {
 	}
 
 	public <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
-		return valueType.fromConfigValueRequired(rawConfigValue);
+		return valueType.fromConfigValueRequired(path, rawConfigValue);
 	}
 
 	public <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
 		return valueType.fromConfigValueOrDefault(rawConfigValue, defaultValue);
 	}
 
-	public boolean isValidAs(ConfigValueType<?> configValueType) {
+	public boolean isPresentAs(ConfigValueType<?> configValueType) {
 		return configValueType.isValidConfigValue(rawConfigValue);
 	}
 
+	@Override
+	public String toString() {
+		return "ConfigValue{"
+				+ "path=" + path
+				+ ", rawValueType=" + (rawConfigValue != null ? rawConfigValue.getClass().getSimpleName() : "null")
+				+ ", rawValue=" + rawConfigValue
+				+ "}";
+	}
 }

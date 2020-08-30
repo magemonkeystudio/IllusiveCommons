@@ -7,8 +7,15 @@ package me.filoghost.fcommons.config.exception;
 
 public abstract class ConfigValueException extends ConfigException {
 
-	public ConfigValueException(String message) {
+	private final String path;
+
+	public ConfigValueException(String path, String message) {
 		super(message);
+		this.path = path;
+	}
+
+	public String getPath() {
+		return path;
 	}
 
 }

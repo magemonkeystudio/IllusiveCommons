@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 
 public interface ValueModifier<V, A extends Annotation> {
 
-	V transformChecked(A annotation, V value);
+	V transform(A annotation, V value);
 
 	Class<A> getAnnotationType();
 
@@ -21,9 +21,7 @@ public interface ValueModifier<V, A extends Annotation> {
 		return getAnnotationType().isInstance(annotation) && getValueType().isInstance(value);
 	}
 
-	default Object transform(Annotation annotation, Object fieldValue) {
-		Preconditions.checkArgument(isApplicable(annotation, fieldValue), "modifier doesn't match given types");
-
-		return transformChecked(getAnnotationType().cast(annotation), getValueType().cast(fieldValue));
+	default Object transformUnchecked(Annotation annotation, Object fieldValue) {
+		return transform(getAnnotationType().cast(annotation), getValueType().cast(fieldValue));
 	}
 }

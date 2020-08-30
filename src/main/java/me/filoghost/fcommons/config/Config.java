@@ -9,6 +9,8 @@ import me.filoghost.fcommons.Preconditions;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 public class Config extends ConfigSection {
 
@@ -34,8 +36,17 @@ public class Config extends ConfigSection {
 		return yaml.saveToString();
 	}
 
-	public void setHeader(String value) {
-		yaml.options().header(value);
+	public String getHeader() {
+		return this.yaml.options().header();
+	}
+
+	public void setHeader(String... lines) {
+		setHeader(Arrays.asList(lines));
+	}
+
+	public void setHeader(List<String> lines) {
+		String header = lines.size() > 0 ? String.join("\n", lines) + "\n" : null;
+		yaml.options().header(header);
 	}
 
 }

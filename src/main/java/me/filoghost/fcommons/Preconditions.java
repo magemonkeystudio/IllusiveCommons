@@ -15,6 +15,13 @@ public final class Preconditions {
 			throw new NullPointerException(objectName + " cannot be null");
 		}
 	}
+
+	public static void notEmpty(String string, String objectName) {
+		notNull(string, objectName);
+		if (string.isEmpty()) {
+			throw new IllegalArgumentException(objectName + " cannot be empty");
+		}
+	}
 	
 	public static void checkArgument(boolean expression, String errorMessage) {
 		if (!expression) {
@@ -38,7 +45,7 @@ public final class Preconditions {
 			throw new IndexOutOfBoundsException(objectName + " (" + index + ") must be less than size (" + size + ")");
 		}
 	}
-	
+
 	public static void checkArgumentNotAir(Material material, String objectName) {
 		notNull(material, objectName);
 		if (MaterialsHelper.isAir(material)) {

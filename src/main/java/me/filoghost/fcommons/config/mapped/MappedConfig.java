@@ -5,20 +5,13 @@
  */
 package me.filoghost.fcommons.config.mapped;
 
-import me.filoghost.fcommons.config.exception.ConfigLoadException;
+import java.util.Collections;
+import java.util.List;
 
-public class MappedConfig {
+public interface MappedConfig extends MappedConfigSection {
 
-	private String header;
-
-	protected void setHeader(String... header) {
-		this.header = String.join("\n", header) + "\n";
+	default List<String> getHeader() {
+		return Collections.emptyList();
 	}
-
-	public String getHeader() {
-		return header;
-	}
-
-	public void postLoad() throws ConfigLoadException {}
 
 }

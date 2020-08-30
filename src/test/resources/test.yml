@@ -1,13 +1,40 @@
+integer: 10
+string: abc
+null-value: null
+quoted-null-value: "null"
 list:
   - one
   - two
   - three
+section:
+  key1: value1
+  key2: value2
+list-with-null:
+  - one
+  - null
+  - three
+list-with-invalid-int:
+  - 1
+  - two
+  - 3
 nested-list:
-  - inner-list-1:
-      - 1
-      - 2
-      - 3
-  - inner-list-2:
-      - a
-      - b
-      - c
+  - - 1
+    - 2
+    - 3
+  - - a
+    - b
+    - c
+sections-list:
+  - key1: value1
+    key2: value2
+  - key1: value3
+    key2: value4
+nested-sections-list:
+  - nested1:
+      key1: value1
+    nested2:
+      key2: value2
+  - nested1:
+      key1: value3
+    nested2:
+      key2: value4

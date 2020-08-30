@@ -10,7 +10,7 @@ import me.filoghost.fcommons.Colors;
 public class ChatColorsModifier implements ValueModifier<String, ChatColors> {
 
 	@Override
-	public String transformChecked(ChatColors annotation, String value) {
+	public String transform(ChatColors annotation, String value) {
 		return Colors.addColors(value);
 	}
 

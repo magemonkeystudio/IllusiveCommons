@@ -5,34 +5,22 @@
  */
 package me.filoghost.fcommons.config.mapped.converter;
 
-import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigValue;
-import me.filoghost.fcommons.config.ConfigValueType;
-import me.filoghost.fcommons.config.exception.ConverterCastException;
-import me.filoghost.fcommons.config.mapped.MappedField;
+import me.filoghost.fcommons.config.exception.ConfigLoadException;
+import me.filoghost.fcommons.config.exception.ConverterException;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
-import java.lang.reflect.Type;
-
-public interface Converter {
-
-	ConfigValueType<?> getConfigValueType(Type[] fieldGenericTypes);
-
-	boolean matches(Class<?> type);
-
-	default ConfigValue toConfigValue(MappedField mappedField, Object value) throws ConverterCastException {
-		ConfigValueType<?> configValueType = getConfigValueType(mappedField.getGenericTypes());
-
-		// Assume that ConfigValueType is compatible with the value
-		return toTypedConfigValue(configValueType, value);
-	}
+public interface Converter<T> {
 
 	@SuppressWarnings("unchecked")
-	default <T> ConfigValue toTypedConfigValue(ConfigValueType<T> configValueType, Object value) throws ConverterCastException {
-		try {
-			return ConfigValue.of(configValueType, (T) value);
-		} catch (ClassCastException e) {
-			throw new ConverterCastException(ConfigErrors.converterFailed(value, this), e);
-		}
+	default ConfigValue toConfigValueUnchecked(TypeInfo fieldTypeInfo, Object fieldValue) throws ConverterException, ConfigLoadException {
+		return toConfigValue(fieldTypeInfo, (T) fieldValue);
 	}
+
+	ConfigValue toConfigValue(TypeInfo fieldTypeInfo, T fieldValue) throws ConverterException, ConfigLoadException;
+
+	T toFieldValue(TypeInfo fieldTypeInfo, ConfigValue configValue) throws ConverterException, ConfigLoadException;
+
+	boolean matches(Class<?> clazz);
 
 }
