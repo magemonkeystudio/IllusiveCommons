@@ -12,7 +12,7 @@ public class MappedConfigSectionConverter implements Converter<MappedConfigSecti
 
 	@Override
 	public ConfigValue toConfigValue(TypeInfo fieldTypeInfo, MappedConfigSection fieldValue) throws ConfigLoadException {
-		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass().asSubclass(MappedConfigSection.class));
+		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClassAs(MappedConfigSection.class));
 
 		ConfigSection configSection = new ConfigSection();
 		configMapper.setConfigFromFields(fieldValue, configSection);
@@ -25,7 +25,7 @@ public class MappedConfigSectionConverter implements Converter<MappedConfigSecti
 			return null;
 		}
 
-		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass().asSubclass(MappedConfigSection.class));
+		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClassAs(MappedConfigSection.class));
 
 		ConfigSection configSection = configValue.as(ConfigValueType.SECTION);
 		MappedConfigSection mappedObject = configMapper.newMappedObjectInstance();

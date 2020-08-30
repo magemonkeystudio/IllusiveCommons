@@ -1,6 +1,7 @@
 package me.filoghost.fcommons.reflection;
 
 import me.filoghost.fcommons.Preconditions;
+import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -18,6 +19,11 @@ public class TypeInfo {
 
 	public Class<?> getTypeClass() {
 		return typeClass;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Class<T> getTypeClassAs(Class<T> clazz) {
+		return (Class<T>) typeClass.asSubclass(clazz);
 	}
 
 	public Type[] getTypeArguments() {
