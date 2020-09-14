@@ -5,48 +5,51 @@
  */
 package me.filoghost.fcommons.config;
 
-import me.filoghost.fcommons.Preconditions;
-import org.bukkit.configuration.file.YamlConfiguration;
+import com.google.common.collect.ImmutableList;
+import me.filoghost.fcommons.config.exception.ConfigLoadException;
+import org.apache.commons.lang.Validate;
 
-import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Config extends ConfigSection {
 
-	private final YamlConfiguration yaml;
-	private final Path sourceFile;
+	private final YamlSerializer yamlSerializer;
+	private List<String> header;
 
-	public Config(Path sourceFile) {
-		this(new YamlConfiguration(), sourceFile);
+	public Config() {
+		this.yamlSerializer = new YamlSerializer();
 	}
 
-	public Config(YamlConfiguration yaml, Path sourceFile) {
-		super(yaml);
-		Preconditions.notNull(sourceFile, "sourceFile");
-		this.yaml = yaml;
-		this.sourceFile = sourceFile;
+	public List<String> getHeader() {
+		return this.header;
 	}
 
-	public Path getSourceFile() {
-		return sourceFile;
+	public void setHeader(String... header) {
+		setHeader(Arrays.asList(header));
 	}
 
-	public String saveToString() {
-		return yaml.saveToString();
+	public void setHeader(List<String> header) {
+		this.header = ImmutableList.copyOf(header);
 	}
 
-	public String getHeader() {
-		return this.yaml.options().header();
+	protected void loadFromString(List<String> fileContents) throws ConfigLoadException {
+		Validate.notNull(fileContents, "fileContents cannot be null");
+
+		LinkedHashMap<String, Object> internalValues = yamlSerializer.parseConfigValues(fileContents);
+		if (internalValues == null) {
+			internalValues = new LinkedHashMap<>();
+		}
+
+		setHeader(yamlSerializer.parseHeader(fileContents));
+		setInternalValues(internalValues);
 	}
 
-	public void setHeader(String... lines) {
-		setHeader(Arrays.asList(lines));
-	}
+	protected String saveToString() {
+		String serializedHeader = yamlSerializer.serializeHeader(header);
+		String serializedValues = yamlSerializer.serializeConfigValues(getInternalValues());
 
-	public void setHeader(List<String> lines) {
-		String header = lines.size() > 0 ? String.join("\n", lines) + "\n" : null;
-		yaml.options().header(header);
+		return serializedHeader + serializedValues;
 	}
-
 }

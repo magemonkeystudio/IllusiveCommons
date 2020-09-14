@@ -86,4 +86,18 @@ public final class Strings {
 	public static boolean isEmpty(String string) {
 		return string == null || string.isEmpty();
 	}
+
+	public static boolean isWhitespace(String string) {
+		if (isEmpty(string)) {
+			return true;
+		}
+
+		for (int i = 0; i < string.length(); i++) {
+			if (!Character.isWhitespace(string.charAt(i))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

@@ -1,14 +1,15 @@
 package me.filoghost.fcommons.config.mapped;
 
 import com.google.common.collect.Lists;
-import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValueType;
-import me.filoghost.fcommons.config.exception.ConverterException;
+import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.mapped.converter.ConfigValueTypeConverter;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.converter.ListConverter;
 import me.filoghost.fcommons.config.mapped.converter.MappedConfigSectionConverter;
+import me.filoghost.fcommons.config.mapped.converter.ConfigSerializableConverter;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.util.List;
 
@@ -26,21 +27,17 @@ public class ConverterRegistry {
 			new ConfigValueTypeConverter<>(ConfigValueType.STRING, String.class),
 			new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class),
 
-			new ListConverter(),
-			new MappedConfigSectionConverter()
+			new ListConverter<>(),
+			new MappedConfigSectionConverter(),
+			new ConfigSerializableConverter<>()
 	);
 
-
-	public static void registerConverter(Converter<?> converter) {
-		Preconditions.notNull(converter, "converter");
-		converters.add(converter);
-	}
-
-	public static Converter<?> find(Class<?> clazz) throws ConverterException {
-		return converters.stream()
-				.filter(converter -> converter.matches(clazz))
+	@SuppressWarnings("unchecked")
+	public static <T> Converter<T> find(TypeInfo<T> typeInfo) throws ConfigMappingException {
+		return (Converter<T>) converters.stream()
+				.filter(converter -> converter.matches(typeInfo.getTypeClass()))
 				.findFirst()
-				.orElseThrow(() -> new ConverterException("cannot find suitable converter for class \"" + clazz.getSimpleName() + "\""));
+				.orElseThrow(() -> new ConfigMappingException("cannot find suitable converter for class \"" + typeInfo + "\""));
 	}
 
 }

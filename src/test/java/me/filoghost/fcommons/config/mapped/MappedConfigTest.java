@@ -1,5 +1,6 @@
 package me.filoghost.fcommons.config.mapped;
 
+import me.filoghost.fcommons.test.AssertExtra;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
@@ -18,7 +19,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testGenerateConfig(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<SimpleMappedConfig> configLoader = newNonExistingConfig(tempDir, SimpleMappedConfig.class);
+		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, SimpleMappedConfig.class);
 		configLoader.init();
 
 		assertThat(configLoader.getFile()).exists();
@@ -30,9 +31,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testReadConfig(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<SimpleMappedConfig> configLoader = newExistingConfig(
-				tempDir,
-				SimpleMappedConfig.class,
+		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, SimpleMappedConfig.class,
 				"integer: 5",
 				"string: def"
 		);
@@ -44,9 +43,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testWrongTypes(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<SimpleMappedConfig> configLoader = newExistingConfig(
-				tempDir,
-				SimpleMappedConfig.class,
+		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, SimpleMappedConfig.class,
 				"integer: string"
 		);
 		SimpleMappedConfig config = configLoader.init();
@@ -56,10 +53,46 @@ class MappedConfigTest {
 	}
 
 	@Test
+	public void testHeaderExisting(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, HeaderConfig.class,
+				"integer: 5"
+		);
+		configLoader.init();
+
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"integer: 5"
+		);
+	}
+
+	@Test
+	public void testHeaderMissingValue(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, HeaderConfig.class,
+				""
+		);
+		configLoader.init();
+
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"# Header line",
+				"",
+				"integer: 1"
+		);
+	}
+
+	@Test
+	public void testHeaderNewFile(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, HeaderConfig.class);
+		configLoader.init();
+
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"# Header line",
+				"",
+				"integer: 1"
+		);
+	}
+
+	@Test
 	public void testConfigSection(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<ConfigSectionConfig> configLoader = newExistingConfig(
-				tempDir,
-				ConfigSectionConfig.class,
+		MappedConfigLoader<ConfigSectionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ConfigSectionConfig.class,
 				"section:",
 				"  key1: value1",
 				"  key2: value2",
@@ -77,9 +110,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testListOfConfigSections(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<ListOfSectionsConfig> configLoader = newExistingConfig(
-				tempDir,
-				ListOfSectionsConfig.class,
+		MappedConfigLoader<ListOfSectionsConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ListOfSectionsConfig.class,
 				"sections:",
 				"- key1: value1",
 				"  key2: value2",
@@ -97,7 +128,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testWriteReadConfig(@TempDir Path tempDir) throws ConfigException {
-		MappedConfigLoader<SimpleMappedConfig> configLoader = newNonExistingConfig(tempDir, SimpleMappedConfig.class);
+		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, SimpleMappedConfig.class);
 		configLoader.init();
 
 		// Read again after initialization
@@ -109,10 +140,10 @@ class MappedConfigTest {
 
 	@Test
 	public void testNestedGenerics(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<NestedGenericsConfig> configLoader = newNonExistingConfig(tempDir, NestedGenericsConfig.class);
+		MappedConfigLoader<NestedGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, NestedGenericsConfig.class);
 		configLoader.init();
 
-		assertFileContents(configLoader.getFile(),
+		AssertExtra.fileContentMatches(configLoader.getFile(),
 				"lists:",
 				"- - 1",
 				"  - 2",
@@ -123,8 +154,8 @@ class MappedConfigTest {
 
 	@Test
 	public void testBadGenerics(@TempDir Path tempDir) {
-		MappedConfigLoader<BadGenericsConfig> configLoaderBadGenerics = newNonExistingConfig(tempDir, BadGenericsConfig.class);
-		MappedConfigLoader<NoGenericsConfig> configLoaderNoGenerics = newNonExistingConfig(tempDir, NoGenericsConfig.class);
+		MappedConfigLoader<BadGenericsConfig> configLoaderBadGenerics = MappedTestCommons.newNonExistingConfig(tempDir, BadGenericsConfig.class);
+		MappedConfigLoader<NoGenericsConfig> configLoaderNoGenerics = MappedTestCommons.newNonExistingConfig(tempDir, NoGenericsConfig.class);
 
 		assertThatExceptionOfType(ConfigLoadException.class).isThrownBy(() -> {
 			configLoaderBadGenerics.init();
@@ -137,10 +168,10 @@ class MappedConfigTest {
 
 	@Test
 	public void testWriteNulls(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<NullConfig> configLoader = newNonExistingConfig(tempDir, NullConfig.class);
+		MappedConfigLoader<NullConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, NullConfig.class);
 		configLoader.init();
 
-		assertFileContents(configLoader.getFile(),
+		AssertExtra.fileContentMatches(configLoader.getFile(),
 				"primitiveInteger: 0",
 				"listWithNull:",
 				"- a",
@@ -168,9 +199,7 @@ class MappedConfigTest {
 
 	@Test
 	public void testCustomObjects(@TempDir Path tempDir) throws ConfigException, IOException {
-		MappedConfigLoader<CustomObjectConfig> configLoader = newExistingConfig(
-				tempDir,
-				CustomObjectConfig.class,
+		MappedConfigLoader<CustomObjectConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, CustomObjectConfig.class,
 				"customObject:",
 				"  string: xyz",
 				"  integer: 99",
@@ -190,7 +219,7 @@ class MappedConfigTest {
 		assertThat(config.customObjectList.get(1).getInteger()).isEqualTo(3); // Should use default
 
 		// Check that missing fields have been added, but not missing keys in sections
-		assertFileContents(configLoader.getFile(),
+		AssertExtra.fileContentMatches(configLoader.getFile(),
 				"customObject:",
 				"  string: xyz",
 				"  integer: 99",
@@ -210,34 +239,21 @@ class MappedConfigTest {
 	}
 
 
-	private static <T extends MappedConfig> MappedConfigLoader<T> newNonExistingConfig(Path tempDir, Class<T> mappedConfigClass) {
-		Path configPath = tempDir.resolve("temp-config.yml");
-		return new MappedConfigLoader<>(tempDir, configPath, mappedConfigClass);
-	}
-
-
-	private static <T extends MappedConfig> MappedConfigLoader<T> newExistingConfig(Path tempDir, Class<T> mappedConfigClass, String... contents) throws IOException {
-		Path configPath = tempDir.resolve("temp-config.yml");
-		if (contents != null && contents.length > 0) {
-			Files.write(configPath, Arrays.asList(contents));
-		} else {
-			Files.createFile(configPath);
-		}
-
-		return new MappedConfigLoader<>(tempDir, configPath, mappedConfigClass);
-	}
-
-
-	private void assertFileContents(Path file, String... contents) throws IOException {
-		assertThat(file).exists();
-		assertThat(Files.readAllLines(file)).containsExactly(contents);
-	}
-
-
 	private static class SimpleMappedConfig implements MappedConfig {
 
 		private int integer = 3;
 		private String string = "abc";
+
+	}
+
+	private static class HeaderConfig implements MappedConfig {
+
+		private int integer = 1;
+
+		@Override
+		public List<String> getHeader() {
+			return Arrays.asList("Header line");
+		}
 
 	}
 

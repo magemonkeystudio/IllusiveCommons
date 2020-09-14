@@ -8,9 +8,6 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
-import me.filoghost.fcommons.config.exception.ConfigSyntaxException;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,7 +17,6 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class ConfigLoader {
@@ -35,9 +31,43 @@ public class ConfigLoader {
 		this.file = file;
 	}
 
+	public Path getFile() {
+		return file;
+	}
+
+	public boolean fileExists() {
+		return Files.isRegularFile(file);
+	}
+
 	public Config init() throws ConfigSaveException, ConfigLoadException {
 		createDefault();
 		return load();
+	}
+
+	public Config load() throws ConfigLoadException {
+		Preconditions.checkState(fileExists(), "\"" + file + "\" doesn't exist or is not a regular file");
+
+		Config config = new Config();
+
+		try {
+			config.loadFromString(Files.readAllLines(file));
+		} catch (IOException e) {
+			throw new ConfigLoadException(ConfigErrors.readIOException, e);
+		}
+
+		return config;
+	}
+
+	public void save(Config config) throws ConfigSaveException {
+		createParentDirectory();
+
+		String data = config.saveToString();
+
+		try (BufferedWriter writer = Files.newBufferedWriter(file)) {
+			writer.write(data);
+		} catch (IOException e) {
+			throw new ConfigSaveException(ConfigErrors.writeDataIOException, e);
+		}
 	}
 
 	public void createDefault() throws ConfigSaveException {
@@ -61,6 +91,16 @@ public class ConfigLoader {
 		}
 	}
 
+	private void createParentDirectory() throws ConfigSaveException {
+		if (file.getParent() != null) {
+			try {
+				Files.createDirectories(file.getParent());
+			} catch (IOException e) {
+				throw new ConfigSaveException(ConfigErrors.createParentFolderIOException(rootDataFolder, file.getParent()), e);
+			}
+		}
+	}
+
 	private String toInternalJarPath(Path path) {
 		return StreamSupport.stream(path.spliterator(), false)
 				.map(Path::toString)
@@ -79,54 +119,6 @@ public class ConfigLoader {
 		URLConnection connection = resourceURL.openConnection();
 		connection.setUseCaches(false);
 		return connection.getInputStream();
-	}
-
-	public boolean fileExists() {
-		return Files.isRegularFile(file);
-	}
-
-	public Config load() throws ConfigLoadException {
-		Preconditions.checkState(fileExists(), "\"" + file + "\" doesn't exist or is not a regular file");
-
-		YamlConfiguration yaml = new YamlConfiguration();
-
-		try (Stream<String> lines = Files.lines(file)) {
-			// TODO: use BufferedReader after updating to Bukkit 1.8+
-			String yamlString = lines.collect(Collectors.joining("\n", "", "\n"));
-			yaml.loadFromString(yamlString);
-		} catch (IOException e) {
-			throw new ConfigLoadException(ConfigErrors.readIOException, e);
-		} catch (InvalidConfigurationException e) {
-			throw new ConfigSyntaxException(ConfigErrors.invalidYamlSyntax, e);
-		}
-
-		return new Config(yaml, file);
-	}
-
-	public void save(Config config) throws ConfigSaveException {
-		createParentDirectory();
-
-		String data = config.saveToString();
-
-		try (BufferedWriter writer = Files.newBufferedWriter(file)) {
-			writer.write(data);
-		} catch (IOException e) {
-			throw new ConfigSaveException(ConfigErrors.writeDataIOException, e);
-		}
-	}
-
-	private void createParentDirectory() throws ConfigSaveException {
-		if (file.getParent() != null) {
-			try {
-				Files.createDirectories(file.getParent());
-			} catch (IOException e) {
-				throw new ConfigSaveException(ConfigErrors.createParentFolderIOException(rootDataFolder, file.getParent()), e);
-			}
-		}
-	}
-
-	public Path getFile() {
-		return file;
 	}
 
 }

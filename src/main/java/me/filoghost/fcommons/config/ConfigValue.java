@@ -19,10 +19,10 @@ public class ConfigValue {
 	public static <T> ConfigValue of(ConfigValueType<T> valueType, T value) {
 		Preconditions.notNull(valueType, "valueType");
 		Preconditions.notNull(value, "value");
-		return new ConfigValue(null, valueType.toConfigValueUnchecked(value));
+		return new ConfigValue(null, valueType.toConfigValue(value));
 	}
 
-	protected static ConfigValue fromRawConfigValue(String path, Object rawConfigValue) {
+	protected static ConfigValue ofRawConfigValue(String path, Object rawConfigValue) {
 		return new ConfigValue(path, rawConfigValue);
 	}
 

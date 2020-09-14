@@ -7,42 +7,45 @@ package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
-import me.filoghost.fcommons.config.exception.ConfigLoadException;
-import me.filoghost.fcommons.config.exception.ConverterException;
+import me.filoghost.fcommons.config.exception.ConfigMappingException;
+import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
+import me.filoghost.fcommons.config.mapped.MappingUtils;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class ListConverter implements Converter<List<?>> {
+public class ListConverter<E> implements Converter<List<E>> {
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ConfigValue toConfigValue(TypeInfo fieldTypeInfo, List<?> fieldValue) throws ConverterException, ConfigLoadException {
-		TypeInfo elementTypeInfo = getListElementTypeInfo(fieldTypeInfo);
-		Converter<?> elementConverter = ConverterRegistry.find(elementTypeInfo.getTypeClass());
+	public ConfigValue toConfigValue(TypeInfo<List<E>> fieldTypeInfo, List<E> fieldValue) throws ConfigMappingException {
+		TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
+		Converter<E> elementConverter = ConverterRegistry.find(elementTypeInfo);
 
 		List<ConfigValue> result = new ArrayList<>();
-		for (Object fieldElement : fieldValue) {
-			result.add(elementConverter.toConfigValueUnchecked(elementTypeInfo, fieldElement));
+		for (E fieldElement : fieldValue) {
+			result.add(elementConverter.toConfigValue(elementTypeInfo, fieldElement));
 		}
 
 		return ConfigValue.of(ConfigValueType.LIST, result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<?> toFieldValue(TypeInfo fieldTypeInfo, ConfigValue configValue) throws ConverterException, ConfigLoadException {
+	public List<E> toFieldValue(TypeInfo<List<E>> fieldTypeInfo, ConfigValue configValue) throws ConfigMappingException, ConfigPostLoadException {
 		if (!configValue.isPresentAs(ConfigValueType.LIST)) {
 			return null;
 		}
 
-		TypeInfo elementTypeInfo = getListElementTypeInfo(fieldTypeInfo);
-		Converter<?> elementConverter = ConverterRegistry.find(elementTypeInfo.getTypeClass());
+		TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
+		Converter<E> elementConverter = ConverterRegistry.find(elementTypeInfo);
 
-		List<Object> result = new ArrayList<>();
+		List<E> result = new ArrayList<>();
 		for (ConfigValue configElement : configValue.as(ConfigValueType.LIST)) {
-			Object fieldValue = elementConverter.toFieldValue(elementTypeInfo, configElement);
+			E fieldValue = elementConverter.toFieldValue(elementTypeInfo, configElement);
 			if (fieldValue != null) {
 				result.add(fieldValue);
 			}
@@ -51,21 +54,9 @@ public class ListConverter implements Converter<List<?>> {
 		return result;
 	}
 
-	private TypeInfo getListElementTypeInfo(TypeInfo typeInfo) throws ConverterException {
-		Type[] typeArguments = typeInfo.getTypeArguments();
-
-		if (typeArguments == null || typeArguments.length == 0) {
-			throw new ConverterException("declaration omits generic type");
-		}
-		if (typeArguments.length != 1) {
-			throw new ConverterException("declaration has more than 1 generic type");
-		}
-
-		try {
-			return TypeInfo.of(typeArguments[0]);
-		} catch (ReflectiveOperationException e) {
-			throw new ConverterException("error while getting type info of " + typeArguments[0], e);
-		}
+	@Override
+	public boolean equals(TypeInfo<List<E>> fieldTypeInfo, List<E> o1, List<E> o2) {
+		return Objects.equals(o1, o2);
 	}
 
 	@Override

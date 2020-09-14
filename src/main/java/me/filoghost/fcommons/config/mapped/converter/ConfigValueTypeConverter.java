@@ -9,6 +9,8 @@ import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
+import java.util.Objects;
+
 public class ConfigValueTypeConverter<T> implements Converter<T> {
 
 	private final Class<T> mainClass;
@@ -26,7 +28,7 @@ public class ConfigValueTypeConverter<T> implements Converter<T> {
 	}
 
 	@Override
-	public ConfigValue toConfigValue(TypeInfo fieldTypeInfo, T fieldValue) {
+	public ConfigValue toConfigValue(TypeInfo<T> fieldTypeInfo, T fieldValue) {
 		if (fieldValue != null) {
 			return ConfigValue.of(configValueType, fieldValue);
 		} else {
@@ -35,8 +37,13 @@ public class ConfigValueTypeConverter<T> implements Converter<T> {
 	}
 
 	@Override
-	public T toFieldValue(TypeInfo fieldTypeInfo, ConfigValue configValue) {
+	public T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue) {
 		return configValue.as(configValueType);
+	}
+
+	@Override
+	public boolean equals(TypeInfo<T> fieldTypeInfo, T o1, T o2) {
+		return Objects.equals(o1, o2);
 	}
 
 	@Override

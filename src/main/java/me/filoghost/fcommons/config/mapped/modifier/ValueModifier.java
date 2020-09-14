@@ -5,8 +5,6 @@
  */
 package me.filoghost.fcommons.config.mapped.modifier;
 
-import me.filoghost.fcommons.Preconditions;
-
 import java.lang.annotation.Annotation;
 
 public interface ValueModifier<V, A extends Annotation> {
@@ -21,7 +19,4 @@ public interface ValueModifier<V, A extends Annotation> {
 		return getAnnotationType().isInstance(annotation) && getValueType().isInstance(value);
 	}
 
-	default Object transformUnchecked(Annotation annotation, Object fieldValue) {
-		return transform(getAnnotationType().cast(annotation), getValueType().cast(fieldValue));
-	}
 }

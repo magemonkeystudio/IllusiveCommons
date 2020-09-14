@@ -8,37 +8,35 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class ConfigSection {
 
-	private final ConfigurationSection yamlSection;
+	private LinkedHashMap<String, Object> values;
 
 	public ConfigSection() {
-		this.yamlSection = new MemoryConfiguration();
+		setInternalValues(new LinkedHashMap<>());
 	}
 
-	public ConfigSection(Map<String, Object> map) {
-		Preconditions.notNull(map, "map");
-		yamlSection = new MemoryConfiguration();
-		for (Entry<String, Object> entry : map.entrySet()) {
-			yamlSection.set(entry.getKey(), entry.getValue());
-		}
+	protected ConfigSection(LinkedHashMap<String, Object> values) {
+		setInternalValues(values);
 	}
 
-	public ConfigSection(ConfigurationSection yamlSection) {
-		Preconditions.notNull(yamlSection, "yamlSection");
-		this.yamlSection = yamlSection;
+	protected void setInternalValues(LinkedHashMap<String, Object> values) {
+		Preconditions.notNull(values, "values");
+		this.values = values;
+	}
+
+	protected LinkedHashMap<String, Object> getInternalValues() {
+		return values;
 	}
 
 	public ConfigValue get(String path) {
-		return ConfigValue.fromRawConfigValue(path, getRawValue(path));
+		return ConfigValue.ofRawConfigValue(path, getRawValue(path));
 	}
 
 	public <T> T get(String path, ConfigValueType<T> configValueType) {
@@ -58,7 +56,7 @@ public class ConfigSection {
 	}
 
 	public <T> void set(String path, ConfigValueType<T> configValueType, T value) {
-		setRawValue(path, configValueType.toConfigValueUnchecked(value));
+		setRawValue(path, configValueType.toConfigValue(value));
 	}
 
 	public boolean contains(String path) {
@@ -69,26 +67,63 @@ public class ConfigSection {
 		setRawValue(path, null);
 	}
 
-	public ConfigSection createSection(String path) {
-		return new ConfigSection(yamlSection.createSection(path));
+	public ConfigSection getOrCreateSection(String path) {
+		ConfigSection section = getConfigSection(path);
+		if (section == null) {
+			section =  new ConfigSection();
+			setConfigSection(path, section);
+		}
+		return section;
 	}
 
 	public Set<String> getKeys() {
-		return yamlSection.getKeys(false);
+		return new LinkedHashSet<>(values.keySet());
 	}
 
 	private Object getRawValue(String path) {
 		Preconditions.notEmpty(path, "path");
-		return yamlSection.get(path, null);
+
+		int separatorIndex = path.indexOf('.');
+		if (separatorIndex >= 0) {
+			String firstPath = path.substring(0, separatorIndex);
+			String remainingPath = path.substring(separatorIndex + 1);
+			ConfigSection section = getConfigSection(firstPath);
+
+			if (section != null) {
+				return section.getRawValue(remainingPath);
+			} else {
+				return null;
+			}
+		} else {
+			return values.get(path);
+		}
 	}
 
 	private void setRawValue(String path, Object value) {
 		Preconditions.notEmpty(path, "path");
-		yamlSection.set(path, value);
-	}
 
-	protected ConfigurationSection getInternalYamlSection() {
-		return yamlSection;
+		int separatorIndex = path.indexOf('.');
+		if (separatorIndex >= 0) {
+			String firstPath = path.substring(0, separatorIndex);
+			String remainingPath = path.substring(separatorIndex + 1);
+			ConfigSection section = getConfigSection(firstPath);
+
+			if (section == null) {
+				if (value == null) {
+					return;
+				} else {
+					section = getOrCreateSection(firstPath);
+				}
+			}
+
+			section.setRawValue(remainingPath, value);
+		} else {
+			if (value != null) {
+				values.put(path, value);
+			} else {
+				values.remove(path);
+			}
+		}
 	}
 
 	/*
@@ -202,9 +237,24 @@ public class ConfigSection {
 	}
 
 	@Override
+	public final boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ConfigSection)) {
+			return false;
+		}
+		ConfigSection other = (ConfigSection) obj;
+		return this.values.equals(other.values);
+	}
+
+	@Override
+	public final int hashCode() {
+		return values.hashCode();
+	}
+
+	@Override
 	public String toString() {
-		return "ConfigSection{" +
-				"yamlSection=" + yamlSection +
-				"}";
+		return "ConfigSection{" + values + "}";
 	}
 }

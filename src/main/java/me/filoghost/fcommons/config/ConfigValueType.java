@@ -7,13 +7,9 @@ package me.filoghost.fcommons.config;
 
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -41,25 +37,9 @@ public class ConfigValueType<T> {
 	public static final ConfigValueType<Float> FLOAT = newNumberType(Number::floatValue);
 
 	public static final ConfigValueType<ConfigSection> SECTION = new ConfigValueType<>(
-			(Object value) -> value instanceof ConfigurationSection || value instanceof Map,
-			(Object value) -> {
-				if (value instanceof Map) {
-					Map<String, Object> result = new LinkedHashMap<>();
-
-					for (Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
-						String key = ConfigValueType.STRING.fromConfigValueOrNull(entry.getKey());
-
-						if (key != null) {
-							result.put(key, entry.getValue());
-						}
-					}
-
-					return new ConfigSection(result);
-				} else {
-					return new ConfigSection((ConfigurationSection) value);
-				}
-			},
-			(ConfigSection value) -> value.getInternalYamlSection(),
+			(Object value) -> value instanceof ConfigSection,
+			(Object value) -> (ConfigSection) value,
+			(ConfigSection value) -> value,
 			ConfigErrors.valueNotSection
 	);
 
@@ -73,7 +53,7 @@ public class ConfigValueType<T> {
 				List<ConfigValue> result = new ArrayList<>();
 
 				for (Object element : (List<?>) value) {
-					result.add(ConfigValue.fromRawConfigValue(null, element));
+					result.add(ConfigValue.ofRawConfigValue(null, element));
 				}
 
 				return result;
@@ -138,7 +118,7 @@ public class ConfigValueType<T> {
 		}
 	}
 
-	protected Object toConfigValueUnchecked(T value) {
+	protected Object toConfigValue(T value) {
 		if (value != null) {
 			return toConfigValueFunction.apply(value);
 		} else {

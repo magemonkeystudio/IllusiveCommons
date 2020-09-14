@@ -9,18 +9,21 @@ import com.google.common.collect.ImmutableList;
 import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
-import me.filoghost.fcommons.config.exception.ConfigLoadException;
-import me.filoghost.fcommons.config.exception.ConverterException;
+import me.filoghost.fcommons.config.exception.ConfigMappingException;
+import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
 import me.filoghost.fcommons.reflection.ReflectionUtils;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ConfigMapper<T> {
 
@@ -28,96 +31,88 @@ public class ConfigMapper<T> {
 			new ChatColorsModifier()
 	);
 
-	private final Class<T> mappedClass;
-	private List<MappedField> mappedFields;
+	private final TypeInfo<T> mappedTypeInfo;
+	private final List<MappedField<?>> mappedFields;
 
-	public ConfigMapper(Class<T> mappedClass) {
-		this.mappedClass = mappedClass;
-	}
-
-	public T newMappedObjectInstance() throws ConfigLoadException {
+	public ConfigMapper(Class<T> mappedClass) throws ConfigMappingException {
 		try {
-			return ReflectionUtils.newInstance(mappedClass);
-		} catch (NoSuchMethodException e) {
-			throw new ConfigLoadException(ConfigErrors.noEmptyConstructor(mappedClass));
-		} catch (ReflectiveOperationException e) {
-			throw new ConfigLoadException(ConfigErrors.cannotCreateInstance(mappedClass), e);
-		}
-	}
-
-	public List<PathAndConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigLoadException {
-		List<PathAndConfigValue> defaultValues = new ArrayList<>();
-
-		for (MappedField mappedField : getMappedFields()) {
-			try {
-				Object fieldValue = mappedField.readFromObject(mappedObject);
-				Converter<?> converter = ConverterRegistry.find(mappedField.getTypeInfo().getTypeClass());
-
-				ConfigValue configValue;
-				if (fieldValue != null) {
-					configValue = converter.toConfigValueUnchecked(mappedField.getTypeInfo(), fieldValue);
-				} else {
-					configValue = ConfigValue.NULL;
+			this.mappedTypeInfo = TypeInfo.of(mappedClass);
+			ImmutableList.Builder<MappedField<?>> mappedFieldsBuilder = ImmutableList.builder();
+			for (Field field : ReflectionUtils.getDeclaredFields(mappedClass)) {
+				if (isMappable(field)) {
+					mappedFieldsBuilder.add(MappedField.of(field));
 				}
+			}
+			this.mappedFields = mappedFieldsBuilder.build();
+		} catch (ReflectiveOperationException e) {
+			throw new ConfigMappingException(ConfigErrors.mapperReflectionException(mappedClass), e);
+		}
+	}
 
-				defaultValues.add(new PathAndConfigValue(mappedField.getConfigPath(), configValue));
+	public T newMappedObjectInstance() throws ConfigMappingException {
+		return MappingUtils.createInstance(mappedTypeInfo);
+	}
 
-			} catch (ReflectiveOperationException e) {
-				throw new ConfigLoadException(ConfigErrors.fieldReadError(mappedField), e);
+	public Map<String, ConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigMappingException {
+		Map<String, ConfigValue> configValues = new LinkedHashMap<>();
 
-			} catch (ConverterException e) {
-				throw new ConfigLoadException(ConfigErrors.conversionFailed(mappedField), e);
+		for (MappedField<?> mappedField : mappedFields) {
+			try {
+				ConfigValue configValue = getFieldAsConfigValue(mappedObject, mappedField);
+				configValues.put(mappedField.getConfigPath(), configValue);
+			} catch (ConfigMappingException e) {
+				// Contextualize the exception
+				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField));
 			}
 		}
 
-		return defaultValues;
+		return configValues;
 	}
 
-	public void setConfigFromFields(T mappedObject, ConfigSection config) throws ConfigLoadException {
-		List<PathAndConfigValue> configValues = getFieldsAsConfigValues(mappedObject);
+	private <F> ConfigValue getFieldAsConfigValue(T mappedObject, MappedField<F> mappedField) throws ConfigMappingException {
+		TypeInfo<F> fieldTypeInfo = mappedField.getTypeInfo();
+		F fieldValue = mappedField.readFromObject(mappedObject);
+		Converter<F> converter = ConverterRegistry.find(fieldTypeInfo);
 
-		for (PathAndConfigValue configValue : configValues) {
-			config.set(configValue.getPath(), configValue.getConfigValue());
+		if (fieldValue != null) {
+			return converter.toConfigValue(fieldTypeInfo, fieldValue);
+		} else {
+			return ConfigValue.NULL;
 		}
 	}
 
-	public boolean addMissingValuesToConfig(ConfigSection config, List<PathAndConfigValue> defaultValues) {
-		boolean modified = false;
+	public void setConfigFromFields(T mappedObject, ConfigSection config) throws ConfigMappingException {
+		Map<String, ConfigValue> configValues = getFieldsAsConfigValues(mappedObject);
 
-		for (PathAndConfigValue defaultValue : defaultValues) {
-			if (!config.contains(defaultValue.getPath())) {
-				config.set(defaultValue.getPath(), defaultValue.getConfigValue());
-				modified = true;
-			}
+		for (Entry<String, ConfigValue> entry : configValues.entrySet()) {
+			config.set(entry.getKey(), entry.getValue());
 		}
-
-		return modified;
 	}
 
-	public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigLoadException {
-		for (MappedField mappedField : getMappedFields()) {
+	public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigMappingException, ConfigPostLoadException {
+		for (MappedField<?> mappedField : mappedFields) {
 			try {
 				setFieldFromConfig(mappedObject, mappedField, config);
-
-			} catch (ConverterException e) {
-				throw new ConfigLoadException(ConfigErrors.conversionFailed(mappedField), e);
-
-			} catch (ReflectiveOperationException e) {
-				throw new ConfigLoadException(ConfigErrors.fieldWriteError(mappedField), e);
+			} catch (ConfigMappingException e) {
+				// Contextualize the exception
+				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField));
 			}
+		}
+
+		// After injecting fields, make sure the config object is alerted
+		if (mappedObject instanceof PostLoadCallback) {
+			((PostLoadCallback) mappedObject).postLoad();
 		}
 	}
 
-	private void setFieldFromConfig(T mappedObject, MappedField mappedField, ConfigSection config)
-			throws ReflectiveOperationException, ConverterException, ConfigLoadException {
-		Converter<?> converter = ConverterRegistry.find(mappedField.getTypeInfo().getTypeClass());
-
+	private <F> void setFieldFromConfig(T mappedObject, MappedField<F> mappedField, ConfigSection config) throws ConfigMappingException, ConfigPostLoadException {
+		Converter<F> converter = ConverterRegistry.find(mappedField.getTypeInfo());
 		ConfigValue configValue = config.get(mappedField.getConfigPath());
 		if (configValue == null) {
 			return;
 		}
 
-		Object fieldValue = converter.toFieldValue(mappedField.getTypeInfo(), configValue);
+		F fieldValue = converter.toFieldValue(mappedField.getTypeInfo(), configValue);
 		if (fieldValue == null) {
 			return;
 		}
@@ -129,30 +124,14 @@ public class ConfigMapper<T> {
 		mappedField.writeToObject(mappedObject, fieldValue);
 	}
 
-	private Object applyValueModifiers(Object fieldValue, Annotation annotation) {
+	@SuppressWarnings("unchecked")
+	private <F, A extends Annotation> F applyValueModifiers(F fieldValue, A annotation) {
 		for (ValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
 			if (modifier.isApplicable(annotation, fieldValue)) {
-				fieldValue = modifier.transformUnchecked(annotation, fieldValue);
+				fieldValue = ((ValueModifier<F, A>) modifier).transform(annotation, fieldValue);
 			}
 		}
 		return fieldValue;
-	}
-
-	private List<MappedField> getMappedFields() throws ConfigLoadException {
-		if (mappedFields == null) {
-			try {
-				mappedFields = new ArrayList<>();
-				for (Field field : ReflectionUtils.getDeclaredFields(mappedClass)) {
-					if (isMappable(field)) {
-						mappedFields.add(new MappedField(field));
-					}
-				}
-			} catch (ReflectiveOperationException e) {
-				throw new ConfigLoadException(ConfigErrors.mapperInitError(mappedClass), e);
-			}
-		}
-
-		return mappedFields;
 	}
 
 	private boolean isMappable(Field field) {
@@ -165,5 +144,22 @@ public class ConfigMapper<T> {
 				|| !Modifier.isFinal(modifiers);
 	}
 
+	public boolean equals(T mappedObject1, T mappedObject2) throws ConfigMappingException {
+		for (MappedField<?> mappedField : mappedFields) {
+			if (!fieldValueEquals(mappedField, mappedObject1, mappedObject2)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private <F> boolean fieldValueEquals(MappedField<F> mappedField, T mappedObject1, T mappedObject2) throws ConfigMappingException {
+		F fieldValue1 = mappedField.readFromObject(mappedObject1);
+		F fieldValue2 = mappedField.readFromObject(mappedObject2);
+
+		Converter<F> converter = ConverterRegistry.find(mappedField.getTypeInfo());
+		return converter.equals(mappedField.getTypeInfo(), fieldValue1, fieldValue2);
+	}
 
 }

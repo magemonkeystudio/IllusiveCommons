@@ -5,19 +5,25 @@
  */
 package me.filoghost.fcommons.config.exception;
 
-import org.bukkit.configuration.InvalidConfigurationException;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
+import org.yaml.snakeyaml.error.YAMLException;
 
 public class ConfigSyntaxException extends ConfigLoadException {
 
-	private final String parsingErrorDetails;
+	private final String syntaxErrorDetails;
 
-	public ConfigSyntaxException(String message, InvalidConfigurationException cause) {
+	public ConfigSyntaxException(String message, YAMLException cause) {
 		super(message, cause);
-		this.parsingErrorDetails = cause.getMessage();
+		this.syntaxErrorDetails = cause instanceof MarkedYAMLException ? cause.toString() : "<could not find syntax error details>";
 	}
 
-	public String getParsingErrorDetails() {
-		return parsingErrorDetails;
+	public ConfigSyntaxException(String message, String syntaxErrorDetails) {
+		super(message);
+		this.syntaxErrorDetails = syntaxErrorDetails;
+	}
+
+	public String getSyntaxErrorDetails() {
+		return syntaxErrorDetails;
 	}
 
 }

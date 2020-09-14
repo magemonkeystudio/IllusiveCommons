@@ -15,7 +15,6 @@ public class ConfigErrors {
 	public static final String createDefaultIOException = "I/O exception while creating default file";
 	public static final String writeDataIOException = "I/O exception while writing data to file";
 	public static final String invalidYamlSyntax = "invalid YAML syntax";
-	public static final String nullMappedConfigFromSupplier = "MappedConfig supplier returned null";
 
 	public static final String valueNotSet = "value is not set";
 	public static final String valueNotList = "value is not a list";
@@ -28,8 +27,8 @@ public class ConfigErrors {
 		return "I/O exception while creating parent directory \"" + formatPath(rootDataFolder, folder) + "\"";
 	}
 
-	public static String mapperInitError(Class<?> clazz) {
-		return "couldn't initialize config mapper for class \"" + clazz + "\"";
+	public static String mapperReflectionException(Class<?> clazz) {
+		return "reflection error on mapped class \"" + clazz + "\"";
 	}
 
 	public static <T> String noEmptyConstructor(Class<T> mappedClass) {
@@ -40,15 +39,15 @@ public class ConfigErrors {
 		return "couldn't create new instance of mapped class \"" + mappedClass + "\"";
 	}
 
-	public static String fieldReadError(MappedField mappedField) {
+	public static String fieldReadError(MappedField<?> mappedField) {
 		return "error while reading field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
 	}
 
-	public static String fieldWriteError(MappedField mappedField) {
+	public static String fieldWriteError(MappedField<?> mappedField) {
 		return "error while writing field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
 	}
 
-	public static String conversionFailed(MappedField mappedField) {
+	public static String conversionFailed(MappedField<?> mappedField) {
 		return "error while converting field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
 	}
 

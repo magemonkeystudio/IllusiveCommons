@@ -1,36 +1,34 @@
 package me.filoghost.fcommons.reflection;
 
 import me.filoghost.fcommons.Preconditions;
-import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class TypeInfo {
+public class TypeInfo<T> {
 
-	private final Class<?> typeClass;
+	private final Class<T> typeClass;
 	private final Type[] typeArguments;
 
-	public TypeInfo(Class<?> typeClass, Type[] typeArguments) {
-		this.typeClass = typeClass;
+	public TypeInfo(Class<T> typeClass, Type[] typeArguments) {
+		this.typeClass = ReflectionUtils.wrapPrimitiveClass(typeClass);
 		this.typeArguments = typeArguments;
 	}
 
-	public Class<?> getTypeClass() {
+	public Class<T> getTypeClass() {
 		return typeClass;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> Class<T> getTypeClassAs(Class<T> clazz) {
-		return (Class<T>) typeClass.asSubclass(clazz);
 	}
 
 	public Type[] getTypeArguments() {
 		return typeArguments;
 	}
 
-	public static TypeInfo of(Field field) throws ReflectiveOperationException {
+	public T cast(Object object) {
+		return typeClass.cast(object);
+	}
+
+	public static TypeInfo<?> of(Field field) throws ReflectiveOperationException {
 		Preconditions.notNull(field, "field");
 
 		Type genericType;
@@ -42,25 +40,28 @@ public class TypeInfo {
 		return of(genericType);
 	}
 
-	public static TypeInfo of(Type type) throws ReflectiveOperationException {
+	public static <T> TypeInfo<T> of(Class<T> clazz) {
+		return new TypeInfo<>(clazz, null);
+	}
+
+	public static TypeInfo<?> of(Type type) throws ReflectiveOperationException {
 		Preconditions.notNull(type, "type");
 
 		try {
-			Type[] typeArguments = null;
-			if (type instanceof ParameterizedType) {
-				typeArguments = ((ParameterizedType) type).getActualTypeArguments();
-			}
-
 			Class<?> typeClass;
+			Type[] typeArguments;
+
 			if (type instanceof Class) {
 				typeClass = (Class<?>) type;
+				typeArguments = null;
 			} else if (type instanceof ParameterizedType) {
 				typeClass = (Class<?>) ((ParameterizedType) type).getRawType();
+				typeArguments = ((ParameterizedType) type).getActualTypeArguments();
 			} else {
 				throw new ReflectiveOperationException("type is not a Class or ParameterizedType");
 			}
 
-			return new TypeInfo(typeClass, typeArguments);
+			return new TypeInfo<>(typeClass, typeArguments);
 
 		} catch (Throwable t) {
 			throw new ReflectiveOperationException(t);
