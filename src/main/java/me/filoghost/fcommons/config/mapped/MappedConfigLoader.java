@@ -28,11 +28,19 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 	}
 
 	public T load() throws ConfigLoadException {
+		return load(null);
+	}
+
+	public T load(Object context) throws ConfigLoadException {
 		Config config = configLoader.load();
-		return super.loadFromConfig(config);
+		return super.loadFromConfig(config, context);
 	}
 
 	public T init() throws ConfigLoadException, ConfigSaveException {
+		return init(null);
+	}
+
+	public T init(Object context) throws ConfigLoadException, ConfigSaveException {
 		Config config = configLoader.init();
 
 		try {
@@ -42,13 +50,13 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 				defaultValues = getMapper().getFieldsAsConfigValues(mappedObject);
 			}
 
-			boolean modified = addMissingDefaultValues(config);
+			boolean modified = addMissingDefaultValues(config, defaultValues);
 			if (modified) {
 				config.setHeader(mappedObject.getHeader());
 				configLoader.save(config);
 			}
 
-			getMapper().setFieldsFromConfig(mappedObject, config);
+			getMapper().setFieldsFromConfig(mappedObject, config, context);
 			return mappedObject;
 
 		} catch (ConfigMappingException e) {
@@ -56,7 +64,7 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 		}
 	}
 
-	private boolean addMissingDefaultValues(ConfigSection config) {
+	private boolean addMissingDefaultValues(ConfigSection config, Map<String, ConfigValue> defaultValues) {
 		boolean modified = false;
 
 		for (Map.Entry<String, ConfigValue> entry : defaultValues.entrySet()) {
@@ -76,6 +84,10 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 	}
 
 	public boolean saveIfDifferent(T newMappedObject) throws ConfigLoadException, ConfigSaveException {
+		return saveIfDifferent(newMappedObject, null);
+	}
+
+	public boolean saveIfDifferent(T newMappedObject, Object context) throws ConfigLoadException, ConfigSaveException {
 		Config config;
 		if (configLoader.fileExists()) {
 			config = configLoader.load();
@@ -83,7 +95,7 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 			config = new Config();
 		}
 
-		T currentMappedObject = loadFromConfig(config);
+		T currentMappedObject = loadFromConfig(config, context);
 
 		try {
 			if (getMapper().equals(newMappedObject, currentMappedObject)) {

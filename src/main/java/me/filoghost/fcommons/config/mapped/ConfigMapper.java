@@ -61,7 +61,7 @@ public class ConfigMapper<T> {
 				ConfigValue configValue = getFieldAsConfigValue(mappedObject, mappedField);
 				configValues.put(mappedField.getConfigPath(), configValue);
 			} catch (ConfigMappingException e) {
-				// Contextualize the exception
+				// Display field information in exception
 				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField));
 			}
 		}
@@ -89,12 +89,13 @@ public class ConfigMapper<T> {
 		}
 	}
 
-	public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigMappingException, ConfigPostLoadException {
+	@SuppressWarnings("unchecked")
+	public void setFieldsFromConfig(T mappedObject, ConfigSection config, Object context) throws ConfigMappingException, ConfigPostLoadException {
 		for (MappedField<?> mappedField : mappedFields) {
 			try {
-				setFieldFromConfig(mappedObject, mappedField, config);
+				setFieldFromConfig(mappedObject, mappedField, config, context);
 			} catch (ConfigMappingException e) {
-				// Contextualize the exception
+				// Display field information in exception
 				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField));
 			}
 		}
@@ -103,16 +104,19 @@ public class ConfigMapper<T> {
 		if (mappedObject instanceof PostLoadCallback) {
 			((PostLoadCallback) mappedObject).postLoad();
 		}
+		if (mappedObject instanceof ContextualPostLoadCallback) {
+			((ContextualPostLoadCallback<Object>) mappedObject).postLoad(context);
+		}
 	}
 
-	private <F> void setFieldFromConfig(T mappedObject, MappedField<F> mappedField, ConfigSection config) throws ConfigMappingException, ConfigPostLoadException {
+	private <F> void setFieldFromConfig(T mappedObject, MappedField<F> mappedField, ConfigSection config, Object context) throws ConfigMappingException, ConfigPostLoadException {
 		Converter<F> converter = ConverterRegistry.find(mappedField.getTypeInfo());
 		ConfigValue configValue = config.get(mappedField.getConfigPath());
 		if (configValue == null) {
 			return;
 		}
 
-		F fieldValue = converter.toFieldValue(mappedField.getTypeInfo(), configValue);
+		F fieldValue = converter.toFieldValue(mappedField.getTypeInfo(), configValue, context);
 		if (fieldValue == null) {
 			return;
 		}

@@ -8,7 +8,6 @@ import me.filoghost.fcommons.config.mapped.converter.ConfigValueTypeConverter;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.converter.ListConverter;
 import me.filoghost.fcommons.config.mapped.converter.MappedConfigSectionConverter;
-import me.filoghost.fcommons.config.mapped.converter.ConfigSerializableConverter;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.util.List;
@@ -28,8 +27,7 @@ public class ConverterRegistry {
 			new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class),
 
 			new ListConverter<>(),
-			new MappedConfigSectionConverter(),
-			new ConfigSerializableConverter<>()
+			new MappedConfigSectionConverter()
 	);
 
 	@SuppressWarnings("unchecked")

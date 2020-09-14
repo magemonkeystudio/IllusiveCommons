@@ -14,7 +14,7 @@ public interface Converter<T> {
 
 	ConfigValue toConfigValue(TypeInfo<T> fieldTypeInfo, T fieldValue) throws ConfigMappingException;
 
-	T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue) throws ConfigMappingException, ConfigPostLoadException;
+	T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException;
 
 	boolean equals(TypeInfo<T> fieldTypeInfo, T o1, T o2) throws ConfigMappingException;
 

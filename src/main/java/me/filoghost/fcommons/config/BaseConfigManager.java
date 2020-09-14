@@ -5,9 +5,8 @@
  */
 package me.filoghost.fcommons.config;
 
-import me.filoghost.fcommons.config.mapped.MappedConfigLoader;
 import me.filoghost.fcommons.config.mapped.MappedConfig;
-import me.filoghost.fcommons.config.mapped.BaseMappedConfigLoader;
+import me.filoghost.fcommons.config.mapped.MappedConfigLoader;
 
 import java.nio.file.Path;
 
@@ -31,7 +30,7 @@ public class BaseConfigManager {
 		return new ConfigLoader(rootDataFolder, configPath);
 	}
 
-	public <T extends MappedConfig> BaseMappedConfigLoader<T> getMappedConfigLoader(String fileName, Class<T> mappedConfigClass) {
+	public <T extends MappedConfig> MappedConfigLoader<T> getMappedConfigLoader(String fileName, Class<T> mappedConfigClass) {
 		return getMappedConfigLoader(rootDataFolder.resolve(fileName), mappedConfigClass);
 	}
 

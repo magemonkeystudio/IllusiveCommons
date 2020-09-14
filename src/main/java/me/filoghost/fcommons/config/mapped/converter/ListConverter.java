@@ -35,7 +35,7 @@ public class ListConverter<E> implements Converter<List<E>> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<E> toFieldValue(TypeInfo<List<E>> fieldTypeInfo, ConfigValue configValue) throws ConfigMappingException, ConfigPostLoadException {
+	public List<E> toFieldValue(TypeInfo<List<E>> fieldTypeInfo, ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException {
 		if (!configValue.isPresentAs(ConfigValueType.LIST)) {
 			return null;
 		}
@@ -45,7 +45,7 @@ public class ListConverter<E> implements Converter<List<E>> {
 
 		List<E> result = new ArrayList<>();
 		for (ConfigValue configElement : configValue.as(ConfigValueType.LIST)) {
-			E fieldValue = elementConverter.toFieldValue(elementTypeInfo, configElement);
+			E fieldValue = elementConverter.toFieldValue(elementTypeInfo, configElement, context);
 			if (fieldValue != null) {
 				result.add(fieldValue);
 			}

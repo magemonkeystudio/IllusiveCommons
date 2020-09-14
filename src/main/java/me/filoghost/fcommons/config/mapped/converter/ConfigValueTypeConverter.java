@@ -37,7 +37,7 @@ public class ConfigValueTypeConverter<T> implements Converter<T> {
 	}
 
 	@Override
-	public T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue) {
+	public T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue, Object context) {
 		return configValue.as(configValueType);
 	}
 

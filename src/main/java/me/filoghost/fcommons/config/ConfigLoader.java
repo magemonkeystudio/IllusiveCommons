@@ -39,15 +39,15 @@ public class ConfigLoader {
 		return Files.isRegularFile(file);
 	}
 
-	public Config init() throws ConfigSaveException, ConfigLoadException {
+	public FileConfig init() throws ConfigSaveException, ConfigLoadException {
 		createDefault();
 		return load();
 	}
 
-	public Config load() throws ConfigLoadException {
+	public FileConfig load() throws ConfigLoadException {
 		Preconditions.checkState(fileExists(), "\"" + file + "\" doesn't exist or is not a regular file");
 
-		Config config = new Config();
+		FileConfig config = new FileConfig(file);
 
 		try {
 			config.loadFromString(Files.readAllLines(file));

@@ -27,9 +27,13 @@ public class BaseMappedConfigLoader<T extends MappedConfig> {
 	}
 
 	public T loadFromConfig(ConfigSection configSection) throws ConfigLoadException {
+		return loadFromConfig(configSection, null);
+	}
+
+	public T loadFromConfig(ConfigSection configSection, Object context) throws ConfigLoadException {
 		try {
 			T mappedObject = getMapper().newMappedObjectInstance();
-			getMapper().setFieldsFromConfig(mappedObject, configSection);
+			getMapper().setFieldsFromConfig(mappedObject, configSection, context);
 			return mappedObject;
 		} catch (ConfigMappingException e) {
 			throw new ConfigLoadException(e.getMessage(), e.getCause());
