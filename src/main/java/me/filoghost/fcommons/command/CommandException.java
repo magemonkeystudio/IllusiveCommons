@@ -1,16 +1,9 @@
-/*
- * Copyright (C) filoghost
- *
- * SPDX-License-Identifier: MIT
- */
 package me.filoghost.fcommons.command;
 
-public class CommandException extends RuntimeException {
+public class CommandException extends Exception {
 
-	private static final long serialVersionUID = 1L;
-
-	public CommandException(String msg) {
-		super(msg);
+	public CommandException(String message) {
+		super(message);
 	}
 
 }

@@ -18,7 +18,11 @@ public class CaseInsensitiveMap<V> implements Map<String, V> {
 	private final Map<String, V> delegate;
 
 	public CaseInsensitiveMap() {
-		this.delegate = new HashMap<>();
+		this(new HashMap<>());
+	}
+
+	public CaseInsensitiveMap(Map<String, V> delegate) {
+		this.delegate = delegate;
 	}
 
 	@Override
