@@ -1,13 +1,12 @@
 package me.filoghost.fcommons.command.multi;
 
 import me.filoghost.fcommons.command.CommandException;
-import org.bukkit.command.CommandSender;
 
 public interface SubCommand {
 
-	void execute(CommandSender sender, String[] args) throws CommandException;
+	void execute(SubCommandSession subCommandSession) throws CommandException;
 
-	String getLabel();
+	String getName();
 
 	String getPermission();
 
@@ -18,5 +17,7 @@ public interface SubCommand {
 	int getMinArgs();
 
 	int getDisplayPriority();
+
+	String getDescription();
 
 }

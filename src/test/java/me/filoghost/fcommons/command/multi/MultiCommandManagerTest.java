@@ -2,7 +2,7 @@ package me.filoghost.fcommons.command.multi;
 
 import me.filoghost.fcommons.command.CommandException;
 import me.filoghost.fcommons.command.annotation.DisplayPriority;
-import me.filoghost.fcommons.command.annotation.Label;
+import me.filoghost.fcommons.command.annotation.Name;
 import org.bukkit.command.CommandSender;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ class MultiCommandManagerTest {
 	void testSubCommandRegistrationAndOrder() {
 		MultiCommandTest multiCommandTest = new MultiCommandTest("test");
 
-		assertThat(multiCommandTest.getAllSubCommands()).extracting(SubCommand::getLabel).containsExactly(
+		assertThat(multiCommandTest.getAllSubCommands()).extracting(SubCommand::getName).containsExactly(
 				"z",
 				"a",
 				"b",
@@ -45,29 +45,29 @@ class MultiCommandManagerTest {
 			registerSubCommand(new SimpleSubCommand("b") {
 
 				@Override
-				public void execute(CommandSender sender, String[] args) {
+				public void execute(SubCommandSession subCommandSession) {
 					bCalled = true;
 				}
 
 			});
 		}
 
-		@Label("z")
+		@Name("z")
 		@DisplayPriority(1)
 		public void z(CommandSender sender, String[] args) {
 			zCalled = true;
 		}
 
-		@Label("D")
+		@Name("D")
 		public void d(CommandSender sender, String[] args) {}
 
-		@Label("a")
+		@Name("a")
 		public void a(CommandSender sender, String[] args) {}
 
-		@Label("e")
+		@Name("e")
 		public void e(CommandSender sender, String[] args) {}
 
-		@Label("C")
+		@Name("C")
 		public void c(CommandSender sender, String[] args) {}
 
 	}

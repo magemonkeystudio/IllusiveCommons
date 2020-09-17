@@ -29,9 +29,10 @@
 package me.filoghost.fcommons.command.multi;
 
 import me.filoghost.fcommons.Preconditions;
+import me.filoghost.fcommons.Strings;
 import me.filoghost.fcommons.command.CommandException;
 import me.filoghost.fcommons.command.CommandManager;
-import me.filoghost.fcommons.command.annotation.Label;
+import me.filoghost.fcommons.command.annotation.Name;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
@@ -52,63 +53,69 @@ public abstract class MultiCommandManager extends CommandManager {
 		super(label);
 		this.subCommands = new TreeSet<>(Comparator
 				.comparing(SubCommand::getDisplayPriority).reversed()
-				.thenComparing(SubCommand::getLabel, String.CASE_INSENSITIVE_ORDER));
+				.thenComparing(SubCommand::getName, String.CASE_INSENSITIVE_ORDER));
 
 		scanSubCommands();
 	}
 
 	private void scanSubCommands() {
 		for (Method method : getClass().getDeclaredMethods()) {
-			if (method.isAnnotationPresent(Label.class)) {
+			if (method.isAnnotationPresent(Name.class)) {
 				MethodReflectionSubCommand subCommand = new MethodReflectionSubCommand(this, method);
 				registerSubCommand(subCommand);
 			}
 		}
 	}
 
-	protected void registerSubCommand(SubCommand subCommand) {
+	protected final void registerSubCommand(SubCommand subCommand) {
 		Preconditions.notNull(subCommand, "subCommand");
-		Preconditions.notNull(subCommand.getLabel(), "subCommand's label");
+		Preconditions.notNull(subCommand.getName(), "subCommand's name");
 		subCommands.add(subCommand);
 	}
 
 	@Override
-	public final void execute(CommandSender sender, String rootCommandLabel, String[] args) throws CommandException {
+	public final void execute(CommandSender sender, String rootLabelUsed, String[] args) throws CommandException {
 		if (args.length == 0) {
-			sendNoArgsMessage(sender, rootCommandLabel);
+			sendNoArgsMessage(sender, rootLabelUsed);
 			return;
 		}
 		
-		String subCommandLabel = args[0];
-		SubCommand subCommand = getSubCommand(subCommandLabel);
+		String subLabelUsed = args[0];
+		SubCommand subCommand = getSubCommand(subLabelUsed);
+		String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
+		SubCommandSession subCommandSession = new SubCommandSession(sender, subCommand, rootLabelUsed, subLabelUsed, subCommandArgs);
 
 		if (subCommand == null) {
-			sendUnknownSubCommandMessage(sender, rootCommandLabel);
+			sendUnknownSubCommandMessage(subCommandSession);
 			return;
 		}
 
-		if (subCommand.getPermission() != null && !sender.hasPermission(subCommand.getPermission())) {
+		String permission = getSubCommandDefaultPermission(subCommand);
+		if (!Strings.isEmpty(subCommand.getPermission())) {
+			permission = subCommand.getPermission();
+		}
+
+		if (!Strings.isEmpty(permission) && !sender.hasPermission(permission)) {
 			if (subCommand.getPermissionMessage() != null) {
 				sender.sendMessage(subCommand.getPermissionMessage());
 			} else {
-				sendSubCommandDefaultPermissionMessage(sender);
+				sendSubCommandDefaultPermissionMessage(subCommandSession);
 			}
 			return;
 		}
 
-		String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
 
 		if (subCommandArgs.length < subCommand.getMinArgs()) {
-			sendSubCommandUsage(sender, rootCommandLabel, subCommand);
+			sendSubCommandUsage(subCommandSession);
 			return;
 		}
 
-		subCommand.execute(sender, subCommandArgs);
+		subCommand.execute(subCommandSession);
 	}
 
 	private SubCommand getSubCommand(String label) {
 		for (SubCommand subCommand : subCommands) {
-			if (subCommand.getLabel().equalsIgnoreCase(label)) {
+			if (subCommand.getName().equalsIgnoreCase(label)) {
 				return subCommand;
 			}
 		}
@@ -129,30 +136,37 @@ public abstract class MultiCommandManager extends CommandManager {
 		return list;
 	}
 
-	protected void sendSubCommandUsage(CommandSender sender, String rootCommandLabel, SubCommand subCommand) {
-		sender.sendMessage(ChatColor.RED + "Usage: " + getUsageText(rootCommandLabel, subCommand));
+	protected String getSubCommandDefaultPermission(SubCommand subCommand) {
+		return null;
 	}
 
-	protected void sendSubCommandDefaultPermissionMessage(CommandSender sender) {
-		sender.sendMessage(ChatColor.RED + "You don't have permission for this sub-command.");
+	protected void sendSubCommandUsage(SubCommandSession session) {
+		String usageText = getUsageText(session.getRootLabelUsed(), session.getSubCommand());
+		session.getSender().sendMessage(ChatColor.RED + "Command usage: " + usageText);
 	}
 
-	protected void sendUnknownSubCommandMessage(CommandSender sender, String rootCommandLabel) {
-		sender.sendMessage(ChatColor.RED + "Unknown subcommand. Use /" + rootCommandLabel + " to see available commands.");
+	protected void sendSubCommandDefaultPermissionMessage(SubCommandSession subCommandSession) {
+		subCommandSession.getSender().sendMessage(ChatColor.RED + "You don't have permission for this sub-command.");
 	}
 
-	protected void sendNoArgsMessage(CommandSender sender, String rootCommandLabel) {
-		sendCommandListMessage(sender, rootCommandLabel);
+	protected void sendUnknownSubCommandMessage(SubCommandSession session) {
+		session.getSender().sendMessage(ChatColor.RED + "Unknown sub-command \"" + session.getSubLabelUsed() + "\". "
+				+ "Use /" + session.getRootLabelUsed() + " to see available commands.");
 	}
 
-	protected void sendCommandListMessage(CommandSender sender, String rootCommandLabel) {
+	protected void sendNoArgsMessage(CommandSender sender, String rootLabelUsed) {
+		sender.sendMessage("/" + rootLabelUsed + " commands:");
 		for (SubCommand subCommand : getAllSubCommands()) {
-			sender.sendMessage(ChatColor.GRAY + getUsageText(rootCommandLabel, subCommand));
+			sender.sendMessage(ChatColor.GRAY + getUsageText(rootLabelUsed, subCommand));
 		}
 	}
 
-	protected String getUsageText(String rootCommandLabel, SubCommand subCommand) {
-		return "/" + rootCommandLabel + " " + subCommand.getLabel() + (subCommand.getUsageArgs() != null ? " " + subCommand.getUsageArgs() : "");
+	protected final String getUsageText(String rootCommandName, SubCommand subCommand) {
+		return getUsageText(rootCommandName, subCommand.getName(), subCommand.getUsageArgs());
+	}
+
+	protected String getUsageText(String rootCommandName, String subCommandName, String usageArgs) {
+		return "/" + rootCommandName + " " + subCommandName + (usageArgs != null ? " " + usageArgs : "");
 	}
 
 }

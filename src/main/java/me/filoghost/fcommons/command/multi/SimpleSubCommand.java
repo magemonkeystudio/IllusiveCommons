@@ -2,20 +2,21 @@ package me.filoghost.fcommons.command.multi;
 
 public abstract class SimpleSubCommand implements SubCommand {
 
-	private final String label;
+	private final String name;
 	private String permission;
 	private String permissionMessage;
 	private String usageArgs;
 	private int minArgs;
 	private int displayPriority;
+	private String description;
 
-	public SimpleSubCommand(String label) {
-		this.label = label;
+	public SimpleSubCommand(String name) {
+		this.name = name;
 	}
 
 	@Override
-	public final String getLabel() {
-		return label;
+	public final String getName() {
+		return name;
 	}
 
 	@Override
@@ -61,6 +62,15 @@ public abstract class SimpleSubCommand implements SubCommand {
 
 	public final void setDisplayPriority(int displayPriority) {
 		this.displayPriority = displayPriority;
+	}
+
+	@Override
+	public final String getDescription() {
+		return description;
+	}
+
+	public final void setDescription(String description) {
+		this.description = description;
 	}
 
 }
