@@ -6,8 +6,8 @@
 package me.filoghost.fcommons.config;
 
 import com.google.common.collect.ImmutableList;
+import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
-import org.apache.commons.lang.Validate;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -35,7 +35,7 @@ public class Config extends ConfigSection {
 	}
 
 	protected void loadFromString(List<String> fileContents) throws ConfigLoadException {
-		Validate.notNull(fileContents, "fileContents cannot be null");
+		Preconditions.notNull(fileContents, "fileContents cannot be null");
 
 		LinkedHashMap<String, Object> internalValues = yamlSerializer.parseConfigValues(fileContents);
 		if (internalValues == null) {

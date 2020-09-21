@@ -6,10 +6,10 @@
 
 package me.filoghost.fcommons.config;
 
+import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSyntaxException;
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.file.YamlConstructor;
 import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
@@ -42,7 +42,7 @@ public class YamlSerializer {
 	}
 
 	public LinkedHashMap<String, Object> parseConfigValues(List<String> fileContents) throws ConfigLoadException {
-		Validate.notNull(fileContents, "fileContents cannot be null");
+		Preconditions.notNull(fileContents, "fileContents cannot be null");
 
 		Map<?, ?> yamlValues = parseYamlMap(String.join("\n", fileContents));
 		if (yamlValues != null) {
