@@ -92,7 +92,7 @@ public class ConfigValueType<T> {
 
 	protected T fromConfigValueRequired(String path, Object rawConfigValue) throws MissingConfigValueException, InvalidConfigValueException {
 		if (rawConfigValue == null) {
-			throw new MissingConfigValueException(ConfigErrors.valueNotSet, path);
+			throw new MissingConfigValueException(path, ConfigErrors.valueNotSet);
 		}
 
 		if (isValidConfigValueFunction.test(rawConfigValue)) {
