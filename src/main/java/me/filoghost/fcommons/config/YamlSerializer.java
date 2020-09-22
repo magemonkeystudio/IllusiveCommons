@@ -10,12 +10,9 @@ import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSyntaxException;
-import org.bukkit.configuration.file.YamlConstructor;
-import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.representer.Representer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,14 +28,11 @@ public class YamlSerializer {
 	private final Yaml yaml;
 
 	public YamlSerializer() {
-		YamlConstructor bukkitYamlConstructor = new YamlConstructor();
-		Representer bukkitYamlRepresenter = new YamlRepresenter();
-		bukkitYamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		DumperOptions yamlOptions = new DumperOptions();
 		yamlOptions.setIndent(2);
 		yamlOptions.setWidth(Integer.MAX_VALUE); // Avoid lines wrapping
 		yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		this.yaml = new Yaml(bukkitYamlConstructor, bukkitYamlRepresenter, yamlOptions);
+		this.yaml = new Yaml(yamlOptions);
 	}
 
 	public LinkedHashMap<String, Object> parseConfigValues(List<String> fileContents) throws ConfigLoadException {
