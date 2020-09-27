@@ -72,7 +72,7 @@ public class ConfigMapper<T> {
 	private <F> ConfigValue getFieldAsConfigValue(T mappedObject, MappedField<F> mappedField) throws ConfigMappingException {
 		TypeInfo<F> fieldTypeInfo = mappedField.getTypeInfo();
 		F fieldValue = mappedField.readFromObject(mappedObject);
-		Converter<F> converter = ConverterRegistry.find(fieldTypeInfo);
+		Converter<F, ?> converter = ConverterRegistry.find(fieldTypeInfo);
 
 		if (fieldValue != null) {
 			return converter.toConfigValue(fieldTypeInfo, fieldValue);
@@ -96,7 +96,7 @@ public class ConfigMapper<T> {
 				setFieldFromConfig(mappedObject, mappedField, config, context);
 			} catch (ConfigMappingException e) {
 				// Display field information in exception
-				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField));
+				throw new ConfigMappingException(ConfigErrors.conversionFailed(mappedField), e);
 			}
 		}
 
@@ -110,7 +110,7 @@ public class ConfigMapper<T> {
 	}
 
 	private <F> void setFieldFromConfig(T mappedObject, MappedField<F> mappedField, ConfigSection config, Object context) throws ConfigMappingException, ConfigPostLoadException {
-		Converter<F> converter = ConverterRegistry.find(mappedField.getTypeInfo());
+		Converter<F, ?> converter = ConverterRegistry.find(mappedField.getTypeInfo());
 		ConfigValue configValue = config.get(mappedField.getConfigPath());
 		if (configValue == null) {
 			return;
@@ -125,6 +125,7 @@ public class ConfigMapper<T> {
 			fieldValue = applyValueModifiers(fieldValue, annotation);
 		}
 
+		// Field is written only if new value is not null (default field value is kept)
 		mappedField.writeToObject(mappedObject, fieldValue);
 	}
 
@@ -148,9 +149,9 @@ public class ConfigMapper<T> {
 				|| !Modifier.isFinal(modifiers);
 	}
 
-	public boolean equals(T mappedObject1, T mappedObject2) throws ConfigMappingException {
+	public boolean equalsConfig(T mappedObject, ConfigSection config) throws ConfigMappingException {
 		for (MappedField<?> mappedField : mappedFields) {
-			if (!fieldValueEquals(mappedField, mappedObject1, mappedObject2)) {
+			if (!fieldEqualsConfigValue(mappedField, mappedObject, config)) {
 				return false;
 			}
 		}
@@ -158,12 +159,12 @@ public class ConfigMapper<T> {
 		return true;
 	}
 
-	private <F> boolean fieldValueEquals(MappedField<F> mappedField, T mappedObject1, T mappedObject2) throws ConfigMappingException {
-		F fieldValue1 = mappedField.readFromObject(mappedObject1);
-		F fieldValue2 = mappedField.readFromObject(mappedObject2);
+	private <F> boolean fieldEqualsConfigValue(MappedField<F> mappedField, T mappedObject, ConfigSection config) throws ConfigMappingException {
+		F fieldValue = mappedField.readFromObject(mappedObject);
+		ConfigValue configValue = config.get(mappedField.getConfigPath());
 
-		Converter<F> converter = ConverterRegistry.find(mappedField.getTypeInfo());
-		return converter.equals(mappedField.getTypeInfo(), fieldValue1, fieldValue2);
+		Converter<F, ?> converter = ConverterRegistry.find(mappedField.getTypeInfo());
+		return converter.equalsConfig(mappedField.getTypeInfo(), fieldValue, configValue);
 	}
 
 }

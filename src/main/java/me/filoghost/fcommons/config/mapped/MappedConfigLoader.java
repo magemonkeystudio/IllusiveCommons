@@ -15,6 +15,7 @@ import me.filoghost.fcommons.config.exception.ConfigSaveException;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfigLoader<T> {
 
@@ -67,7 +68,7 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 	private boolean addMissingDefaultValues(ConfigSection config, Map<String, ConfigValue> defaultValues) {
 		boolean modified = false;
 
-		for (Map.Entry<String, ConfigValue> entry : defaultValues.entrySet()) {
+		for (Entry<String, ConfigValue> entry : defaultValues.entrySet()) {
 			if (!config.contains(entry.getKey())) {
 				config.set(entry.getKey(), entry.getValue());
 				modified = true;
@@ -84,29 +85,23 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
 	}
 
 	public boolean saveIfDifferent(T newMappedObject) throws ConfigLoadException, ConfigSaveException {
-		return saveIfDifferent(newMappedObject, null);
-	}
-
-	public boolean saveIfDifferent(T newMappedObject, Object context) throws ConfigLoadException, ConfigSaveException {
-		Config config;
-		if (configLoader.fileExists()) {
-			config = configLoader.load();
-		} else {
-			config = new Config();
+		if (!configLoader.fileExists()) {
+			saveWithHeader(new Config(), newMappedObject);
+			return true;
 		}
 
-		T currentMappedObject = loadFromConfig(config, context);
+		Config config = configLoader.load();
 
 		try {
-			if (getMapper().equals(newMappedObject, currentMappedObject)) {
-				return false;
+			if (!getMapper().equalsConfig(newMappedObject, config)) {
+				saveWithHeader(config, newMappedObject);
+				return true;
 			}
 		} catch (ConfigMappingException e) {
 			throw new ConfigLoadException(e.getMessage(), e.getCause());
 		}
 
-		saveWithHeader(config, newMappedObject);
-		return true;
+		return false;
 	}
 
 	private void saveWithHeader(Config config, T mappedObject) throws ConfigSaveException {

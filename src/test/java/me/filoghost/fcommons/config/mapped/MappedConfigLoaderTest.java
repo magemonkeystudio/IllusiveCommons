@@ -146,6 +146,41 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
+	public void testSaveExistingFileWithDefaultPrimitive(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<TestPrimitiveConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestPrimitiveConfig.class);
+		boolean changed = configLoader.saveIfDifferent(new TestPrimitiveConfig());
+
+		assertThat(changed).isTrue();
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"integer: 0"
+		);
+	}
+
+	@Test
+	public void testSaveExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<TestSingleInnerSection> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerSection.class);
+		boolean changed = configLoader.saveIfDifferent(new TestSingleInnerSection());
+
+		assertThat(changed).isTrue();
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"section:",
+				"  string: abc"
+		);
+	}
+
+	@Test
+	public void testSaveNonExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
+		MappedConfigLoader<TestSingleInnerSection> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestSingleInnerSection.class);
+		boolean changed = configLoader.saveIfDifferent(new TestSingleInnerSection());
+
+		assertThat(changed).isTrue();
+		AssertExtra.fileContentMatches(configLoader.getFile(),
+				"section:",
+				"  string: abc"
+		);
+	}
+
+	@Test
 	public void testNoSaveBecauseEqual(@TempDir Path tempDir) throws ConfigException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestConfig.class);
 		configLoader.init();
@@ -186,6 +221,52 @@ class MappedConfigLoaderTest {
 				"- normalPresent: 1",
 				"  normalMissing: 2"
 		);
+	}
+
+	@Test
+	public void testSaveNotDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
+		MappedConfigLoader<ComplexConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ComplexConfig.class,
+				"section:",
+				"  key2: value2", // Order of keys shouldn't matter in sections (the same is true for the root section)
+				"  key1: value1",
+				"  key3: value3",
+				"  key5: value5",
+				"  key4: value4",
+				"list:",
+				"- 1",
+				"- 2",
+				"- 3",
+				"nestedSection:",
+				"  nested1:",
+				"    nested2:",
+				"      key: value"
+		);
+
+		boolean changed = configLoader.saveIfDifferent(new ComplexConfig());
+		assertThat(changed).isFalse();
+	}
+
+	@Test
+	public void testSaveDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
+		MappedConfigLoader<ComplexConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ComplexConfig.class,
+				"list:",
+				"- 1",
+				"- 2",
+				"- string",
+				"section:",
+				"  key1: value1",
+				"  key2: value2",
+				"  key3: value3",
+				"  key4: value4",
+				"  key5: value5",
+				"nestedSection:",
+				"  nested1:",
+				"    nested2:",
+				"      key: value"
+		);
+
+		boolean changed = configLoader.saveIfDifferent(new ComplexConfig());
+		assertThat(changed).isTrue();
 	}
 
 	@Test
@@ -283,10 +364,36 @@ class MappedConfigLoaderTest {
 
 	}
 
+	private static class TestPrimitiveConfig implements MappedConfig {
+
+		private int integer = 0;
+
+	}
+
 	@ChatColors
 	private static class TestColors implements MappedConfig {
 
 		private String message = "&aHello";
+
+	}
+
+	private static class ComplexConfig implements MappedConfig {
+
+		private List<Integer> list = Arrays.asList(1, 2, 3);
+		private ConfigSection section;
+		private ConfigSection nestedSection;
+
+		private ComplexConfig() {
+			section = new ConfigSection();
+			section.setString("key1", "value1");
+			section.setString("key2", "value2");
+			section.setString("key3", "value3");
+			section.setString("key4", "value4");
+			section.setString("key5", "value5");
+
+			nestedSection = new ConfigSection();
+			nestedSection.getOrCreateSection("nested1").getOrCreateSection("nested2").setString("key", "value");
+		}
 
 	}
 

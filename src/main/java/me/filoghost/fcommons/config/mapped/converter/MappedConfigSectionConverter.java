@@ -1,7 +1,6 @@
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigSection;
-import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
@@ -9,41 +8,41 @@ import me.filoghost.fcommons.config.mapped.ConfigMapper;
 import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
-public class MappedConfigSectionConverter implements Converter<MappedConfigSection> {
+public class MappedConfigSectionConverter implements Converter<MappedConfigSection, ConfigSection> {
 
 	@Override
-	public ConfigValue toConfigValue(TypeInfo<MappedConfigSection> fieldTypeInfo, MappedConfigSection fieldValue) throws ConfigMappingException {
-		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass());
-
-		ConfigSection configSection = new ConfigSection();
-		configMapper.setConfigFromFields(fieldValue, configSection);
-		return ConfigValue.of(ConfigValueType.SECTION, configSection);
+	public ConfigValueType<ConfigSection> getRequiredConfigValueType() {
+		return ConfigValueType.SECTION;
 	}
 
 	@Override
-	public MappedConfigSection toFieldValue(TypeInfo<MappedConfigSection> fieldTypeInfo, ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException {
-		if (!configValue.isPresentAs(ConfigValueType.SECTION)) {
-			return null;
-		}
-
+	public ConfigSection toConfigValue0(TypeInfo<MappedConfigSection> fieldTypeInfo, MappedConfigSection mappedObject) throws ConfigMappingException {
 		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass());
 
-		ConfigSection configSection = configValue.as(ConfigValueType.SECTION);
+		ConfigSection configSection = new ConfigSection();
+		configMapper.setConfigFromFields(mappedObject, configSection);
+		return configSection;
+	}
+
+	@Override
+	public MappedConfigSection toFieldValue0(TypeInfo<MappedConfigSection> fieldTypeInfo, ConfigSection configSection, Object context) throws ConfigMappingException, ConfigPostLoadException {
+		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass());
+
 		MappedConfigSection mappedObject = configMapper.newMappedObjectInstance();
 		configMapper.setFieldsFromConfig(mappedObject, configSection, context);
 		return mappedObject;
 	}
 
 	@Override
-	public boolean equals(TypeInfo<MappedConfigSection> fieldTypeInfo, MappedConfigSection o1, MappedConfigSection o2) throws ConfigMappingException {
-		if (o1 == o2) {
+	public boolean equalsConfig0(TypeInfo<MappedConfigSection> fieldTypeInfo, MappedConfigSection fieldValue, ConfigSection configSection) throws ConfigMappingException {
+		if (fieldValue == null && configSection == null) {
 			return true;
-		} else if (o1 == null || o2 == null) {
+		} else if (fieldValue == null || configSection == null) {
 			return false;
 		}
 
 		ConfigMapper<MappedConfigSection> configMapper = new ConfigMapper<>(fieldTypeInfo.getTypeClass());
-		return configMapper.equals(o1, o2);
+		return configMapper.equalsConfig(fieldValue, configSection);
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ConverterRegistry {
 
-	private static final List<Converter<?>> converters = Lists.newArrayList(
+	private static final List<Converter<?, ?>> converters = Lists.newArrayList(
 			new ConfigValueTypeConverter<>(ConfigValueType.DOUBLE, Double.class, double.class),
 			new ConfigValueTypeConverter<>(ConfigValueType.FLOAT, Float.class, float.class),
 			new ConfigValueTypeConverter<>(ConfigValueType.LONG, Long.class, long.class),
@@ -31,8 +31,8 @@ public class ConverterRegistry {
 	);
 
 	@SuppressWarnings("unchecked")
-	public static <T> Converter<T> find(TypeInfo<T> typeInfo) throws ConfigMappingException {
-		return (Converter<T>) converters.stream()
+	public static <T> Converter<T, ?> find(TypeInfo<T> typeInfo) throws ConfigMappingException {
+		return (Converter<T, ?>) converters.stream()
 				.filter(converter -> converter.matches(typeInfo.getTypeClass()))
 				.findFirst()
 				.orElseThrow(() -> new ConfigMappingException("cannot find suitable converter for class \"" + typeInfo + "\""));

@@ -5,13 +5,12 @@
  */
 package me.filoghost.fcommons.config.mapped.converter;
 
-import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.util.Objects;
 
-public class ConfigValueTypeConverter<T> implements Converter<T> {
+public class ConfigValueTypeConverter<T> implements Converter<T, T> {
 
 	private final Class<T> mainClass;
 	private final Class<?> primitiveClass;
@@ -28,22 +27,23 @@ public class ConfigValueTypeConverter<T> implements Converter<T> {
 	}
 
 	@Override
-	public ConfigValue toConfigValue(TypeInfo<T> fieldTypeInfo, T fieldValue) {
-		if (fieldValue != null) {
-			return ConfigValue.of(configValueType, fieldValue);
-		} else {
-			return ConfigValue.NULL;
-		}
+	public ConfigValueType<T> getRequiredConfigValueType() {
+		return configValueType;
 	}
 
 	@Override
-	public T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue, Object context) {
-		return configValue.as(configValueType);
+	public T toConfigValue0(TypeInfo<T> fieldTypeInfo, T fieldValue) {
+		return fieldValue;
 	}
 
 	@Override
-	public boolean equals(TypeInfo<T> fieldTypeInfo, T o1, T o2) {
-		return Objects.equals(o1, o2);
+	public T toFieldValue0(TypeInfo<T> fieldTypeInfo, T configValue, Object context) {
+		return configValue;
+	}
+
+	@Override
+	public boolean equalsConfig0(TypeInfo<T> fieldTypeInfo, T fieldValue, T configValue) {
+		return Objects.equals(fieldValue, configValue);
 	}
 
 	@Override
