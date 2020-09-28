@@ -24,6 +24,10 @@ public class TypeInfo<T> {
 		return typeArguments;
 	}
 
+	public boolean isSubClassOf(Class<?> otherClass) {
+		return otherClass.isAssignableFrom(typeClass);
+	}
+
 	public T cast(Object object) {
 		return typeClass.cast(object);
 	}

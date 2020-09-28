@@ -9,41 +9,42 @@ import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
-import me.filoghost.fcommons.reflection.TypeInfo;
 
-public interface Converter<T, V> {
+public abstract class Converter<F, V> {
 
-	ConfigValueType<V> getRequiredConfigValueType();
+	protected final ConfigValueType<V> configValueType;
 
-	default ConfigValue toConfigValue(TypeInfo<T> fieldTypeInfo, T fieldValue) throws ConfigMappingException {
-		V configValue = toConfigValue0(fieldTypeInfo, fieldValue);
+	protected Converter(ConfigValueType<V> configValueType) {
+		this.configValueType = configValueType;
+	}
+
+	public final ConfigValue toConfigValue(F fieldValue) throws ConfigMappingException {
+		V configValue = toConfigValue0(fieldValue);
 		if (configValue != null) {
-			return ConfigValue.of(getRequiredConfigValueType(), configValue);
+			return ConfigValue.of(configValueType, configValue);
 		} else {
 			return ConfigValue.NULL;
 		}
 	}
 
-	V toConfigValue0(TypeInfo<T> fieldTypeInfo, T fieldValue) throws ConfigMappingException;
+	protected abstract V toConfigValue0(F fieldValue) throws ConfigMappingException;
 
-	default T toFieldValue(TypeInfo<T> fieldTypeInfo, ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException {
-		V expectedConfigValue = configValue.as(getRequiredConfigValueType());
-		if (expectedConfigValue != null) {
-			return toFieldValue0(fieldTypeInfo, expectedConfigValue, context);
+	public final F toFieldValue(ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException {
+		V rawConfigValue = configValue.as(configValueType);
+		if (rawConfigValue != null) {
+			return toFieldValue0(rawConfigValue, context);
 		} else {
 			return null;
 		}
 	}
 
-	T toFieldValue0(TypeInfo<T> fieldTypeInfo, V configValue, Object context) throws ConfigMappingException, ConfigPostLoadException;
+	protected abstract F toFieldValue0(V configValue, Object context) throws ConfigMappingException, ConfigPostLoadException;
 
-	default boolean equalsConfig(TypeInfo<T> fieldTypeInfo, T fieldValue, ConfigValue configValue) throws ConfigMappingException {
-		V expectedConfigValue = configValue.as(getRequiredConfigValueType());
-		return equalsConfig0(fieldTypeInfo, fieldValue, expectedConfigValue);
+	public final boolean equalsConfig(F fieldValue, ConfigValue configValue) throws ConfigMappingException {
+		V rawConfigValue = configValue.as(configValueType);
+		return equalsConfig0(fieldValue, rawConfigValue);
 	}
 
-	boolean equalsConfig0(TypeInfo<T> fieldTypeInfo, T fieldValue, V configValue) throws ConfigMappingException;
-
-	boolean matches(Class<?> clazz);
+	protected abstract boolean equalsConfig0(F fieldValue, V configValue) throws ConfigMappingException;
 
 }

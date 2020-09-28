@@ -9,19 +9,20 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
 public class BaseMappedConfigLoader<T extends MappedConfig> {
 
-	private final Class<T> mappedConfigClass;
+	private final TypeInfo<T> mappedTypeInfo;
 	private ConfigMapper<T> configMapper;
 
-	public BaseMappedConfigLoader(Class<T> mappedConfigClass) {
-		this.mappedConfigClass = mappedConfigClass;
+	public BaseMappedConfigLoader(Class<T> mappedClass) {
+		this.mappedTypeInfo = TypeInfo.of(mappedClass);
 	}
 
 	protected ConfigMapper<T> getMapper() throws ConfigMappingException {
 		if (configMapper == null) {
-			configMapper = new ConfigMapper<>(mappedConfigClass);
+			configMapper = new ConfigMapper<>(mappedTypeInfo);
 		}
 		return configMapper;
 	}

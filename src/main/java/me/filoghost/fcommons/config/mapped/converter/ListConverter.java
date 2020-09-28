@@ -15,39 +15,36 @@ import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ListConverter<E> implements Converter<List<E>,List<ConfigValue>> {
+public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
 
-	@Override
-	public ConfigValueType<List<ConfigValue>> getRequiredConfigValueType() {
-		return ConfigValueType.LIST;
-	}
+	protected final TypeInfo<List<E>> fieldTypeInfo;
+	private final Converter<E, ?> elementConverter;
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<ConfigValue> toConfigValue0(TypeInfo<List<E>> fieldTypeInfo, List<E> fieldValue) throws ConfigMappingException {
+	public ListConverter(TypeInfo<List<E>> fieldTypeInfo) throws ConfigMappingException {
+		super(ConfigValueType.LIST);
+		this.fieldTypeInfo = fieldTypeInfo;
 		TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
-		Converter<E, ?> elementConverter = ConverterRegistry.find(elementTypeInfo);
+		this.elementConverter = ConverterRegistry.create(elementTypeInfo);
+	}
 
+	@Override
+	protected List<ConfigValue> toConfigValue0(List<E> fieldValue) throws ConfigMappingException {
 		List<ConfigValue> configList = new ArrayList<>();
 		for (E fieldElement : fieldValue) {
-			configList.add(elementConverter.toConfigValue(elementTypeInfo, fieldElement));
+			configList.add(elementConverter.toConfigValue(fieldElement));
 		}
 
 		return configList;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<E> toFieldValue0(TypeInfo<List<E>> fieldTypeInfo, List<ConfigValue> configList, Object context) throws ConfigMappingException, ConfigPostLoadException {
-		TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
-		Converter<E, ?> elementConverter = ConverterRegistry.find(elementTypeInfo);
-
+	protected List<E> toFieldValue0(List<ConfigValue> configList, Object context) throws ConfigMappingException, ConfigPostLoadException {
 		List<E> fieldList = new ArrayList<>();
 		for (ConfigValue configElement : configList) {
-			E fieldValue = elementConverter.toFieldValue(elementTypeInfo, configElement, context);
-			if (fieldValue != null) {
+			if (isValidConfigListElement(configElement)) {
+				E fieldValue = elementConverter.toFieldValue(configElement, context);
 				fieldList.add(fieldValue);
 			}
 		}
@@ -55,22 +52,21 @@ public class ListConverter<E> implements Converter<List<E>,List<ConfigValue>> {
 		return fieldList;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public boolean equalsConfig0(TypeInfo<List<E>> fieldTypeInfo, List<E> fieldList, List<ConfigValue> configList) throws ConfigMappingException {
+	protected boolean equalsConfig0(List<E> fieldList, List<ConfigValue> configList) throws ConfigMappingException {
 		if (fieldList == null && configList == null) {
 			return true;
 		} else if (fieldList == null || configList == null) {
 			return false;
 		}
 
-		TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
-		Converter<E, ?> elementConverter = ConverterRegistry.find(elementTypeInfo);
-
 		// Skip elements that would be skipped during read
-		List<ConfigValue> filteredConfigList = configList.stream()
-				.filter(configElement -> configElement.isPresentAs(elementConverter.getRequiredConfigValueType()))
-				.collect(Collectors.toList());
+		List<ConfigValue> filteredConfigList = new ArrayList<>();
+		for (ConfigValue configValue : configList) {
+			if (isValidConfigListElement(configValue)) {
+				filteredConfigList.add(configValue);
+			}
+		}
 
 		if (filteredConfigList.size() != fieldList.size()) {
 			return false;
@@ -80,7 +76,7 @@ public class ListConverter<E> implements Converter<List<E>,List<ConfigValue>> {
 			ConfigValue configElement = filteredConfigList.get(i);
 			E fieldElement = fieldList.get(i);
 
-			if (!elementConverter.equalsConfig(elementTypeInfo, fieldElement, configElement)) {
+			if (!elementConverter.equalsConfig(fieldElement, configElement)) {
 				return false;
 			}
 		}
@@ -88,8 +84,11 @@ public class ListConverter<E> implements Converter<List<E>,List<ConfigValue>> {
 		return true;
 	}
 
-	@Override
-	public boolean matches(Class<?> clazz) {
+	private boolean isValidConfigListElement(ConfigValue configElement) {
+		return configElement.isPresentAs(elementConverter.configValueType);
+	}
+
+	public static boolean supports(Class<?> clazz) {
 		return clazz == List.class;
 	}
 

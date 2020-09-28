@@ -18,10 +18,11 @@ class MappedConfigSectionTest {
 	public void testPostLoad(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
 		MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
 
-		PostLoadConfig config = configLoader.init(3);
+		PostLoadConfig config = configLoader.init("abc");
 
-		assertThat(config.postLoadCalled).isTrue();
-		assertThat(config.postLoadContext).isEqualTo(3);
+		assertThat(config.postLoadCount).isEqualTo(1);
+		assertThat(config.postLoadContextCount).isEqualTo(1);
+		assertThat(config.postLoadContext).isEqualTo("abc");
 	}
 
 	@Test
@@ -29,7 +30,7 @@ class MappedConfigSectionTest {
 		MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
 
 		assertThatExceptionOfType(ClassCastException.class).isThrownBy(() -> {
-			configLoader.init("bad context");
+			configLoader.init(123);
 		});
 	}
 
@@ -70,21 +71,23 @@ class MappedConfigSectionTest {
 		configLoader.save(new PostLoadExceptionConfig());
 	}
 
-	private static class PostLoadConfig implements MappedConfig, PostLoadCallback, ContextualPostLoadCallback<Integer> {
+	private static class PostLoadConfig implements MappedConfig, PostLoadCallback, ContextualPostLoadCallback<String> {
 
 		private String string = "abc";
 
-		private transient boolean postLoadCalled;
-		private transient Integer postLoadContext;
+		private transient int postLoadCount;
+		private transient int postLoadContextCount;
+		private transient String postLoadContext;
 
 		@Override
 		public void postLoad() {
-			postLoadCalled = true;
+			postLoadCount++;
 		}
 
 		@Override
-		public void postLoad(Integer context) {
+		public void postLoad(String context) {
 			postLoadContext = context;
+			postLoadContextCount++;
 		}
 
 	}

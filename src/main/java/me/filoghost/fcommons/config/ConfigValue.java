@@ -19,7 +19,7 @@ public class ConfigValue {
 	public static <T> ConfigValue of(ConfigValueType<T> valueType, T value) {
 		Preconditions.notNull(valueType, "valueType");
 		Preconditions.notNull(value, "value");
-		return new ConfigValue(null, valueType.toConfigValue(value));
+		return new ConfigValue(null, valueType.toConfigValueOrNull(value));
 	}
 
 	protected static ConfigValue ofRawConfigValue(String path, Object rawConfigValue) {
@@ -35,20 +35,20 @@ public class ConfigValue {
 		return rawConfigValue;
 	}
 
-	public <T> T as(ConfigValueType<T> valueType) {
+	public final <T> T as(ConfigValueType<T> valueType) {
 		return valueType.fromConfigValueOrDefault(rawConfigValue, null);
 	}
 
-	public <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
+	public final <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
 		return valueType.fromConfigValueRequired(path, rawConfigValue);
 	}
 
-	public <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
+	public final <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
 		return valueType.fromConfigValueOrDefault(rawConfigValue, defaultValue);
 	}
 
 	public boolean isPresentAs(ConfigValueType<?> configValueType) {
-		return configValueType.isValidConfigValue(rawConfigValue);
+		return configValueType.isValidNonNullConfigValue(rawConfigValue);
 	}
 
 	@Override

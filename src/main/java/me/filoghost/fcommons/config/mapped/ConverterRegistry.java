@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ConverterRegistry {
 
-	private static final List<Converter<?, ?>> converters = Lists.newArrayList(
+	private static final List<ConfigValueTypeConverter<?>> CONFIG_VALUE_TYPE_CONVERTERS = Lists.newArrayList(
 			new ConfigValueTypeConverter<>(ConfigValueType.DOUBLE, Double.class, double.class),
 			new ConfigValueTypeConverter<>(ConfigValueType.FLOAT, Float.class, float.class),
 			new ConfigValueTypeConverter<>(ConfigValueType.LONG, Long.class, long.class),
@@ -24,18 +24,27 @@ public class ConverterRegistry {
 			new ConfigValueTypeConverter<>(ConfigValueType.BOOLEAN, Boolean.class, boolean.class),
 
 			new ConfigValueTypeConverter<>(ConfigValueType.STRING, String.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class),
-
-			new ListConverter<>(),
-			new MappedConfigSectionConverter()
+			new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class)
 	);
 
 	@SuppressWarnings("unchecked")
-	public static <T> Converter<T, ?> find(TypeInfo<T> typeInfo) throws ConfigMappingException {
-		return (Converter<T, ?>) converters.stream()
-				.filter(converter -> converter.matches(typeInfo.getTypeClass()))
-				.findFirst()
-				.orElseThrow(() -> new ConfigMappingException("cannot find suitable converter for class \"" + typeInfo + "\""));
+	public static <T> Converter<T, ?> create(TypeInfo<T> typeInfo) throws ConfigMappingException {
+		Class<T> typeClass = typeInfo.getTypeClass();
+
+		for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
+			if (configValueTypeConverter.supports(typeClass)) {
+				return (Converter<T, ?>) configValueTypeConverter;
+			}
+		}
+
+		if (MappedConfigSectionConverter.supports(typeClass)) {
+			return (Converter<T, ?>) new MappedConfigSectionConverter((TypeInfo<MappedConfigSection>) typeInfo);
+
+		} else if (ListConverter.supports(typeClass)) {
+			return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<T>>) typeInfo);
+		}
+
+		throw new ConfigMappingException("cannot find suitable converter for class \"" + typeClass + "\"");
 	}
 
 }

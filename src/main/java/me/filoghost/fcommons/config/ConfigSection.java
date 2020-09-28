@@ -56,7 +56,7 @@ public class ConfigSection {
 	}
 
 	public <T> void set(String path, ConfigValueType<T> configValueType, T value) {
-		setRawValue(path, configValueType.toConfigValue(value));
+		setRawValue(path, configValueType.toConfigValueOrNull(value));
 	}
 
 	public boolean contains(String path) {
