@@ -23,7 +23,12 @@ class ConfigTest {
 	}
 
 	@Test
-	void testNulls() {
+	void testNonExistingPath() {
+		assertThat(config.contains("non-existing-path")).isFalse();
+	}
+
+	@Test
+	void testExplicitNulls() {
 		assertThat(config.getString("null-value")).isNull();
 		assertThat(config.getString("quoted-null-value")).isEqualTo("null");
 	}
@@ -98,18 +103,28 @@ class ConfigTest {
 	}
 
 	@Test
-	void testListWithNull() throws ConfigException {
+	void testListWithNull() {
 		// Null values are skipped
-		assertThat(config.getRequired("list-with-null", ConfigValueType.STRING_LIST)).containsExactly(
+		assertThat(config.get("list-with-null", ConfigValueType.STRING_LIST)).containsExactly(
 				"one",
 				"three"
 		);
 	}
 
 	@Test
-	void testListWithInvalidElement() throws ConfigException {
+	void testWrappedListWithNull() throws ConfigException {
+		// Null values are NOT skipped with wrapped values
+		assertThat(config.getRequired("list-with-null", ConfigValueType.LIST)).containsExactly(
+				ConfigValue.of(ConfigValueType.STRING, "one"),
+				ConfigValue.NULL,
+				ConfigValue.of(ConfigValueType.STRING, "three")
+		);
+	}
+
+	@Test
+	void testListWithInvalidElement() {
 		// Invalid values are skipped
-		assertThat(config.getRequired("list-with-invalid-int", ConfigValueType.INTEGER_LIST)).containsExactly(
+		assertThat(config.get("list-with-invalid-int", ConfigValueType.INTEGER_LIST)).containsExactly(
 				1,
 				3
 		);
