@@ -13,27 +13,34 @@ import java.util.List;
 
 public abstract class ConfigValueType<T> {
 
-	public static final ConfigValueType<String> STRING = new StringConfigValueType();
-	public static final ConfigValueType<Boolean> BOOLEAN = new BooleanConfigValueType();
-	public static final ConfigValueType<Long> LONG = new NumberConfigValueType<>(Number::longValue);
-	public static final ConfigValueType<Integer> INTEGER = new NumberConfigValueType<>(Number::intValue);
-	public static final ConfigValueType<Short> SHORT = new NumberConfigValueType<>(Number::shortValue);
-	public static final ConfigValueType<Byte> BYTE = new NumberConfigValueType<>(Number::byteValue);
-	public static final ConfigValueType<Double> DOUBLE = new NumberConfigValueType<>(Number::doubleValue);
-	public static final ConfigValueType<Float> FLOAT = new NumberConfigValueType<>(Number::floatValue);
+	public static final ConfigValueType<String> STRING = new StringConfigValueType("STRING");
+	public static final ConfigValueType<Boolean> BOOLEAN = new BooleanConfigValueType("BOOLEAN");
+	public static final ConfigValueType<Long> LONG = new NumberConfigValueType<>("LONG", Number::longValue);
+	public static final ConfigValueType<Integer> INTEGER = new NumberConfigValueType<>("INTEGER", Number::intValue);
+	public static final ConfigValueType<Short> SHORT = new NumberConfigValueType<>("SHORT", Number::shortValue);
+	public static final ConfigValueType<Byte> BYTE = new NumberConfigValueType<>("BYTE", Number::byteValue);
+	public static final ConfigValueType<Double> DOUBLE = new NumberConfigValueType<>("DOUBLE", Number::doubleValue);
+	public static final ConfigValueType<Float> FLOAT = new NumberConfigValueType<>("FLOAT", Number::floatValue);
 
-	public static final ConfigValueType<ConfigSection> SECTION = new SectionConfigValueType();
+	public static final ConfigValueType<ConfigSection> SECTION = new SectionConfigValueType("SECTION");
 
-	public static final ConfigValueType<List<ConfigValue>> LIST = new WrappedListConfigValueType();
-	public static final ConfigValueType<List<String>> STRING_LIST = new ListConfigValueType<>(STRING);
-	public static final ConfigValueType<List<Integer>> INTEGER_LIST = new ListConfigValueType<>(INTEGER);
-	public static final ConfigValueType<List<ConfigSection>> SECTION_LIST = new ListConfigValueType<>(SECTION);
+	public static final ConfigValueType<List<ConfigValue>> LIST = new WrappedListConfigValueType("LIST");
+	public static final ConfigValueType<List<String>> STRING_LIST = new ListConfigValueType<>("STRING_LIST", STRING);
+	public static final ConfigValueType<List<Integer>> INTEGER_LIST = new ListConfigValueType<>("INTEGER_LIST", INTEGER);
+	public static final ConfigValueType<List<ConfigSection>> SECTION_LIST = new ListConfigValueType<>("SECTION_LIST", SECTION);
 
 
+	private final String name;
 	protected final String notConvertibleErrorMessage;
 
-	protected ConfigValueType(String notConvertibleErrorMessage) {
+	protected ConfigValueType(String name, String notConvertibleErrorMessage) {
+		this.name = name;
 		this.notConvertibleErrorMessage = notConvertibleErrorMessage;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
 	protected T fromConfigValueRequired(String path, Object rawConfigValue) throws MissingConfigValueException, InvalidConfigValueException {
@@ -80,14 +87,14 @@ public abstract class ConfigValueType<T> {
 		return configValue.getRawConfigValue();
 	}
 
+	protected static <T> T fromConfigValueOrNull(ConfigValueType<T> type, Object rawConfigValue) {
+		return type.fromConfigValueOrNull(rawConfigValue);
+	}
+
 	protected abstract boolean isValidConfigValue(Object value);
 
 	protected abstract T fromConfigValue(Object value);
 
 	protected abstract Object toConfigValue(T value);
-
-	protected static <T> T fromConfigValueOrNull(ConfigValueType<T> type, Object rawConfigValue) {
-		return type.fromConfigValueOrNull(rawConfigValue);
-	}
 
 }

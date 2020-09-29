@@ -255,6 +255,6 @@ public class ConfigSection {
 
 	@Override
 	public String toString() {
-		return "ConfigSection{" + values + "}";
+		return values.toString();
 	}
 }

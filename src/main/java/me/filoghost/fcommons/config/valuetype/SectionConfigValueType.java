@@ -12,8 +12,8 @@ import me.filoghost.fcommons.config.ConfigValueType;
 
 public class SectionConfigValueType extends ConfigValueType<ConfigSection> {
 
-	public SectionConfigValueType() {
-		super(ConfigErrors.valueNotSection);
+	public SectionConfigValueType(String name) {
+		super(name, ConfigErrors.valueNotSection);
 	}
 
 	@Override

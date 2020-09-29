@@ -9,7 +9,9 @@ import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
 
-public class ConfigValue {
+import java.util.Objects;
+
+public final class ConfigValue {
 
 	public static final ConfigValue NULL = new ConfigValue(null, null);
 
@@ -19,7 +21,7 @@ public class ConfigValue {
 	public static <T> ConfigValue of(ConfigValueType<T> valueType, T value) {
 		Preconditions.notNull(valueType, "valueType");
 		Preconditions.notNull(value, "value");
-		return new ConfigValue(null, valueType.toConfigValueOrNull(value));
+		return new ConfigValue(null, valueType.toConfigValue(value));
 	}
 
 	protected static ConfigValue ofRawConfigValue(String path, Object rawConfigValue) {
@@ -52,11 +54,25 @@ public class ConfigValue {
 	}
 
 	@Override
-	public String toString() {
-		return "ConfigValue{"
-				+ "path=" + path
-				+ ", rawValueType=" + (rawConfigValue != null ? rawConfigValue.getClass().getSimpleName() : "null")
-				+ ", rawValue=" + rawConfigValue
-				+ "}";
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		ConfigValue other = (ConfigValue) obj;
+		return Objects.equals(this.rawConfigValue, other.rawConfigValue);
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(rawConfigValue);
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toString(rawConfigValue);
+	}
+
 }

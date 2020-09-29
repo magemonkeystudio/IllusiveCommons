@@ -15,8 +15,8 @@ public class NumberConfigValueType<T extends Number> extends ConfigValueType<T> 
 
 	private final Function<Number, T> toTypeFunction;
 
-	public NumberConfigValueType(Function<Number, T> toTypeFunction) {
-		super(ConfigErrors.valueNotNumber);
+	public NumberConfigValueType(String name, Function<Number, T> toTypeFunction) {
+		super(name, ConfigErrors.valueNotNumber);
 		this.toTypeFunction = toTypeFunction;
 	}
 

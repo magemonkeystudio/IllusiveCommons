@@ -16,8 +16,8 @@ public class ListConfigValueType<E> extends ConfigValueType<List<E>> {
 
 	private final ConfigValueType<E> elementType;
 
-	public ListConfigValueType(ConfigValueType<E> elementType) {
-		super(ConfigErrors.valueNotList);
+	public ListConfigValueType(String name, ConfigValueType<E> elementType) {
+		super(name, ConfigErrors.valueNotList);
 		this.elementType = elementType;
 	}
 

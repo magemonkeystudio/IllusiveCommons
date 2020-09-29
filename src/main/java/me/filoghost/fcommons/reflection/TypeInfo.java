@@ -5,13 +5,15 @@ import me.filoghost.fcommons.Preconditions;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class TypeInfo<T> {
 
 	private final Class<T> typeClass;
 	private final Type[] typeArguments;
 
-	public TypeInfo(Class<T> typeClass, Type[] typeArguments) {
+	public TypeInfo(Class<T> typeClass, Type... typeArguments) {
 		this.typeClass = ReflectionUtils.wrapPrimitiveClass(typeClass);
 		this.typeArguments = typeArguments;
 	}
@@ -22,10 +24,6 @@ public class TypeInfo<T> {
 
 	public Type[] getTypeArguments() {
 		return typeArguments;
-	}
-
-	public boolean isSubClassOf(Class<?> otherClass) {
-		return otherClass.isAssignableFrom(typeClass);
 	}
 
 	public T cast(Object object) {
@@ -45,7 +43,7 @@ public class TypeInfo<T> {
 	}
 
 	public static <T> TypeInfo<T> of(Class<T> clazz) {
-		return new TypeInfo<>(clazz, null);
+		return new TypeInfo<>(clazz);
 	}
 
 	public static TypeInfo<?> of(Type type) throws ReflectiveOperationException {
@@ -70,6 +68,19 @@ public class TypeInfo<T> {
 		} catch (Throwable t) {
 			throw new ReflectiveOperationException(t);
 		}
+	}
+
+	@Override
+	public String toString() {
+		String output = typeClass.toString();
+
+		if (typeArguments != null && typeArguments.length > 0) {
+			output += Arrays.stream(typeArguments)
+					.map(Object::toString)
+					.collect(Collectors.joining(", ", "<", ">"));
+		}
+
+		return output;
 	}
 
 }

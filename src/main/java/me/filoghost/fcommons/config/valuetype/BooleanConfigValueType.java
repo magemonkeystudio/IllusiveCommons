@@ -11,8 +11,8 @@ import me.filoghost.fcommons.config.ConfigValueType;
 
 public class BooleanConfigValueType extends ConfigValueType<Boolean> {
 
-	public BooleanConfigValueType() {
-		super(ConfigErrors.valueNotBoolean);
+	public BooleanConfigValueType(String name) {
+		super(name, ConfigErrors.valueNotBoolean);
 	}
 
 	@Override

@@ -11,8 +11,8 @@ import me.filoghost.fcommons.config.ConfigValueType;
 
 public class StringConfigValueType extends ConfigValueType<String> {
 
-	public StringConfigValueType() {
-		super(ConfigErrors.valueNotString);
+	public StringConfigValueType(String name) {
+		super(name, ConfigErrors.valueNotString);
 	}
 
 	@Override

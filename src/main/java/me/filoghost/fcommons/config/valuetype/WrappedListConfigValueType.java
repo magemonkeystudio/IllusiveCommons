@@ -15,8 +15,8 @@ import java.util.List;
 
 public class WrappedListConfigValueType extends ConfigValueType<List<ConfigValue>> {
 
-	public WrappedListConfigValueType() {
-		super(ConfigErrors.valueNotList);
+	public WrappedListConfigValueType(String name) {
+		super(name, ConfigErrors.valueNotList);
 	}
 
 	@Override
