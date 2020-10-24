@@ -6,7 +6,6 @@
 package me.filoghost.fcommons;
 
 import me.filoghost.fcommons.collection.Registry;
-import me.filoghost.fcommons.reflection.ReflectionUtils;
 import org.bukkit.Material;
 
 import java.util.Collection;
@@ -26,8 +25,8 @@ public final class MaterialsHelper {
 	private static Registry<Material> initMaterialsRegistry() {
 		Registry<Material> materialsRegistry = Registry.fromEnumValues(Material.class);
 
-		// Add numerical IDs in legacy versions (the Tag class was added in 1.13)
-		if (!ReflectionUtils.isClassLoaded("org.bukkit.Tag")) {
+		// Add numerical IDs in legacy versions
+		if (!FeatureSupport.NEW_MATERIALS_API) {
 			for (Material material : Material.values()) {
 				materialsRegistry.put(Integer.toString(material.getId()), material);
 			}
