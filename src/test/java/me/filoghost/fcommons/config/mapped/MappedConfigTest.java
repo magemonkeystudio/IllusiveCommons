@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 class MappedConfigTest {
 
 	@Test
-	public void testGenerateConfig(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testGenerateConfig(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, SimpleMappedConfig.class);
 		configLoader.init();
 
@@ -30,7 +30,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testReadConfig(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testReadConfig(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, SimpleMappedConfig.class,
 				"integer: 5",
 				"string: def"
@@ -42,7 +42,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testWrongTypes(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testWrongTypes(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, SimpleMappedConfig.class,
 				"integer: string"
 		);
@@ -53,7 +53,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testHeaderExisting(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testHeaderExisting(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, HeaderConfig.class,
 				"integer: 5"
 		);
@@ -65,7 +65,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testHeaderMissingValue(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testHeaderMissingValue(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, HeaderConfig.class,
 				""
 		);
@@ -79,7 +79,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testHeaderNewFile(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testHeaderNewFile(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<HeaderConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, HeaderConfig.class);
 		configLoader.init();
 
@@ -91,7 +91,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testConfigSection(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testConfigSection(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<ConfigSectionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ConfigSectionConfig.class,
 				"section:",
 				"  key1: value1",
@@ -109,7 +109,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testListOfConfigSections(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testListOfConfigSections(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<ListOfSectionsConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ListOfSectionsConfig.class,
 				"sections:",
 				"- key1: value1",
@@ -127,7 +127,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testWriteReadConfig(@TempDir Path tempDir) throws ConfigException {
+	void testWriteReadConfig(@TempDir Path tempDir) throws ConfigException {
 		MappedConfigLoader<SimpleMappedConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, SimpleMappedConfig.class);
 		configLoader.init();
 
@@ -139,7 +139,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testNestedGenerics(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testNestedGenerics(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<NestedGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, NestedGenericsConfig.class);
 		configLoader.init();
 
@@ -153,7 +153,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testBadGenerics(@TempDir Path tempDir) {
+	void testBadGenerics(@TempDir Path tempDir) {
 		MappedConfigLoader<BadGenericsConfig> configLoaderBadGenerics = MappedTestCommons.newNonExistingConfig(tempDir, BadGenericsConfig.class);
 		MappedConfigLoader<NoGenericsConfig> configLoaderNoGenerics = MappedTestCommons.newNonExistingConfig(tempDir, NoGenericsConfig.class);
 
@@ -167,7 +167,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testWriteNulls(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testWriteNulls(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<NullConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, NullConfig.class);
 		configLoader.init();
 
@@ -183,7 +183,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testReadNulls(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testReadNulls(@TempDir Path tempDir) throws ConfigException, IOException {
 		Path configPath = tempDir.resolve("mapped-config.yml");
 		Files.createFile(configPath);
 
@@ -198,7 +198,7 @@ class MappedConfigTest {
 	}
 
 	@Test
-	public void testCustomObjects(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testCustomObjects(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<CustomObjectConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, CustomObjectConfig.class,
 				"customObject:",
 				"  string: xyz",

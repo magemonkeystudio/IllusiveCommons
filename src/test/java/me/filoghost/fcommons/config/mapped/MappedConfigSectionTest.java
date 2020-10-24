@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 class MappedConfigSectionTest {
 
 	@Test
-	public void testPostLoad(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
+	void testPostLoad(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
 		MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
 
 		PostLoadConfig config = configLoader.init("abc");
@@ -26,7 +26,7 @@ class MappedConfigSectionTest {
 	}
 
 	@Test
-	public void testPostLoadWrongTypedContext(@TempDir Path tempDir) {
+	void testPostLoadWrongTypedContext(@TempDir Path tempDir) {
 		MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
 
 		assertThatExceptionOfType(ClassCastException.class).isThrownBy(() -> {
@@ -35,14 +35,14 @@ class MappedConfigSectionTest {
 	}
 
 	@Test
-	public void testPostLoadNullContext(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
+	void testPostLoadNullContext(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
 		MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
 
 		configLoader.init(null);
 	}
 
 	@Test
-	public void testInitException(@TempDir Path tempDir) {
+	void testInitException(@TempDir Path tempDir) {
 		MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadExceptionConfig.class);
 
 		assertThatExceptionOfType(ConfigPostLoadException.class).isThrownBy(() -> {
@@ -51,7 +51,7 @@ class MappedConfigSectionTest {
 	}
 
 	@Test
-	public void testLoadException(@TempDir Path tempDir) throws IOException {
+	void testLoadException(@TempDir Path tempDir) throws IOException {
 		MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, PostLoadExceptionConfig.class,
 				"string: abc"
 		);
@@ -62,7 +62,7 @@ class MappedConfigSectionTest {
 	}
 
 	@Test
-	public void testSaveNotThrowException(@TempDir Path tempDir) throws IOException, ConfigException {
+	void testSaveNotThrowException(@TempDir Path tempDir) throws IOException, ConfigException {
 		MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, PostLoadExceptionConfig.class,
 				"string: abc"
 		);

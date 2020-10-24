@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 class ConfigLoaderTest {
 
 	@Test
-	public void testSerialization(@TempDir Path tempDir) throws ConfigSaveException, IOException {
+	void testSerialization(@TempDir Path tempDir) throws ConfigSaveException, IOException {
 		ConfigLoader configLoader = newNonExistingConfig(tempDir);
 		Config config = new Config();
 
@@ -63,7 +63,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testHeader(@TempDir Path tempDir) throws IOException, ConfigLoadException {
+	void testHeader(@TempDir Path tempDir) throws IOException, ConfigLoadException {
 		ConfigLoader configLoader = newExistingConfig(tempDir,
 				"# a",
 				"# b",
@@ -75,7 +75,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testHeaderWhitespaces(@TempDir Path tempDir) throws IOException, ConfigLoadException {
+	void testHeaderWhitespaces(@TempDir Path tempDir) throws IOException, ConfigLoadException {
 		ConfigLoader configLoader = newExistingConfig(tempDir,
 				"#a",
 				"# ",
@@ -92,7 +92,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testHeaderEmptyLineBetween(@TempDir Path tempDir) throws IOException, ConfigLoadException {
+	void testHeaderEmptyLineBetween(@TempDir Path tempDir) throws IOException, ConfigLoadException {
 		ConfigLoader configLoader = newExistingConfig(tempDir,
 				"# a",
 				"",
@@ -104,7 +104,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testHeaderEmptyLineBefore(@TempDir Path tempDir) throws IOException, ConfigLoadException {
+	void testHeaderEmptyLineBefore(@TempDir Path tempDir) throws IOException, ConfigLoadException {
 		ConfigLoader configLoader = newExistingConfig(tempDir,
 				"",
 				"# a",
@@ -116,7 +116,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testHeaderEmptyLineAfter(@TempDir Path tempDir) throws IOException, ConfigLoadException {
+	void testHeaderEmptyLineAfter(@TempDir Path tempDir) throws IOException, ConfigLoadException {
 		ConfigLoader configLoader = newExistingConfig(tempDir,
 				"# a",
 				"# b",
@@ -128,7 +128,7 @@ class ConfigLoaderTest {
 	}
 
 	@Test
-	public void testLongStringsDontWrap(@TempDir Path tempDir) throws IOException, ConfigSaveException {
+	void testLongStringsDontWrap(@TempDir Path tempDir) throws IOException, ConfigSaveException {
 		ConfigLoader configLoader = newNonExistingConfig(tempDir);
 		Config config = new Config();
 
@@ -141,7 +141,7 @@ class ConfigLoaderTest {
 		);
 	}
 
-	public static ConfigLoader newExistingConfig(Path tempDir, String... contents) throws IOException {
+	static ConfigLoader newExistingConfig(Path tempDir, String... contents) throws IOException {
 		Path configPath = tempDir.resolve("temp-config.yml");
 
 		if (contents != null && contents.length > 0) {
@@ -153,7 +153,7 @@ class ConfigLoaderTest {
 		return new ConfigLoader(tempDir, configPath);
 	}
 
-	public static ConfigLoader newNonExistingConfig(Path tempDir) {
+	static ConfigLoader newNonExistingConfig(Path tempDir) {
 		Path configPath = tempDir.resolve("temp-config.yml");
 		return new ConfigLoader(tempDir, configPath);
 	}

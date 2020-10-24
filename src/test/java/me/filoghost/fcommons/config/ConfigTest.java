@@ -17,7 +17,7 @@ class ConfigTest {
 	private static Config config;
 
 	@BeforeAll
-	public static void setUp() throws ConfigLoadException {
+	static void setUp() throws ConfigLoadException {
 		ConfigLoader configLoader = new ConfigLoader(TestResources.FOLDER, TestResources.get("test.yml"));
 		config = configLoader.load();
 	}

@@ -20,7 +20,7 @@ class MappedConfigLoaderTest {
 
 
 	@Test
-	public void testInitNew(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testInitNew(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestConfig.class);
 		configLoader.init();
 
@@ -39,7 +39,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testInitExisting(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testInitExisting(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestConfig.class,
 				"normalMissing: 5",
 				"listPresent: not a list"
@@ -59,7 +59,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testLoad(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testLoad(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestConfig.class,
 				"normalMissing: 5"
 		);
@@ -72,7 +72,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testLoadFromConfig() throws ConfigException {
+	void testLoadFromConfig() throws ConfigException {
 		BaseMappedConfigLoader<TestConfig> configLoader = new BaseMappedConfigLoader<>(TestConfig.class);
 		Config config = new Config();
 		config.setInt("normalMissing", 5);
@@ -82,7 +82,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSave(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSave(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestConfig.class,
 				"normalPresent: 5",
 				"listPresent: not a list"
@@ -113,7 +113,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveNotRemoveExtra(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveNotRemoveExtra(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerObject.class,
 				"object:",
 				"  normalPresent: 10",
@@ -130,7 +130,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveSectionDifference(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveSectionDifference(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerSection> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerSection.class,
 				"section:",
 				"  string: xyz",
@@ -146,7 +146,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveExistingFileWithDefaultPrimitive(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveExistingFileWithDefaultPrimitive(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestPrimitiveConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestPrimitiveConfig.class);
 		boolean changed = configLoader.saveIfDifferent(new TestPrimitiveConfig());
 
@@ -157,7 +157,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerSection> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerSection.class);
 		boolean changed = configLoader.saveIfDifferent(new TestSingleInnerSection());
 
@@ -169,7 +169,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveNonExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveNonExistingFileWithDefaults(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerSection> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestSingleInnerSection.class);
 		boolean changed = configLoader.saveIfDifferent(new TestSingleInnerSection());
 
@@ -181,7 +181,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testNoSaveBecauseEqual(@TempDir Path tempDir) throws ConfigException {
+	void testNoSaveBecauseEqual(@TempDir Path tempDir) throws ConfigException {
 		MappedConfigLoader<TestConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestConfig.class);
 		configLoader.init();
 
@@ -191,7 +191,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveObjectDifference(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveObjectDifference(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerObject.class,
 				"object:",
 				"  normalPresent: 9"
@@ -206,7 +206,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveListOfObjectsDifference(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveListOfObjectsDifference(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestListOfObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestListOfObject.class,
 				"list:",
 				"- normalPresent: 5",
@@ -224,7 +224,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveNotDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
+	void testSaveNotDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
 		MappedConfigLoader<ComplexConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ComplexConfig.class,
 				"section:",
 				"  key2: value2", // Order of keys shouldn't matter in sections (the same is true for the root section)
@@ -247,7 +247,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
+	void testSaveDifferent(@TempDir Path tempDir) throws IOException, ConfigException {
 		MappedConfigLoader<ComplexConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, ComplexConfig.class,
 				"list:",
 				"- 1",
@@ -270,7 +270,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testColorsExisting(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testColorsExisting(@TempDir Path tempDir) throws ConfigException, IOException {
 		String modifiedMessage = "&cModified";
 		MappedConfigLoader<TestColors> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestColors.class,
 				"message: '" + modifiedMessage + "'"
@@ -281,7 +281,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testColorsDefault(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testColorsDefault(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestColors> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestColors.class);
 		TestColors testColors = configLoader.init();
 
@@ -292,7 +292,7 @@ class MappedConfigLoaderTest {
 	}
 
 	@Test
-	public void testSaveConfigWithNullByDefault(@TempDir Path tempDir) throws ConfigException, IOException {
+	void testSaveConfigWithNullByDefault(@TempDir Path tempDir) throws ConfigException, IOException {
 		MappedConfigLoader<TestSingleInnerObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestSingleInnerObject.class,
 				"object:",
 				"  normalPresent: 10",
