@@ -26,7 +26,7 @@ public final class MaterialsHelper {
 		Registry<Material> materialsRegistry = Registry.fromEnumValues(Material.class);
 
 		// Add numerical IDs in legacy versions
-		if (!FeatureSupport.NEW_MATERIALS_API) {
+		if (FeatureSupport.LEGACY_MATERIAL_IDS) {
 			for (Material material : Material.values()) {
 				materialsRegistry.put(Integer.toString(material.getId()), material);
 			}

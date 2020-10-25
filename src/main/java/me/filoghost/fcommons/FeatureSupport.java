@@ -20,7 +20,8 @@ public class FeatureSupport {
     public static final boolean V1_15 = ReflectionUtils.isClassLoaded("org.bukkit.entity.Bee");
     public static final boolean V1_16 = ReflectionUtils.isClassLoaded("org.bukkit.entity.Strider");
 
-    public static final boolean NEW_MATERIALS_API = V1_13;
+    public static final boolean LEGACY_MATERIAL_IDS = !V1_13;
     public static final boolean HEX_CHAT_COLORS = V1_16;
+    public static final boolean CHAT_COMPONENTS = ReflectionUtils.isClassLoaded("net.md_5.bungee.api.chat.ComponentBuilder");
 
 }
