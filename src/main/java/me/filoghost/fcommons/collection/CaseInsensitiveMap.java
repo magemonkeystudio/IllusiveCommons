@@ -10,6 +10,7 @@ import me.filoghost.fcommons.Preconditions;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,7 +89,7 @@ public class CaseInsensitiveMap<V> implements Map<String, V> {
 	private String getLowercaseKey(Object key) {
 		Preconditions.notNull(key, "key");
 		Preconditions.checkArgument(key instanceof String, "key must be a string");
-		return ((String) key).toLowerCase();
+		return ((String) key).toLowerCase(Locale.ROOT);
 	}
 
 }
