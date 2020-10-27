@@ -8,7 +8,6 @@ package me.filoghost.fcommons.collection;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,14 +38,14 @@ public class Registry<T> {
 	
 	private Registry(Class<T> valuesType) {
 		this.valuesType = valuesType;
-		this.valuesMap = new HashMap<>();
+		this.valuesMap = new CaseInsensitiveMap<>();
 	}
 	
 	public Optional<T> find(String key) {
 		if (key == null) {
 			return Optional.empty();
 		}
-		return Optional.ofNullable(valuesMap.get(toKeyFormat(key)));
+		return Optional.ofNullable(valuesMap.get(removeIgnoredChars(key)));
 	}
 	
 	public void putIfEnumExists(String key, String enumValueName) {
@@ -63,16 +62,16 @@ public class Registry<T> {
 	
 	private void putAll(T[] enumValues, Function<T, String> toKeyFunction) {
 		for (T enumValue : enumValues) {
-			valuesMap.put(toKeyFormat(toKeyFunction.apply(enumValue)), enumValue);
+			valuesMap.put(removeIgnoredChars(toKeyFunction.apply(enumValue)), enumValue);
 		}
 	}
 	
 	public void put(String key, T enumValue) {
-		valuesMap.put(toKeyFormat(key), enumValue);
+		valuesMap.put(removeIgnoredChars(key), enumValue);
 	}
 	
-	private String toKeyFormat(String enumValueName) {
-		return Strings.stripChars(enumValueName, KEY_IGNORE_CHARS).toLowerCase();
+	private String removeIgnoredChars(String enumValueName) {
+		return Strings.stripChars(enumValueName, KEY_IGNORE_CHARS);
 	}
 
 	@Override
