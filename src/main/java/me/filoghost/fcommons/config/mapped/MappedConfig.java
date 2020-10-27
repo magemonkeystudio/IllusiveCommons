@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface MappedConfig extends MappedConfigSection {
 
-	default List<String> getHeader() {
-		return Collections.emptyList();
-	}
+    default List<String> getHeader() {
+        return Collections.emptyList();
+    }
 
 }

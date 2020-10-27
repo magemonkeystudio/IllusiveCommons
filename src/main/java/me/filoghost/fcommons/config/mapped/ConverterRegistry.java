@@ -14,37 +14,37 @@ import java.util.List;
 
 public class ConverterRegistry {
 
-	private static final List<ConfigValueTypeConverter<?>> CONFIG_VALUE_TYPE_CONVERTERS = Lists.newArrayList(
-			new ConfigValueTypeConverter<>(ConfigValueType.DOUBLE, Double.class, double.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.FLOAT, Float.class, float.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.LONG, Long.class, long.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.INTEGER, Integer.class, int.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.SHORT, Short.class, short.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.BYTE, Byte.class, byte.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.BOOLEAN, Boolean.class, boolean.class),
+    private static final List<ConfigValueTypeConverter<?>> CONFIG_VALUE_TYPE_CONVERTERS = Lists.newArrayList(
+            new ConfigValueTypeConverter<>(ConfigValueType.DOUBLE, Double.class, double.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.FLOAT, Float.class, float.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.LONG, Long.class, long.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.INTEGER, Integer.class, int.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.SHORT, Short.class, short.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.BYTE, Byte.class, byte.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.BOOLEAN, Boolean.class, boolean.class),
 
-			new ConfigValueTypeConverter<>(ConfigValueType.STRING, String.class),
-			new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class)
-	);
+            new ConfigValueTypeConverter<>(ConfigValueType.STRING, String.class),
+            new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class)
+    );
 
-	@SuppressWarnings("unchecked")
-	public static <T> Converter<T, ?> create(TypeInfo<T> typeInfo) throws ConfigMappingException {
-		Class<T> typeClass = typeInfo.getTypeClass();
+    @SuppressWarnings("unchecked")
+    public static <T> Converter<T, ?> create(TypeInfo<T> typeInfo) throws ConfigMappingException {
+        Class<T> typeClass = typeInfo.getTypeClass();
 
-		for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
-			if (configValueTypeConverter.supports(typeClass)) {
-				return (Converter<T, ?>) configValueTypeConverter;
-			}
-		}
+        for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
+            if (configValueTypeConverter.supports(typeClass)) {
+                return (Converter<T, ?>) configValueTypeConverter;
+            }
+        }
 
-		if (MappedConfigSectionConverter.supports(typeClass)) {
-			return (Converter<T, ?>) new MappedConfigSectionConverter((TypeInfo<MappedConfigSection>) typeInfo);
+        if (MappedConfigSectionConverter.supports(typeClass)) {
+            return (Converter<T, ?>) new MappedConfigSectionConverter((TypeInfo<MappedConfigSection>) typeInfo);
 
-		} else if (ListConverter.supports(typeClass)) {
-			return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<T>>) typeInfo);
-		}
+        } else if (ListConverter.supports(typeClass)) {
+            return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<T>>) typeInfo);
+        }
 
-		throw new ConfigMappingException("cannot find suitable converter for class \"" + typeClass + "\"");
-	}
+        throw new ConfigMappingException("cannot find suitable converter for class \"" + typeClass + "\"");
+    }
 
 }

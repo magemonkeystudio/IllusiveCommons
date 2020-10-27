@@ -7,12 +7,12 @@ package me.filoghost.fcommons.config.exception;
 
 public class ConfigLoadException extends ConfigException {
 
-	public ConfigLoadException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ConfigLoadException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public ConfigLoadException(String message) {
-		super(message);
-	}
+    public ConfigLoadException(String message) {
+        super(message);
+    }
 
 }

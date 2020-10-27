@@ -15,35 +15,35 @@ import java.util.List;
 
 public class WrappedListConfigValueType extends ConfigValueType<List<ConfigValue>> {
 
-	public WrappedListConfigValueType(String name) {
-		super(name, ConfigErrors.valueNotList);
-	}
+    public WrappedListConfigValueType(String name) {
+        super(name, ConfigErrors.valueNotList);
+    }
 
-	@Override
-	protected boolean isValidConfigValue(Object value) {
-		return value instanceof List;
-	}
+    @Override
+    protected boolean isValidConfigValue(Object value) {
+        return value instanceof List;
+    }
 
-	@Override
-	protected List<ConfigValue> fromConfigValue(Object value) {
-		List<ConfigValue> result = new ArrayList<>();
+    @Override
+    protected List<ConfigValue> fromConfigValue(Object value) {
+        List<ConfigValue> result = new ArrayList<>();
 
-		for (Object element : (List<?>) value) {
-			result.add(wrapRawValue(element));
-		}
+        for (Object element : (List<?>) value) {
+            result.add(wrapRawValue(element));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	protected Object toConfigValue(List<ConfigValue> value) {
-		List<Object> result = new ArrayList<>();
+    @Override
+    protected Object toConfigValue(List<ConfigValue> value) {
+        List<Object> result = new ArrayList<>();
 
-		for (ConfigValue element : value) {
-			result.add(unwrapRawValue(element));
-		}
+        for (ConfigValue element : value) {
+            result.add(unwrapRawValue(element));
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 }

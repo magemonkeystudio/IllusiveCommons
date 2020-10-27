@@ -4,6 +4,6 @@ import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 
 public interface ContextualPostLoadCallback<C> {
 
-	void postLoad(C context) throws ConfigPostLoadException;
+    void postLoad(C context) throws ConfigPostLoadException;
 
 }

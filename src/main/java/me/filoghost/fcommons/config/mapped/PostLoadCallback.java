@@ -4,6 +4,6 @@ import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 
 public interface PostLoadCallback {
 
-	void postLoad() throws ConfigPostLoadException;
+    void postLoad() throws ConfigPostLoadException;
 
 }

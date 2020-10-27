@@ -14,35 +14,35 @@ import java.util.List;
 
 public class ListConfigValueType<E> extends ConfigValueType<List<E>> {
 
-	private final ConfigValueType<E> elementType;
+    private final ConfigValueType<E> elementType;
 
-	public ListConfigValueType(String name, ConfigValueType<E> elementType) {
-		super(name, ConfigErrors.valueNotList);
-		this.elementType = elementType;
-	}
+    public ListConfigValueType(String name, ConfigValueType<E> elementType) {
+        super(name, ConfigErrors.valueNotList);
+        this.elementType = elementType;
+    }
 
-	@Override
-	protected boolean isValidConfigValue(Object value) {
-		return value instanceof List;
-	}
+    @Override
+    protected boolean isValidConfigValue(Object value) {
+        return value instanceof List;
+    }
 
-	@Override
-	protected List<E> fromConfigValue(Object value) {
-		List<E> result = new ArrayList<>();
+    @Override
+    protected List<E> fromConfigValue(Object value) {
+        List<E> result = new ArrayList<>();
 
-		for (Object element : ((List<?>) value)) {
-			E convertedElement = fromConfigValueOrNull(elementType, element);
-			if (convertedElement != null) {
-				result.add(convertedElement);
-			}
-		}
+        for (Object element : ((List<?>) value)) {
+            E convertedElement = fromConfigValueOrNull(elementType, element);
+            if (convertedElement != null) {
+                result.add(convertedElement);
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	@Override
-	protected Object toConfigValue(List<E> value) {
-    	return value;
-	}
+    @Override
+    protected Object toConfigValue(List<E> value) {
+        return value;
+    }
 
 }

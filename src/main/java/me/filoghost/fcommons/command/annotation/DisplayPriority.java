@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface DisplayPriority {
 
-	int value();
+    int value();
 
 }

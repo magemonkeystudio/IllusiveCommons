@@ -42,58 +42,58 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public abstract class CommandManager implements CommandExecutor {
 
-	private final String label;
+    private final String label;
 
-	public CommandManager(String label) {
-		this.label = label;
-	}
+    public CommandManager(String label) {
+        this.label = label;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public boolean register(JavaPlugin plugin) {
-		PluginCommand pluginCommand = plugin.getCommand(label);
-		if (pluginCommand == null) {
-			return false;
-		}
+    public boolean register(JavaPlugin plugin) {
+        PluginCommand pluginCommand = plugin.getCommand(label);
+        if (pluginCommand == null) {
+            return false;
+        }
 
-		Permission permission = getClass().getAnnotation(Permission.class);
-		if (permission != null) {
-			pluginCommand.setPermission(permission.value());
-		}
+        Permission permission = getClass().getAnnotation(Permission.class);
+        if (permission != null) {
+            pluginCommand.setPermission(permission.value());
+        }
 
-		PermissionMessage noPermissionMessage = getClass().getAnnotation(PermissionMessage.class);
-		if (noPermissionMessage != null) {
-			pluginCommand.setPermissionMessage(noPermissionMessage.value());
-		} else {
-			pluginCommand.setPermissionMessage(getDefaultPermissionMessage());
-		}
+        PermissionMessage noPermissionMessage = getClass().getAnnotation(PermissionMessage.class);
+        if (noPermissionMessage != null) {
+            pluginCommand.setPermissionMessage(noPermissionMessage.value());
+        } else {
+            pluginCommand.setPermissionMessage(getDefaultPermissionMessage());
+        }
 
-		pluginCommand.setExecutor(this);
-		return true;
-	}
-	
-	@Override
-	public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		try {
-			execute(sender, label, args);
-		} catch (CommandException ex) {
-			if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
-				sender.sendMessage(formatCommandExceptionMessage(ex.getMessage()));
-			}
-		}
-		return true;
-	}
+        pluginCommand.setExecutor(this);
+        return true;
+    }
 
-	public abstract void execute(CommandSender sender, String label, String[] args) throws CommandException;
+    @Override
+    public final boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        try {
+            execute(sender, label, args);
+        } catch (CommandException ex) {
+            if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+                sender.sendMessage(formatCommandExceptionMessage(ex.getMessage()));
+            }
+        }
+        return true;
+    }
 
-	protected String formatCommandExceptionMessage(String message) {
-		return ChatColor.RED + message;
-	}
+    public abstract void execute(CommandSender sender, String label, String[] args) throws CommandException;
 
-	protected String getDefaultPermissionMessage() {
-		return ChatColor.RED + "You don't have permission for this command.";
-	}
+    protected String formatCommandExceptionMessage(String message) {
+        return ChatColor.RED + message;
+    }
+
+    protected String getDefaultPermissionMessage() {
+        return ChatColor.RED + "You don't have permission for this command.";
+    }
 
 }

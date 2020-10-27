@@ -7,8 +7,8 @@ package me.filoghost.fcommons.config.exception;
 
 public class MissingConfigValueException extends ConfigValueException {
 
-	public MissingConfigValueException(String path, String message) {
-		super(path, message);
-	}
+    public MissingConfigValueException(String path, String message) {
+        super(path, message);
+    }
 
 }

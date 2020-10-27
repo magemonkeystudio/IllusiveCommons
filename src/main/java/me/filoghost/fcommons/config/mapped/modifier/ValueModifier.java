@@ -9,14 +9,14 @@ import java.lang.annotation.Annotation;
 
 public interface ValueModifier<V, A extends Annotation> {
 
-	V transform(A annotation, V value);
+    V transform(A annotation, V value);
 
-	Class<A> getAnnotationType();
+    Class<A> getAnnotationType();
 
-	Class<V> getValueType();
+    Class<V> getValueType();
 
-	default boolean isApplicable(Annotation annotation, Object value) {
-		return getAnnotationType().isInstance(annotation) && getValueType().isInstance(value);
-	}
+    default boolean isApplicable(Annotation annotation, Object value) {
+        return getAnnotationType().isInstance(annotation) && getValueType().isInstance(value);
+    }
 
 }

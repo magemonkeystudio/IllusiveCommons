@@ -10,20 +10,20 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 public class ConfigSyntaxException extends ConfigLoadException {
 
-	private final String syntaxErrorDetails;
+    private final String syntaxErrorDetails;
 
-	public ConfigSyntaxException(String message, YAMLException cause) {
-		super(message, cause);
-		this.syntaxErrorDetails = cause instanceof MarkedYAMLException ? cause.toString() : "<could not find syntax error details>";
-	}
+    public ConfigSyntaxException(String message, YAMLException cause) {
+        super(message, cause);
+        this.syntaxErrorDetails = cause instanceof MarkedYAMLException ? cause.toString() : "<could not find syntax error details>";
+    }
 
-	public ConfigSyntaxException(String message, String syntaxErrorDetails) {
-		super(message);
-		this.syntaxErrorDetails = syntaxErrorDetails;
-	}
+    public ConfigSyntaxException(String message, String syntaxErrorDetails) {
+        super(message);
+        this.syntaxErrorDetails = syntaxErrorDetails;
+    }
 
-	public String getSyntaxErrorDetails() {
-		return syntaxErrorDetails;
-	}
+    public String getSyntaxErrorDetails() {
+        return syntaxErrorDetails;
+    }
 
 }

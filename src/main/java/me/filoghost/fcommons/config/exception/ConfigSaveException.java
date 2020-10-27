@@ -7,8 +7,8 @@ package me.filoghost.fcommons.config.exception;
 
 public class ConfigSaveException extends ConfigException {
 
-	public ConfigSaveException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ConfigSaveException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

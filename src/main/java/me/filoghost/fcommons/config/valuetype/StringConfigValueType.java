@@ -11,23 +11,23 @@ import me.filoghost.fcommons.config.ConfigValueType;
 
 public class StringConfigValueType extends ConfigValueType<String> {
 
-	public StringConfigValueType(String name) {
-		super(name, ConfigErrors.valueNotString);
-	}
+    public StringConfigValueType(String name) {
+        super(name, ConfigErrors.valueNotString);
+    }
 
-	@Override
-	protected boolean isValidConfigValue(Object value) {
-		return value instanceof String || value instanceof Number || value instanceof Boolean || value instanceof Character;
-	}
+    @Override
+    protected boolean isValidConfigValue(Object value) {
+        return value instanceof String || value instanceof Number || value instanceof Boolean || value instanceof Character;
+    }
 
-	@Override
-	protected String fromConfigValue(Object value) {
-    	return value.toString();
-	}
+    @Override
+    protected String fromConfigValue(Object value) {
+        return value.toString();
+    }
 
-	@Override
-	protected Object toConfigValue(String value) {
-    	return value;
-	}
+    @Override
+    protected Object toConfigValue(String value) {
+        return value;
+    }
 
 }

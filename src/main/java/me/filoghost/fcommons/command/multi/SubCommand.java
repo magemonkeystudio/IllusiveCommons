@@ -4,20 +4,20 @@ import me.filoghost.fcommons.command.CommandException;
 
 public interface SubCommand {
 
-	void execute(SubCommandSession subCommandSession) throws CommandException;
+    void execute(SubCommandSession subCommandSession) throws CommandException;
 
-	String getName();
+    String getName();
 
-	String getPermission();
+    String getPermission();
 
-	String getPermissionMessage();
+    String getPermissionMessage();
 
-	String getUsageArgs();
+    String getUsageArgs();
 
-	int getMinArgs();
+    int getMinArgs();
 
-	int getDisplayPriority();
+    int getDisplayPriority();
 
-	String getDescription();
+    String getDescription();
 
 }

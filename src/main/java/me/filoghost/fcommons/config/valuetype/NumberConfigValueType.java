@@ -13,26 +13,26 @@ import java.util.function.Function;
 
 public class NumberConfigValueType<T extends Number> extends ConfigValueType<T> {
 
-	private final Function<Number, T> toTypeFunction;
+    private final Function<Number, T> toTypeFunction;
 
-	public NumberConfigValueType(String name, Function<Number, T> toTypeFunction) {
-		super(name, ConfigErrors.valueNotNumber);
-		this.toTypeFunction = toTypeFunction;
-	}
+    public NumberConfigValueType(String name, Function<Number, T> toTypeFunction) {
+        super(name, ConfigErrors.valueNotNumber);
+        this.toTypeFunction = toTypeFunction;
+    }
 
-	@Override
-	protected boolean isValidConfigValue(Object value) {
-		return value instanceof Number;
-	}
+    @Override
+    protected boolean isValidConfigValue(Object value) {
+        return value instanceof Number;
+    }
 
-	@Override
-	protected T fromConfigValue(Object value) {
-    	return toTypeFunction.apply((Number) value);
-	}
+    @Override
+    protected T fromConfigValue(Object value) {
+        return toTypeFunction.apply((Number) value);
+    }
 
-	@Override
-	protected Object toConfigValue(T value) {
-    	return value;
-	}
+    @Override
+    protected Object toConfigValue(T value) {
+        return value;
+    }
 
 }

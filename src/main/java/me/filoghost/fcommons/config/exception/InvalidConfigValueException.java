@@ -7,8 +7,8 @@ package me.filoghost.fcommons.config.exception;
 
 public class InvalidConfigValueException extends ConfigValueException {
 
-	public InvalidConfigValueException(String path, String message) {
-		super(path, message);
-	}
+    public InvalidConfigValueException(String path, String message) {
+        super(path, message);
+    }
 
 }
