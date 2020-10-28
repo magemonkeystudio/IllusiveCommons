@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
 package me.filoghost.fcommons.config.valuetype;
 
 import me.filoghost.fcommons.config.ConfigErrors;
@@ -30,7 +29,7 @@ public class ListConfigValueType<E> extends ConfigValueType<List<E>> {
     protected List<E> fromConfigValue(Object value) {
         List<E> result = new ArrayList<>();
 
-        for (Object element : ((List<?>) value)) {
+        for (Object element : (List<?>) value) {
             E convertedElement = fromConfigValueOrNull(elementType, element);
             if (convertedElement != null) {
                 result.add(convertedElement);

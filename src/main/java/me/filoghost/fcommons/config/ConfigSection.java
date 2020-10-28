@@ -43,7 +43,8 @@ public class ConfigSection {
         return getOrDefault(path, configValueType, null);
     }
 
-    public <T> T getRequired(String path, ConfigValueType<T> configValueType) throws MissingConfigValueException, InvalidConfigValueException {
+    public <T> T getRequired(String path, ConfigValueType<T> configValueType)
+            throws MissingConfigValueException, InvalidConfigValueException {
         return configValueType.fromConfigValueRequired(path, getRawValue(path));
     }
 
@@ -70,7 +71,7 @@ public class ConfigSection {
     public ConfigSection getOrCreateSection(String path) {
         ConfigSection section = getConfigSection(path);
         if (section == null) {
-            section =  new ConfigSection();
+            section = new ConfigSection();
             setConfigSection(path, section);
         }
         return section;

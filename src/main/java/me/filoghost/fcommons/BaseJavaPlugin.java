@@ -43,8 +43,8 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(getErrorMessage(errorMessage, throwable));
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
-            Bukkit.getConsoleSender().sendMessage(
-                    getFatalErrorPrefix() + "Fatal error while enabling the plugin. Check previous logs for more information.");
+            Bukkit.getConsoleSender().sendMessage(getFatalErrorPrefix()
+                    + "Fatal error while enabling the plugin. Check previous logs for more information.");
         }, 10);
 
         setEnabled(false);

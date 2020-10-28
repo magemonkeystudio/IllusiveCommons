@@ -25,7 +25,8 @@ public class ConfigLoader {
     private final Path file;
 
     public ConfigLoader(Path rootDataFolder, Path file) {
-        Preconditions.checkArgument(file.startsWith(rootDataFolder), "file \"" + file + "\" must be inside \"" + rootDataFolder + "\"");
+        Preconditions.checkArgument(file.startsWith(rootDataFolder), "file \"" + file + "\""
+                + " must be inside \"" + rootDataFolder + "\"");
 
         this.rootDataFolder = rootDataFolder;
         this.file = file;

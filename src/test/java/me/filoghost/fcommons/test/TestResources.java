@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.test;
 
 import java.nio.file.Path;

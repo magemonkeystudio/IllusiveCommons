@@ -37,15 +37,15 @@ public final class ConfigValue {
         return rawConfigValue;
     }
 
-    public final <T> T as(ConfigValueType<T> valueType) {
+    public <T> T as(ConfigValueType<T> valueType) {
         return valueType.fromConfigValueOrDefault(rawConfigValue, null);
     }
 
-    public final <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
+    public <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
         return valueType.fromConfigValueRequired(path, rawConfigValue);
     }
 
-    public final <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
+    public <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
         return valueType.fromConfigValueOrDefault(rawConfigValue, defaultValue);
     }
 

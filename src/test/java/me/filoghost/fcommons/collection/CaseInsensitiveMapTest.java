@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
 package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;

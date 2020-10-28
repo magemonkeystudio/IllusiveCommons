@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
 package me.filoghost.fcommons.config.valuetype;
 
 import me.filoghost.fcommons.config.ConfigErrors;

@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.command.multi;
 
 import me.filoghost.fcommons.command.CommandException;
@@ -18,10 +23,6 @@ import java.util.function.Function;
 
 public class MethodReflectionSubCommand extends SimpleSubCommand {
 
-    private final Object instance;
-    private final Method method;
-    private final Class<?>[] methodParameterTypes;
-
     private static final Map<Class<?>, Function<SubCommandSession, ?>> parameterProviders = new HashMap<>();
     static {
         parameterProviders.put(SubCommandSession.class, Function.identity());
@@ -29,6 +30,10 @@ public class MethodReflectionSubCommand extends SimpleSubCommand {
         parameterProviders.put(SubCommand.class, SubCommandSession::getSubCommand);
         parameterProviders.put(String[].class, SubCommandSession::getArgs);
     }
+
+    private final Object instance;
+    private final Method method;
+    private final Class<?>[] methodParameterTypes;
 
     protected MethodReflectionSubCommand(Object instance, Method method) {
         super(getNameAnnotation(method).value());
@@ -39,7 +44,8 @@ public class MethodReflectionSubCommand extends SimpleSubCommand {
         Class<?>[] params = method.getParameterTypes();
         for (Class<?> param : params) {
             if (!parameterProviders.containsKey(param)) {
-                throw new IllegalArgumentException("Method " + method.getName() + " contains unsupported parameter type: " + param.getSimpleName());
+                throw new IllegalArgumentException("Method " + method.getName()
+                        + " contains unsupported parameter type: " + param.getSimpleName());
             }
         }
         this.methodParameterTypes = params;

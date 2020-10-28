@@ -74,7 +74,8 @@ public class MappedField<T> {
         }
     }
 
-    public void setFieldValueFromConfig(Object mappedObject, ConfigSection config, Object context) throws ConfigMappingException, ConfigPostLoadException {
+    public void setFieldValueFromConfig(Object mappedObject, ConfigSection config, Object context)
+            throws ConfigMappingException, ConfigPostLoadException {
         ConfigValue configValue = config.get(configPath);
         if (configValue == null) {
             return;

@@ -7,7 +7,12 @@ package me.filoghost.fcommons.config;
 
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import me.filoghost.fcommons.config.valuetype.*;
+import me.filoghost.fcommons.config.valuetype.BooleanConfigValueType;
+import me.filoghost.fcommons.config.valuetype.ListConfigValueType;
+import me.filoghost.fcommons.config.valuetype.NumberConfigValueType;
+import me.filoghost.fcommons.config.valuetype.SectionConfigValueType;
+import me.filoghost.fcommons.config.valuetype.StringConfigValueType;
+import me.filoghost.fcommons.config.valuetype.WrappedListConfigValueType;
 
 import java.util.List;
 
@@ -31,7 +36,7 @@ public abstract class ConfigValueType<T> {
 
 
     private final String name;
-    protected final String notConvertibleErrorMessage;
+    private final String notConvertibleErrorMessage;
 
     protected ConfigValueType(String name, String notConvertibleErrorMessage) {
         this.name = name;
@@ -43,7 +48,8 @@ public abstract class ConfigValueType<T> {
         return name;
     }
 
-    protected T fromConfigValueRequired(String path, Object rawConfigValue) throws MissingConfigValueException, InvalidConfigValueException {
+    protected T fromConfigValueRequired(String path, Object rawConfigValue)
+            throws MissingConfigValueException, InvalidConfigValueException {
         if (isValidNonNullConfigValue(rawConfigValue)) {
             return fromConfigValue(rawConfigValue);
         } else {

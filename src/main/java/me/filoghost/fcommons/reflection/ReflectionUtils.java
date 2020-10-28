@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.reflection;
 
 import java.lang.reflect.Constructor;

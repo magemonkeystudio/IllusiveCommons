@@ -63,7 +63,8 @@ public class ConfigMapper<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public void setFieldsFromConfig(T mappedObject, ConfigSection config, Object context) throws ConfigMappingException, ConfigPostLoadException {
+    public void setFieldsFromConfig(T mappedObject, ConfigSection config, Object context)
+            throws ConfigMappingException, ConfigPostLoadException {
         for (MappedField<?> mappedField : mappedFields) {
             mappedField.setFieldValueFromConfig(mappedObject, config, context);
         }

@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.command.multi;
 
 public abstract class SimpleSubCommand implements SubCommand {

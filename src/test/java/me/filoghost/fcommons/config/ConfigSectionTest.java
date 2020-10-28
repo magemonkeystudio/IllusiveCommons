@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.config;
 
 import me.filoghost.fcommons.config.exception.ConfigValueException;

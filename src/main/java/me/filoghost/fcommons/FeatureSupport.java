@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: MIT
  */
-
 package me.filoghost.fcommons;
 
 import me.filoghost.fcommons.reflection.ReflectionUtils;

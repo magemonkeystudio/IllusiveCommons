@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) filoghost
+ *
+ * SPDX-License-Identifier: MIT
+ */
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigSection;
@@ -25,7 +30,8 @@ public class MappedConfigSectionConverter extends Converter<MappedConfigSection,
     }
 
     @Override
-    protected MappedConfigSection toFieldValue0(ConfigSection configSection, Object context) throws ConfigMappingException, ConfigPostLoadException {
+    protected MappedConfigSection toFieldValue0(ConfigSection configSection, Object context)
+            throws ConfigMappingException, ConfigPostLoadException {
         MappedConfigSection mappedObject = configMapper.newMappedObjectInstance();
         configMapper.setFieldsFromConfig(mappedObject, configSection, context);
         return mappedObject;

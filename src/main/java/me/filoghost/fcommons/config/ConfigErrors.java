@@ -40,15 +40,18 @@ public class ConfigErrors {
     }
 
     public static String fieldReadError(MappedField<?> mappedField) {
-        return "error while reading field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
+        return "error while reading field \"" + mappedField.getFieldName() + "\""
+                + " in class \"" + mappedField.getDeclaringClass() + "\"";
     }
 
     public static String fieldWriteError(MappedField<?> mappedField) {
-        return "error while writing field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
+        return "error while writing field \"" + mappedField.getFieldName() + "\""
+                + " in class \"" + mappedField.getDeclaringClass() + "\"";
     }
 
     public static String conversionFailed(MappedField<?> mappedField) {
-        return "error while converting field \"" + mappedField.getFieldName() + "\" in class \"" + mappedField.getDeclaringClass() + "\"";
+        return "error while converting field \"" + mappedField.getFieldName() + "\""
+                + " in class \"" + mappedField.getDeclaringClass() + "\"";
     }
 
     public static String formatPath(Path rootDataFolder, Path path) {

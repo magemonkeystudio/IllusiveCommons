@@ -77,6 +77,29 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <configLocation>${project.basedir}/checkstyle/checkstyle.xml</configLocation>
+                    <propertyExpansion>samedir=${project.basedir}/checkstyle</propertyExpansion>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}</sourceDirectory>
+                    </sourceDirectories>
+                    <includes>checkstyle/**/*, pom.xml, src/main/java/**/*.java</includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-check</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
