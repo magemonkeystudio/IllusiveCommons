@@ -5,9 +5,7 @@
  */
 package me.filoghost.fcommons;
 
-import me.filoghost.fcommons.reflection.ReflectionUtils;
 import org.assertj.core.api.AbstractStringAssert;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -17,14 +15,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.*;
 
 class ColorsTest {
-
-    @BeforeAll
-    static void beforeAll() throws ReflectiveOperationException {
-        ReflectionUtils.setFinalFieldValue(
-                FeatureSupport.class.getDeclaredField("HEX_CHAT_COLORS"),
-                null,
-                true);
-    }
 
     @Test
     void nullString() {
@@ -65,7 +55,7 @@ class ColorsTest {
     }
 
     @Test
-    void hexColors() {
+    void hexColor() {
         String hexColor = "&#09af00";
         String hexColorOutput = "§x§0§9§a§f§0§0";
         testStringPositions(hexColor).forEach(input -> {
@@ -75,16 +65,12 @@ class ColorsTest {
 
     @Test
     void uppercaseHexColor() {
-        String input = "&#00FF00";
-        String output = "§x§0§0§f§f§0§0";
-        assertThatColored(input).isEqualTo(output);
+        assertThatColored("&#00FF00").isEqualTo("§x§0§0§f§f§0§0");
     }
 
     @Test
     void longHexColor() {
-        String input = "&#1234567890";
-        String output = "§x§1§2§3§4§5§67890";
-        assertThatColored(input).isEqualTo(output);
+        assertThatColored("&#1234567890").isEqualTo("§x§1§2§3§4§5§67890");
     }
 
     @ParameterizedTest

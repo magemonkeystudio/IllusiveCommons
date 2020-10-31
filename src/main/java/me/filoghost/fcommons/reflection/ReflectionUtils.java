@@ -7,7 +7,6 @@ package me.filoghost.fcommons.reflection;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class ReflectionUtils {
 
@@ -25,22 +24,6 @@ public class ReflectionUtils {
     public static void setFieldValue(Field field, Object instance, Object value) throws ReflectiveOperationException {
         try {
             field.setAccessible(true);
-            field.set(instance, value);
-        } catch (ReflectiveOperationException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new ReflectiveOperationException(t);
-        }
-    }
-
-    public static void setFinalFieldValue(Field field, Object instance, Object value) throws ReflectiveOperationException {
-        try {
-            field.setAccessible(true);
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
             field.set(instance, value);
         } catch (ReflectiveOperationException e) {
             throw e;
