@@ -17,6 +17,7 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
     @Override
     public final void onEnable() {
         try {
+            FCommons.setPluginInstance(this);
             checkPackageRelocation();
             onCheckedEnable();
         } catch (PluginEnableException e) {

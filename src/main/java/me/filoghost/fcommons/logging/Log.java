@@ -5,23 +5,18 @@
  */
 package me.filoghost.fcommons.logging;
 
+import me.filoghost.fcommons.FCommons;
+
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Log {
-
-    private static Logger logger;
-
-    public static void setLogger(Logger logger) {
-        Log.logger = logger;
-    }
 
     public static void info(String msg) {
         info(msg, null);
     }
 
     public static void info(String msg, Throwable thrown) {
-        logger.log(Level.INFO, msg, thrown);
+        log(Level.INFO, msg, thrown);
     }
 
     public static void warning(String msg) {
@@ -29,7 +24,7 @@ public class Log {
     }
 
     public static void warning(String msg, Throwable thrown) {
-        logger.log(Level.WARNING, msg, thrown);
+        log(Level.WARNING, msg, thrown);
     }
 
     public static void severe(String msg) {
@@ -37,7 +32,11 @@ public class Log {
     }
 
     public static void severe(String msg, Throwable thrown) {
-        logger.log(Level.SEVERE, msg, thrown);
+        log(Level.SEVERE, msg, thrown);
+    }
+
+    private static void log(Level level, String msg, Throwable thrown) {
+        FCommons.getPluginInstance().getLogger().log(level, msg, thrown);
     }
 
 }
