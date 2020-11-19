@@ -14,11 +14,9 @@ import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
-import me.filoghost.fcommons.reflection.ReflectionUtils;
-import me.filoghost.fcommons.reflection.TypeInfo;
+import me.filoghost.fcommons.reflection.ReflectField;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,24 +27,18 @@ public class MappedField<T> {
     private static final List<ValueModifier<?, ?>> VALUE_MODIFIERS = ImmutableList.of(
             new ChatColorsModifier()
     );
-
-    private final TypeInfo<T> typeInfo;
-    private final Field field;
+    
+    private final ReflectField<T> field;
     private final Converter<T, ?> converter;
     private final String configPath;
     private final List<Annotation> annotations;
-
-    public static MappedField<?> of(Field field) throws ReflectiveOperationException, ConfigMappingException {
-        return new MappedField<>(TypeInfo.of(field), field);
-    }
-
-    private MappedField(TypeInfo<T> typeInfo, Field field) throws ConfigMappingException {
-        this.typeInfo = typeInfo;
+    
+    public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
         this.field = field;
-        this.converter = ConverterRegistry.create(typeInfo);
+        this.converter = ConverterRegistry.fromObjectType(field.getCheckedDeclarationType());
         this.configPath = field.getName().replace("__", ".").replace("_", "-");
         this.annotations = Stream.concat(
-                Arrays.stream(field.getDeclaredAnnotations()),
+                Arrays.stream(field.getAnnotations()),
                 Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
                 .collect(Collectors.toList());
     }
@@ -102,7 +94,7 @@ public class MappedField<T> {
 
     private T readFromObject(Object mappedObject) throws ConfigMappingException {
         try {
-            return typeInfo.cast(ReflectionUtils.getFieldValue(field, mappedObject));
+            return field.get(mappedObject);
         } catch (ReflectiveOperationException e) {
             throw new ConfigMappingException(ConfigErrors.fieldReadError(this), e);
         }
@@ -110,7 +102,7 @@ public class MappedField<T> {
 
     private void writeToObject(Object mappedObject, T fieldValue) throws ConfigMappingException {
         try {
-            ReflectionUtils.setFieldValue(field, mappedObject, fieldValue);
+            field.set(mappedObject, fieldValue);
         } catch (ReflectiveOperationException e) {
             throw new ConfigMappingException(ConfigErrors.fieldWriteError(this), e);
         }

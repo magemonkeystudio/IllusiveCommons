@@ -7,6 +7,7 @@ package me.filoghost.fcommons.reflection;
 
 import me.filoghost.fcommons.Preconditions;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,8 +19,8 @@ public class TypeInfo<T> {
     private final Class<T> typeClass;
     private final Type[] typeArguments;
 
-    public TypeInfo(Class<T> typeClass, Type... typeArguments) {
-        this.typeClass = ReflectionUtils.wrapPrimitiveClass(typeClass);
+    private TypeInfo(Class<T> typeClass, Type... typeArguments) {
+        this.typeClass = typeClass;
         this.typeArguments = typeArguments;
     }
 
@@ -33,6 +34,33 @@ public class TypeInfo<T> {
 
     public T cast(Object object) {
         return typeClass.cast(object);
+    }
+
+    public ReflectField<?>[] getDeclaredFields() throws ReflectiveOperationException {
+        Field[] declaredFields;
+        try {
+            declaredFields = typeClass.getDeclaredFields();
+        } catch (Throwable t) {
+            throw new ReflectiveOperationException(t);
+        }
+        
+        ReflectField<?>[] output = new ReflectField[declaredFields.length];
+        for (int i = 0; i < declaredFields.length; i++) {
+            output[i] = ReflectField.wrap(declaredFields[i]);
+        }
+        return output;
+    }
+
+    public T newInstance() throws ReflectiveOperationException {
+        try {
+            Constructor<T> constructor = typeClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new ReflectiveOperationException(t);
+        }
     }
 
     public static TypeInfo<?> of(Field field) throws ReflectiveOperationException {

@@ -11,10 +11,9 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
-import me.filoghost.fcommons.reflection.ReflectionUtils;
+import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,14 +28,14 @@ public class ConfigMapper<T> {
         try {
             this.mappedTypeInfo = typeInfo;
             ImmutableList.Builder<MappedField<?>> mappedFieldsBuilder = ImmutableList.builder();
-            for (Field field : ReflectionUtils.getDeclaredFields(typeInfo.getTypeClass())) {
+            for (ReflectField<?> field : typeInfo.getDeclaredFields()) {
                 if (isMappable(field)) {
-                    mappedFieldsBuilder.add(MappedField.of(field));
+                    mappedFieldsBuilder.add(new MappedField<>(field));
                 }
             }
             this.mappedFields = mappedFieldsBuilder.build();
         } catch (ReflectiveOperationException e) {
-            throw new ConfigMappingException(ConfigErrors.mapperReflectionException(typeInfo.getTypeClass()), e);
+            throw new ConfigMappingException(ConfigErrors.mapperReflectionException(typeInfo), e);
         }
     }
 
@@ -78,7 +77,7 @@ public class ConfigMapper<T> {
         }
     }
 
-    private boolean isMappable(Field field) {
+    private boolean isMappable(ReflectField<?> field) {
         int modifiers = field.getModifiers();
         boolean includeStatic = field.isAnnotationPresent(IncludeStatic.class)
                 || field.getDeclaringClass().isAnnotationPresent(IncludeStatic.class);

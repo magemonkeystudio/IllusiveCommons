@@ -33,7 +33,7 @@ public class ConverterRegistry {
     );
 
     @SuppressWarnings("unchecked")
-    public static <T> Converter<T, ?> create(TypeInfo<T> typeInfo) throws ConfigMappingException {
+    public static <T> Converter<T, ?> fromObjectType(TypeInfo<T> typeInfo) throws ConfigMappingException {
         Class<T> typeClass = typeInfo.getTypeClass();
 
         for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
@@ -43,7 +43,7 @@ public class ConverterRegistry {
         }
 
         if (MappedConfigSectionConverter.supports(typeClass)) {
-            return (Converter<T, ?>) new MappedConfigSectionConverter((TypeInfo<MappedConfigSection>) typeInfo);
+            return (Converter<T, ?>) new MappedConfigSectionConverter<>((TypeInfo<MappedConfigSection>) typeInfo);
 
         } else if (ListConverter.supports(typeClass)) {
             return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<T>>) typeInfo);

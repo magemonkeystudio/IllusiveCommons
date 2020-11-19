@@ -13,32 +13,32 @@ import me.filoghost.fcommons.config.mapped.ConfigMapper;
 import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
-public class MappedConfigSectionConverter extends Converter<MappedConfigSection, ConfigSection> {
+public class MappedConfigSectionConverter<T extends MappedConfigSection> extends Converter<T, ConfigSection> {
 
-    private final ConfigMapper<MappedConfigSection> configMapper;
+    private final ConfigMapper<T> configMapper;
 
-    public MappedConfigSectionConverter(TypeInfo<MappedConfigSection> fieldTypeInfo) throws ConfigMappingException {
+    public MappedConfigSectionConverter(TypeInfo<T> fieldTypeInfo) throws ConfigMappingException {
         super(ConfigValueType.SECTION);
         this.configMapper = new ConfigMapper<>(fieldTypeInfo);
     }
 
     @Override
-    protected ConfigSection toConfigValue0(MappedConfigSection mappedObject) throws ConfigMappingException {
+    protected ConfigSection toConfigValue0(T mappedObject) throws ConfigMappingException {
         ConfigSection configSection = new ConfigSection();
         configMapper.setConfigFromFields(mappedObject, configSection);
         return configSection;
     }
 
     @Override
-    protected MappedConfigSection toFieldValue0(ConfigSection configSection, Object context)
+    protected T toFieldValue0(ConfigSection configSection, Object context)
             throws ConfigMappingException, ConfigPostLoadException {
-        MappedConfigSection mappedObject = configMapper.newMappedObjectInstance();
+        T mappedObject = configMapper.newMappedObjectInstance();
         configMapper.setFieldsFromConfig(mappedObject, configSection, context);
         return mappedObject;
     }
 
     @Override
-    protected boolean equalsConfig0(MappedConfigSection fieldValue, ConfigSection configSection) throws ConfigMappingException {
+    protected boolean equalsConfig0(T fieldValue, ConfigSection configSection) throws ConfigMappingException {
         if (fieldValue == null && configSection == null) {
             return true;
         } else if (fieldValue == null || configSection == null) {

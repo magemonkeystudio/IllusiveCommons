@@ -7,7 +7,6 @@ package me.filoghost.fcommons.config.mapped;
 
 import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.reflection.ReflectionUtils;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.lang.reflect.Type;
@@ -15,13 +14,12 @@ import java.lang.reflect.Type;
 public class MappingUtils {
 
     public static <T> T createInstance(TypeInfo<T> typeInfo) throws ConfigMappingException {
-        Class<T> clazz = typeInfo.getTypeClass();
         try {
-            return ReflectionUtils.newInstance(clazz);
+            return typeInfo.newInstance();
         } catch (NoSuchMethodException e) {
-            throw new ConfigMappingException(ConfigErrors.noEmptyConstructor(clazz));
+            throw new ConfigMappingException(ConfigErrors.noEmptyConstructor(typeInfo));
         } catch (ReflectiveOperationException e) {
-            throw new ConfigMappingException(ConfigErrors.cannotCreateInstance(clazz), e);
+            throw new ConfigMappingException(ConfigErrors.cannotCreateInstance(typeInfo), e);
         }
     }
 

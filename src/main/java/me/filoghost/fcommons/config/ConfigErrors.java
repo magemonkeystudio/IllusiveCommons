@@ -6,6 +6,7 @@
 package me.filoghost.fcommons.config;
 
 import me.filoghost.fcommons.config.mapped.MappedField;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.nio.file.Path;
 
@@ -27,16 +28,16 @@ public class ConfigErrors {
         return "I/O exception while creating parent directory \"" + formatPath(rootDataFolder, folder) + "\"";
     }
 
-    public static String mapperReflectionException(Class<?> clazz) {
-        return "reflection error on mapped class \"" + clazz + "\"";
+    public static String mapperReflectionException(TypeInfo<?> typeInfo) {
+        return "reflection error on mapped class \"" + typeInfo.getTypeClass() + "\"";
     }
 
-    public static <T> String noEmptyConstructor(Class<T> mappedClass) {
-        return "mapped class \"" + mappedClass + "\" has no constructor without parameters";
+    public static String noEmptyConstructor(TypeInfo<?> typeInfo) {
+        return "mapped class \"" + typeInfo.getTypeClass() + "\" has no constructor without parameters";
     }
 
-    public static <T> String cannotCreateInstance(Class<T> mappedClass) {
-        return "couldn't create new instance of mapped class \"" + mappedClass + "\"";
+    public static String cannotCreateInstance(TypeInfo<?> typeInfo) {
+        return "couldn't create new instance of mapped class \"" + typeInfo.getTypeClass() + "\"";
     }
 
     public static String fieldReadError(MappedField<?> mappedField) {

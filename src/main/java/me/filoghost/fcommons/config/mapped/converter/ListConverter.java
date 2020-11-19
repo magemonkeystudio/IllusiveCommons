@@ -26,7 +26,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
         super(ConfigValueType.LIST);
         this.fieldTypeInfo = fieldTypeInfo;
         TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
-        this.elementConverter = ConverterRegistry.create(elementTypeInfo);
+        this.elementConverter = ConverterRegistry.fromObjectType(elementTypeInfo);
     }
 
     @Override
