@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ConfigValueTypeConverter<T> extends Converter<T, T> {
 
     private final Class<T> mainClass;
-    private final Class<?> primitiveClass;
+    private final Class<T> primitiveClass;
 
     public ConfigValueTypeConverter(ConfigValueType<T> configValueType, Class<T> mainClass) {
         this(configValueType, mainClass, null);
@@ -39,8 +39,8 @@ public class ConfigValueTypeConverter<T> extends Converter<T, T> {
         return Objects.equals(fieldValue, configValue);
     }
 
-    public boolean supports(Class<?> clazz) {
-        return clazz == mainClass || (primitiveClass != null && clazz == primitiveClass);
+    public boolean supports(Class<?> typeClass) {
+        return typeClass == mainClass || (primitiveClass != null && typeClass == primitiveClass);
     }
 
 }

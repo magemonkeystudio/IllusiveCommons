@@ -11,22 +11,19 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-@SuppressWarnings("unchecked")
 public class ValidReflectField<T> implements ReflectField<T> {
     
-    private final Class<T> expectedFieldType;
-    private final Class<T> boxedExpectedFieldType;
+    private final Class<T> expectedClass;
+    private final Class<T> boxedExpectedClass;
     private final Field field;
 
     private boolean initialized;
-    private boolean canRead;
-    private boolean canWrite;
 
-    protected ValidReflectField(Class<T> expectedFieldType, Field field) {
-        Preconditions.notNull(expectedFieldType, "fieldType");
+    protected ValidReflectField(Class<T> expectedClass, Field field) {
+        Preconditions.notNull(expectedClass, "expectedClass");
         Preconditions.notNull(field, "field");
-        this.expectedFieldType = expectedFieldType;
-        this.boxedExpectedFieldType = ReflectUtils.boxPrimitiveClass(expectedFieldType);
+        this.expectedClass = expectedClass;
+        this.boxedExpectedClass = ReflectUtils.boxPrimitiveClass(expectedClass);
         this.field = field;
     }
     
@@ -41,29 +38,17 @@ public class ValidReflectField<T> implements ReflectField<T> {
             throw new ReflectiveOperationException(t);
         }
 
-
-        Class<?> boxedActualFieldType = ReflectUtils.boxPrimitiveClass(field.getType());
-        canRead = boxedExpectedFieldType.isAssignableFrom(boxedActualFieldType);
-        canWrite = boxedActualFieldType.isAssignableFrom(boxedExpectedFieldType);
-        
         initialized = true;
     }
-    
+
     @Override
-    public TypeInfo<?> getDeclarationType() throws ReflectiveOperationException {
-        return TypeInfo.of(field);
+    public Class<T> getExpectedClass() {
+        return expectedClass;
     }
 
     @Override
-    public TypeInfo<T> getCheckedDeclarationType() throws ReflectiveOperationException {
-        TypeInfo<?> typeInfo = TypeInfo.of(field);
-        
-        if (typeInfo.getTypeClass() == expectedFieldType) {
-            return (TypeInfo<T>) typeInfo;
-        } else {
-            throw new TypeNotCompatibleException("expected type \"" + expectedFieldType + "\""
-                    + " must be equal to actual field type \"" + field.getType() + "\"");
-        }
+    public Field getRawField() {
+        return field;
     }
 
     @Override
@@ -76,13 +61,8 @@ public class ValidReflectField<T> implements ReflectField<T> {
         init();
         checkInstance(instance);
         
-        if (!canRead) {
-            throw new TypeNotCompatibleException("cannot safely read type \"" + expectedFieldType + "\""
-                    + " from field type \"" + field.getType() + "\"");
-        }
-        
         try {
-            return boxedExpectedFieldType.cast(field.get(instance));
+            return boxedExpectedClass.cast(field.get(instance));
         } catch (ReflectiveOperationException e) {
             throw e;
         } catch (Throwable t) {
@@ -100,13 +80,8 @@ public class ValidReflectField<T> implements ReflectField<T> {
         init();
         checkInstance(instance);
         
-        if (!canWrite) {
-            throw new TypeNotCompatibleException("cannot safely write type \"" + expectedFieldType + "\""
-                    + " into field type \"" + field.getType() + "\"");
-        }
-        
         try {
-            field.set(instance, boxedExpectedFieldType.cast(value));
+            field.set(instance, boxedExpectedClass.cast(value));
         } catch (ReflectiveOperationException e) {
             throw e;
         } catch (Throwable t) {

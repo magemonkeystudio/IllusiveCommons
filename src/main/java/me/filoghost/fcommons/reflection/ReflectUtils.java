@@ -5,6 +5,11 @@
  */
 package me.filoghost.fcommons.reflection;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 public class ReflectUtils {
 
     public static boolean isClassLoaded(String className) {
@@ -41,6 +46,19 @@ public class ReflectUtils {
         }
 
         return clazz;
+    }
+
+    @Nullable
+    public static Class<?> getClassFromType(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            if (parameterizedType.getRawType() instanceof Class) {
+                return (Class<?>) parameterizedType.getRawType();
+            }
+        }
+        return null;
     }
 
 }

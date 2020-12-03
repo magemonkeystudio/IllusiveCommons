@@ -8,25 +8,25 @@ package me.filoghost.fcommons.reflection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-@SuppressWarnings("unchecked")
 public class ReflectMethod<T> {
 
-    private final Class<T> expectedReturnType;
-    private final Class<T> boxedExpectedReturnType;
+    private final Class<T> boxedExpectedReturnClass;
     private final Class<?> declaringClass;
     private final String name;
     private final Class<?>[] parameterTypes;
 
     private Method method;
-    private boolean canCastReturnType;
 
-    public static <T> ReflectMethod<T> lookup(Class<T> returnType, Class<?> declaringClass, String name, Class<?>... parameterTypes) {
-        return new ReflectMethod<>(returnType, declaringClass, name, parameterTypes);
+    public static <T> ReflectMethod<T> lookup(ClassToken<T> expectedReturnClassToken, Class<?> declaringClass, String name, Class<?>... parameterTypes) {
+        return new ReflectMethod<>(expectedReturnClassToken.asClass(), declaringClass, name, parameterTypes);
+    }
+    
+    public static <T> ReflectMethod<T> lookup(Class<T> expectedReturnClass, Class<?> declaringClass, String name, Class<?>... parameterTypes) {
+        return new ReflectMethod<>(expectedReturnClass, declaringClass, name, parameterTypes);
     }
 
-    private ReflectMethod(Class<T> expectedReturnType, Class<?> declaringClass, String name, Class<?>[] parameterTypes) {
-        this.expectedReturnType = expectedReturnType;
-        this.boxedExpectedReturnType = ReflectUtils.boxPrimitiveClass(expectedReturnType);
+    private ReflectMethod(Class<T> expectedReturnClass, Class<?> declaringClass, String name, Class<?>[] parameterTypes) {
+        this.boxedExpectedReturnClass = ReflectUtils.boxPrimitiveClass(expectedReturnClass);
         this.declaringClass = declaringClass;
         this.name = name;
         this.parameterTypes = parameterTypes;
@@ -42,9 +42,6 @@ public class ReflectMethod<T> {
             } catch (Throwable t) {
                 throw new ReflectiveOperationException(t);
             }
-
-            Class<?> boxedActualReturnType = ReflectUtils.boxPrimitiveClass(method.getReturnType());
-            canCastReturnType = boxedExpectedReturnType.isAssignableFrom(boxedActualReturnType);
         }
     }
 
@@ -54,14 +51,9 @@ public class ReflectMethod<T> {
         if (!Modifier.isStatic(method.getModifiers()) && instance == null) {
             throw new InvalidInstanceException("instance cannot be null when method is not static");
         }
-
-        if (!canCastReturnType) {
-            throw new TypeNotCompatibleException("cannot safely cast type \"" + expectedReturnType + "\""
-                    + " from method return type \"" + method.getReturnType() + "\"");
-        }
         
         try {
-            return boxedExpectedReturnType.cast(method.invoke(instance, args));
+            return boxedExpectedReturnClass.cast(method.invoke(instance, args));
         } catch (ReflectiveOperationException e) {
             throw e;
         } catch (Throwable t) {

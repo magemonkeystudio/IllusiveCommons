@@ -158,16 +158,20 @@ class MappedConfigTest {
     }
 
     @Test
-    void testBadGenerics(@TempDir Path tempDir) {
-        MappedConfigLoader<BadGenericsConfig> configLoaderBadGenerics = MappedTestCommons.newNonExistingConfig(tempDir, BadGenericsConfig.class);
-        MappedConfigLoader<NoGenericsConfig> configLoaderNoGenerics = MappedTestCommons.newNonExistingConfig(tempDir, NoGenericsConfig.class);
-
+    void testWildcardGenerics(@TempDir Path tempDir) {
+        MappedConfigLoader<WildcardGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, WildcardGenericsConfig.class);
+        
         assertThatExceptionOfType(ConfigLoadException.class).isThrownBy(() -> {
-            configLoaderBadGenerics.init();
+            configLoader.init();
         });
-
+    }
+    
+    @Test
+    void testMissingGenerics(@TempDir Path tempDir) {
+        MappedConfigLoader<MissingGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, MissingGenericsConfig.class);
+        
         assertThatExceptionOfType(ConfigLoadException.class).isThrownBy(() -> {
-            configLoaderNoGenerics.init();
+            configLoader.init();
         });
     }
 
@@ -283,13 +287,13 @@ class MappedConfigTest {
 
     }
 
-    private static class BadGenericsConfig implements MappedConfig {
+    private static class WildcardGenericsConfig implements MappedConfig {
 
         private List<?> list = Arrays.asList(1, 2, 3);
 
     }
 
-    private static class NoGenericsConfig implements MappedConfig {
+    private static class MissingGenericsConfig implements MappedConfig {
 
         private List list = Arrays.asList(1, 2, 3);
 

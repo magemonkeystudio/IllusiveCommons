@@ -130,36 +130,32 @@ class ReflectFieldTest {
     }
 
     @Test
-    void setCorrectUnsafeTypeUsingSuperClass() {
+    void setCorrectUnsafeTypeUsingSuperClass() throws ReflectiveOperationException {
         ReflectField<Object> field = ReflectField.lookup(Object.class, ClassWithFields.class, "number");
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            // Cannot set Object where field type is Number (even if actual value is Double)
-            field.set(new ClassWithFields(), 1.23);
-        });
+        // Can set Double where field type is Number (even if declared as Object)
+        field.set(new ClassWithFields(), 1.23);
     }
 
     @Test
     void setWrongTypeUsingSuperClass() {
         ReflectField<Object> field = ReflectField.lookup(Object.class, ClassWithFields.class, "number");
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            // Cannot set Object where field type is Number (and actual value is Object)
+        assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
+            // Cannot set Object where field type is Number
             field.set(new ClassWithFields(), new Object());
         });
     }
 
     @Test
-    void getCorrectUnsafeTypeUsingSubClass() {
+    void getCorrectUnsafeTypeUsingSubClass() throws ReflectiveOperationException {
         ReflectField<Integer> field = ReflectField.lookup(Integer.class, ClassWithFields.class, "number");
 
         ClassWithFields instance = new ClassWithFields();
         instance.number = 1;
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            // Cannot get Integer where field type is Number (even if actual value is Integer)
-            field.get(instance);
-        });
+        // Can get Integer where field type is Number (if the value is an Integer)
+        field.get(instance);
     }
 
     @Test
@@ -169,7 +165,7 @@ class ReflectFieldTest {
         ClassWithFields instance = new ClassWithFields();
         instance.number = 1;  
         
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
             // Cannot get Double where field type is Number (and actual value is Integer)
             field.get(instance);
         });
@@ -248,8 +244,11 @@ class ReflectFieldTest {
     void getWrongType() {
         ReflectField<Boolean> field = ReflectField.lookup(Boolean.class, ClassWithFields.class, "string");
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            field.get(new ClassWithFields());
+        ClassWithFields instance = new ClassWithFields();
+        instance.string = "abc";
+        
+        assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
+            field.get(instance);
         });
     }
 
@@ -257,24 +256,8 @@ class ReflectFieldTest {
     void setWrongType() {
         ReflectField<Boolean> field = ReflectField.lookup(Boolean.class, ClassWithFields.class, "string");
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
             field.set(new ClassWithFields(), true);
-        });
-    }
-
-    @Test
-    void getMismatchingDeclarationType() throws ReflectiveOperationException {
-        ReflectField<Boolean> field = ReflectField.lookup(Boolean.class, ClassWithFields.class, "string");
-        
-        field.getDeclarationType(); // No exception here
-    }
-
-    @Test
-    void getCheckedMismatchingDeclarationType() {
-        ReflectField<Boolean> field = ReflectField.lookup(Boolean.class, ClassWithFields.class, "string");
-
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            field.getCheckedDeclarationType();
         });
     }
     

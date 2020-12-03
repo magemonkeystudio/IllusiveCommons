@@ -15,6 +15,8 @@ import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
 import me.filoghost.fcommons.reflection.ReflectField;
+import me.filoghost.fcommons.reflection.TypeInfo;
+import me.filoghost.fcommons.reflection.UnexpectedActualClassException;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -35,12 +37,23 @@ public class MappedField<T> {
     
     public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
         this.field = field;
-        this.converter = ConverterRegistry.fromObjectType(field.getCheckedDeclarationType());
+        this.converter = ConverterRegistry.fromObjectType(getFieldTypeInfo(field));
         this.configPath = field.getName().replace("__", ".").replace("_", "-");
         this.annotations = Stream.concat(
                 Arrays.stream(field.getAnnotations()),
                 Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
                 .collect(Collectors.toList());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private TypeInfo<T> getFieldTypeInfo(ReflectField<T> field) throws ReflectiveOperationException {
+        TypeInfo<?> typeInfo = TypeInfo.of(field);
+        if (typeInfo.getTypeClass() == field.getExpectedClass()) {
+            return (TypeInfo<T>) typeInfo;
+        } else {
+            throw new UnexpectedActualClassException("actual field type \"" + typeInfo + "\""
+                    + " doesn't have expected class \"" + field.getExpectedClass() + "\"");
+        }
     }
 
     public boolean equalsConfigValue(Object mappedObject, ConfigSection config) throws ConfigMappingException {

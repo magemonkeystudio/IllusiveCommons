@@ -35,21 +35,23 @@ public class ConverterRegistry {
     @SuppressWarnings("unchecked")
     public static <T> Converter<T, ?> fromObjectType(TypeInfo<T> typeInfo) throws ConfigMappingException {
         Class<T> typeClass = typeInfo.getTypeClass();
+        
+        if (typeClass != null) {
+            for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
+                if (configValueTypeConverter.supports(typeClass)) {
+                    return (Converter<T, ?>) configValueTypeConverter;
+                }
+            }
 
-        for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
-            if (configValueTypeConverter.supports(typeClass)) {
-                return (Converter<T, ?>) configValueTypeConverter;
+            if (MappedConfigSectionConverter.supports(typeClass)) {
+                return (Converter<T, ?>) new MappedConfigSectionConverter<>((TypeInfo<MappedConfigSection>) typeInfo);
+
+            } else if (ListConverter.supports(typeClass)) {
+                return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<Object>>) typeInfo);
             }
         }
 
-        if (MappedConfigSectionConverter.supports(typeClass)) {
-            return (Converter<T, ?>) new MappedConfigSectionConverter<>((TypeInfo<MappedConfigSection>) typeInfo);
-
-        } else if (ListConverter.supports(typeClass)) {
-            return (Converter<T, ?>) new ListConverter<>((TypeInfo<List<T>>) typeInfo);
-        }
-
-        throw new ConfigMappingException("cannot find suitable converter for class \"" + typeClass + "\"");
+        throw new ConfigMappingException("cannot find suitable converter for type \"" + typeInfo + "\"");
     }
 
 }

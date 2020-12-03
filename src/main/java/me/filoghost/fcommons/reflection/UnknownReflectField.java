@@ -6,6 +6,7 @@
 package me.filoghost.fcommons.reflection;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * Returned when the internal initialization of a ReflectField throws an exception.
@@ -15,11 +16,13 @@ public class UnknownReflectField<T> implements ReflectField<T> {
 
     private static final Object EMPTY_ARRAY = new Object[0];
 
+    private final Class<T> expectedClass;
     private final Class<?> declaringClass;
     private final String fieldName;
     private final ReflectiveOperationException error;
 
-    public UnknownReflectField(Class<?> declaringClass, String fieldName, Throwable error) {
+    protected UnknownReflectField(Class<T> expectedClass, Class<?> declaringClass, String fieldName, Throwable error) {
+        this.expectedClass = expectedClass;
         this.declaringClass = declaringClass;
         this.fieldName = fieldName;
         if (error instanceof ReflectiveOperationException) {
@@ -30,12 +33,12 @@ public class UnknownReflectField<T> implements ReflectField<T> {
     }
 
     @Override
-    public TypeInfo<?> getDeclarationType() throws ReflectiveOperationException {
-        throw error;
+    public Class<T> getExpectedClass() {
+        return expectedClass;
     }
 
     @Override
-    public TypeInfo<T> getCheckedDeclarationType() throws ReflectiveOperationException {
+    public Field getRawField() throws ReflectiveOperationException {
         throw error;
     }
 

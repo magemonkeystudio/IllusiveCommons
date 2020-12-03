@@ -18,13 +18,11 @@ import java.util.List;
 
 public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
 
-    protected final TypeInfo<List<E>> fieldTypeInfo;
     private final Converter<E, ?> elementConverter;
 
     @SuppressWarnings("unchecked")
     public ListConverter(TypeInfo<List<E>> fieldTypeInfo) throws ConfigMappingException {
         super(ConfigValueType.LIST);
-        this.fieldTypeInfo = fieldTypeInfo;
         TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
         this.elementConverter = ConverterRegistry.fromObjectType(elementTypeInfo);
     }
@@ -88,8 +86,8 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
         return configElement.isPresentAs(elementConverter.configValueType);
     }
 
-    public static boolean supports(Class<?> clazz) {
-        return clazz == List.class;
+    public static boolean supports(Class<?> typeClass) {
+        return typeClass == List.class;
     }
 
 }

@@ -6,37 +6,45 @@
 package me.filoghost.fcommons.reflection;
 
 import me.filoghost.fcommons.Preconditions;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class TypeInfo<T> {
 
+    private final Type type;
     private final Class<T> typeClass;
     private final Type[] typeArguments;
 
-    private TypeInfo(Class<T> typeClass, Type... typeArguments) {
+    private TypeInfo(Type type, Class<T> typeClass, Type[] typeArguments) {
+        Preconditions.notNull(type, "type");
+        this.type = type;
         this.typeClass = typeClass;
         this.typeArguments = typeArguments;
     }
 
+    public Type getType() {
+        return type;
+    }
+    
+    @Nullable
     public Class<T> getTypeClass() {
         return typeClass;
     }
 
+    @Nullable
     public Type[] getTypeArguments() {
         return typeArguments;
     }
 
-    public T cast(Object object) {
-        return typeClass.cast(object);
-    }
-
     public ReflectField<?>[] getDeclaredFields() throws ReflectiveOperationException {
+        if (typeClass == null) {
+            throw new TypeWithoutClassException("cannot read fields of type without class: " + type);
+        }
+        
         Field[] declaredFields;
         try {
             declaredFields = typeClass.getDeclaredFields();
@@ -52,6 +60,10 @@ public class TypeInfo<T> {
     }
 
     public T newInstance() throws ReflectiveOperationException {
+        if (typeClass == null) {
+            throw new TypeWithoutClassException("cannot create instance of type without class: " + type);
+        }
+
         try {
             Constructor<T> constructor = typeClass.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -61,6 +73,16 @@ public class TypeInfo<T> {
         } catch (Throwable t) {
             throw new ReflectiveOperationException(t);
         }
+    }
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
+    public static TypeInfo<?> of(ReflectField<?> reflectField) throws ReflectiveOperationException {
+        Preconditions.notNull(reflectField, "reflectField");
+        return TypeInfo.of(reflectField.getRawField());
     }
 
     public static TypeInfo<?> of(Field field) throws ReflectiveOperationException {
@@ -75,45 +97,22 @@ public class TypeInfo<T> {
         return of(genericType);
     }
 
-    public static <T> TypeInfo<T> of(Class<T> clazz) {
-        return new TypeInfo<>(clazz);
+    public static <T> TypeInfo<T> of(Class<T> typeClass) {
+        return new TypeInfo<>(typeClass, typeClass, null);
     }
 
     public static TypeInfo<?> of(Type type) throws ReflectiveOperationException {
-        Preconditions.notNull(type, "type");
-
+        Type[] typeArguments;
         try {
-            Class<?> typeClass;
-            Type[] typeArguments;
-
-            if (type instanceof Class) {
-                typeClass = (Class<?>) type;
-                typeArguments = null;
-            } else if (type instanceof ParameterizedType) {
-                typeClass = (Class<?>) ((ParameterizedType) type).getRawType();
+            if (type instanceof ParameterizedType) {
                 typeArguments = ((ParameterizedType) type).getActualTypeArguments();
             } else {
-                throw new ReflectiveOperationException("type is not a Class or ParameterizedType");
+                typeArguments = null;
             }
-
-            return new TypeInfo<>(typeClass, typeArguments);
-
         } catch (Throwable t) {
             throw new ReflectiveOperationException(t);
         }
-    }
-
-    @Override
-    public String toString() {
-        String output = typeClass.toString();
-
-        if (typeArguments != null && typeArguments.length > 0) {
-            output += Arrays.stream(typeArguments)
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", ", "<", ">"));
-        }
-
-        return output;
+        return new TypeInfo<>(type, ReflectUtils.getClassFromType(type), typeArguments);
     }
 
 }

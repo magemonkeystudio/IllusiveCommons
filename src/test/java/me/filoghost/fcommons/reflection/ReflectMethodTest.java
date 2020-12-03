@@ -71,12 +71,11 @@ class ReflectMethodTest {
     }
 
     @Test
-    void wrongReturnTypeSubClass() {
+    void wrongReturnTypeSubClass() throws ReflectiveOperationException {
         ReflectMethod<Integer> field = ReflectMethod.lookup(Integer.class, ClassWithMethods.class, "number", Number.class);
 
-        assertThatExceptionOfType(TypeNotCompatibleException.class).isThrownBy(() -> {
-            field.invoke(new ClassWithMethods(), 1); // Should throw exception even if actual return type is valid
-        });
+        // Should not throw exception, because actual returned value is Integer
+        field.invoke(new ClassWithMethods(), 1);
     }
 
     @Test

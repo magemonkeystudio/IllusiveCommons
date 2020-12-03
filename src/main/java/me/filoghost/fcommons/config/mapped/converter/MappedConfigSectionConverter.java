@@ -48,8 +48,8 @@ public class MappedConfigSectionConverter<T extends MappedConfigSection> extends
         return configMapper.equalsConfig(fieldValue, configSection);
     }
 
-    public static boolean supports(Class<?> clazz) {
-        return MappedConfigSection.class.isAssignableFrom(clazz);
+    public static boolean supports(Class<?> typeClass) {
+        return MappedConfigSection.class.isAssignableFrom(typeClass);
     }
 
 }

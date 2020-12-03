@@ -29,15 +29,15 @@ public class ConfigErrors {
     }
 
     public static String mapperReflectionException(TypeInfo<?> typeInfo) {
-        return "reflection error on mapped class \"" + typeInfo.getTypeClass() + "\"";
+        return "reflection error on mapped type \"" + typeInfo + "\"";
     }
 
     public static String noEmptyConstructor(TypeInfo<?> typeInfo) {
-        return "mapped class \"" + typeInfo.getTypeClass() + "\" has no constructor without parameters";
+        return "mapped type \"" + typeInfo + "\" has no constructor without parameters";
     }
 
     public static String cannotCreateInstance(TypeInfo<?> typeInfo) {
-        return "couldn't create new instance of mapped class \"" + typeInfo.getTypeClass() + "\"";
+        return "couldn't create new instance of mapped type \"" + typeInfo + "\"";
     }
 
     public static String fieldReadError(MappedField<?> mappedField) {

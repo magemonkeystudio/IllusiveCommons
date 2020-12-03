@@ -5,9 +5,9 @@
  */
 package me.filoghost.fcommons.reflection;
 
-public class TypeNotCompatibleException extends ReflectiveOperationException {
+public class UnexpectedActualClassException extends ReflectiveOperationException {
 
-    public TypeNotCompatibleException(String message) {
+    public UnexpectedActualClassException(String message) {
         super(message);
     }
 
