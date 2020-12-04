@@ -7,9 +7,9 @@ package me.filoghost.fcommons.collection;
 
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class Registry<T> {
@@ -20,8 +20,7 @@ public class Registry<T> {
     private final Class<T> valuesType;
     private final Map<String, T> valuesMap;
 
-
-
+    
     public static <T extends Enum<T>> Registry<T> fromEnumValues(Class<T> enumClass) {
         Registry<T> registry = new Registry<>(enumClass);
         registry.putAll(enumClass.getEnumConstants(), Enum::name);
@@ -41,11 +40,12 @@ public class Registry<T> {
         this.valuesMap = new CaseInsensitiveMap<>();
     }
 
-    public Optional<T> find(String key) {
+    @Nullable
+    public T find(String key) {
         if (key == null) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.ofNullable(valuesMap.get(removeIgnoredChars(key)));
+        return valuesMap.get(removeIgnoredChars(key));
     }
 
     public void putIfEnumExists(String key, String enumValueName) {

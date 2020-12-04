@@ -8,9 +8,9 @@ package me.filoghost.fcommons;
 import me.filoghost.fcommons.collection.Registry;
 import org.bukkit.Material;
 
-import java.util.Collection;
+import javax.annotation.Nullable;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.Set;
 
 public final class MaterialsHelper {
 
@@ -18,7 +18,7 @@ public final class MaterialsHelper {
     private static final Registry<Material> MATERIALS_REGISTRY = initMaterialsRegistry();
 
     // Materials that are considered air (with 1.13+ compatibility)
-    private static final Collection<Material> AIR_MATERIALS = getExistingMaterials("AIR", "CAVE_AIR", "VOID_AIR");
+    private static final Set<Material> AIR_MATERIALS = getExistingMaterials("AIR", "CAVE_AIR", "VOID_AIR");
 
 
     @SuppressWarnings("deprecation")
@@ -88,12 +88,13 @@ public final class MaterialsHelper {
         return materialsRegistry;
     }
 
-    public static Optional<Material> matchMaterial(String materialName) {
+    @Nullable
+    public static Material matchMaterial(String materialName) {
         return MATERIALS_REGISTRY.find(materialName);
     }
 
-    private static Collection<Material> getExistingMaterials(String... materialEnumNames) {
-        Collection<Material> existingMaterials = new HashSet<>();
+    private static Set<Material> getExistingMaterials(String... materialEnumNames) {
+        Set<Material> existingMaterials = new HashSet<>();
 
         for (String materialEnumName : materialEnumNames) {
             try {
