@@ -59,11 +59,11 @@ public final class MaterialsHelper {
         materialsRegistry.putIfEnumExists("piston", "PISTON_BASE");
         materialsRegistry.putIfEnumExists("sticky piston", "PISTON_STICKY_BASE");
         materialsRegistry.putIfEnumExists("flower pot", "FLOWER_POT_ITEM");
-        materialsRegistry.putIfEnumExists("wood showel", "WOOD_SPADE");
-        materialsRegistry.putIfEnumExists("stone showel", "STONE_SPADE");
-        materialsRegistry.putIfEnumExists("gold showel", "GOLD_SPADE");
-        materialsRegistry.putIfEnumExists("iron showel", "IRON_SPADE");
-        materialsRegistry.putIfEnumExists("diamond showel", "DIAMOND_SPADE");
+        materialsRegistry.putIfEnumExists("wood shovel", "WOOD_SPADE");
+        materialsRegistry.putIfEnumExists("stone shovel", "STONE_SPADE");
+        materialsRegistry.putIfEnumExists("gold shovel", "GOLD_SPADE");
+        materialsRegistry.putIfEnumExists("iron shovel", "IRON_SPADE");
+        materialsRegistry.putIfEnumExists("diamond shovel", "DIAMOND_SPADE");
         materialsRegistry.putIfEnumExists("steak", "COOKED_BEEF");
         materialsRegistry.putIfEnumExists("cooked porkchop", "GRILLED_PORK");
         materialsRegistry.putIfEnumExists("raw porkchop", "PORK");
