@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class BaseJavaPlugin extends JavaPlugin {
@@ -21,7 +22,7 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
             checkPackageRelocation();
             onCheckedEnable();
         } catch (PluginEnableException e) {
-            criticalShutdown(e.getMessage(), null);
+            criticalShutdown(e.getMessageLines(), e.getCause());
         } catch (Throwable t) {
             criticalShutdown(null, t);
         }
@@ -40,8 +41,8 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
     protected abstract void onCheckedEnable() throws PluginEnableException;
 
 
-    private void criticalShutdown(String errorMessage, Throwable throwable) {
-        Bukkit.getConsoleSender().sendMessage(getErrorMessage(errorMessage, throwable));
+    private void criticalShutdown(List<String> errorMessageLines, Throwable throwable) {
+        printCriticalError(errorMessageLines, throwable);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             Bukkit.getConsoleSender().sendMessage(getFatalErrorPrefix()
@@ -51,26 +52,27 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
         setEnabled(false);
     }
 
-    protected String getErrorMessage(String errorMessage, Throwable throwable) {
+    protected void printCriticalError(List<String> errorMessageLines, Throwable throwable) {
         List<String> output = new ArrayList<>();
 
-        if (throwable != null) {
-            output.add(getFatalErrorPrefix() + "Fatal unexpected error while enabling plugin:");
-        } else {
+        if (errorMessageLines != null) {
             output.add(getFatalErrorPrefix() + "Fatal error while enabling plugin:");
+        } else {
+            output.add(getFatalErrorPrefix() + "Fatal unexpected error while enabling plugin:");
+        }
+        if (errorMessageLines != null) {
+            output.add("");
+            output.addAll(errorMessageLines);
         }
         if (throwable != null) {
-            output.add(" ");
-            output.add(CommonsUtil.getStackTraceString(throwable));
+            output.add("");
+            output.addAll(CommonsUtil.getStackTraceOutputLines(throwable));
+            output.add("");
         }
-        output.add(" ");
-        if (errorMessage != null) {
-            output.add(errorMessage);
-        }
-        output.add("The plugin has been disabled.");
-        output.add(" ");
+        output.add(getDescription().getName() + " has been disabled.");
+        output.add("");
 
-        return String.join("\n", output);
+        Bukkit.getConsoleSender().sendMessage(String.join("\n", output));
     }
 
     private String getFatalErrorPrefix() {
@@ -80,8 +82,19 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
 
     public static class PluginEnableException extends Exception {
 
-        public PluginEnableException(String message) {
-            super(message);
+        private final List<String> messageLines;
+
+        public PluginEnableException(String... message) {
+            this(null, message);
+        }
+
+        public PluginEnableException(Throwable cause, String... message) {
+            super(String.join(" ", message), cause);
+            this.messageLines = Arrays.asList(message);
+        }
+
+        public List<String> getMessageLines() {
+            return messageLines;
         }
 
     }
