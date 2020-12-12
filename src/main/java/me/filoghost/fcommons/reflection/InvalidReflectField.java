@@ -10,9 +10,9 @@ import java.lang.reflect.Field;
 
 /**
  * Returned when the internal initialization of a ReflectField throws an exception.
- * Always throws the initial exception on any method calls.
+ * Always throws the initial exception on some method calls.
  */
-public class UnknownReflectField<T> implements ReflectField<T> {
+public class InvalidReflectField<T> implements ReflectField<T> {
 
     private static final Object EMPTY_ARRAY = new Object[0];
 
@@ -21,7 +21,7 @@ public class UnknownReflectField<T> implements ReflectField<T> {
     private final String fieldName;
     private final ReflectiveOperationException error;
 
-    protected UnknownReflectField(Class<T> expectedClass, Class<?> declaringClass, String fieldName, Throwable error) {
+    protected InvalidReflectField(Class<T> expectedClass, Class<?> declaringClass, String fieldName, Throwable error) {
         this.expectedClass = expectedClass;
         this.declaringClass = declaringClass;
         this.fieldName = fieldName;
@@ -63,16 +63,6 @@ public class UnknownReflectField<T> implements ReflectField<T> {
     }
 
     @Override
-    public String getName() {
-        return fieldName;
-    }
-
-    @Override
-    public Class<?> getDeclaringClass() {
-        return declaringClass;
-    }
-
-    @Override
     public int getModifiers() {
         return 0;
     }
@@ -96,6 +86,21 @@ public class UnknownReflectField<T> implements ReflectField<T> {
     @Override
     public Annotation[] getAnnotations() {
         return (Annotation[]) EMPTY_ARRAY;
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return fieldName;
+    }
+
+    @Override
+    public Class<?> getDeclaringClass() {
+        return declaringClass;
     }
 
 }

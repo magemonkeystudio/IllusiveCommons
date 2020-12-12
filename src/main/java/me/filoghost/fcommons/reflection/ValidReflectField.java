@@ -17,8 +17,6 @@ public class ValidReflectField<T> implements ReflectField<T> {
     private final Class<T> boxedExpectedClass;
     private final Field field;
 
-    private boolean initialized;
-
     protected ValidReflectField(Class<T> expectedClass, Field field) {
         Preconditions.notNull(expectedClass, "expectedClass");
         Preconditions.notNull(field, "field");
@@ -27,20 +25,6 @@ public class ValidReflectField<T> implements ReflectField<T> {
         this.field = field;
     }
     
-    private void init() throws ReflectiveOperationException {
-        if (initialized) {
-            return;
-        }
-        
-        try {
-            field.setAccessible(true);
-        } catch (Throwable t) {
-            throw new ReflectiveOperationException(t);
-        }
-
-        initialized = true;
-    }
-
     @Override
     public Class<T> getExpectedClass() {
         return expectedClass;
@@ -58,7 +42,6 @@ public class ValidReflectField<T> implements ReflectField<T> {
 
     @Override
     public T get(Object instance) throws ReflectiveOperationException {
-        init();
         checkInstance(instance);
         
         try {
@@ -77,7 +60,6 @@ public class ValidReflectField<T> implements ReflectField<T> {
 
     @Override
     public void set(Object instance, T value) throws ReflectiveOperationException {
-        init();
         checkInstance(instance);
         
         try {
@@ -93,16 +75,6 @@ public class ValidReflectField<T> implements ReflectField<T> {
         if (!Modifier.isStatic(getModifiers()) && instance == null) {
             throw new InvalidInstanceException("instance cannot be null when field is not static");
         }
-    }
-
-    @Override
-    public String getName() {
-        return field.getName();
-    }
-
-    @Override
-    public Class<?> getDeclaringClass() {
-        return field.getDeclaringClass();
     }
 
     @Override
@@ -128,6 +100,21 @@ public class ValidReflectField<T> implements ReflectField<T> {
     @Override
     public Annotation[] getAnnotations() {
         return field.getAnnotations();
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    @Override
+    public String getName() {
+        return field.getName();
+    }
+
+    @Override
+    public Class<?> getDeclaringClass() {
+        return field.getDeclaringClass();
     }
 
 }

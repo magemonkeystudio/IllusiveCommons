@@ -8,31 +8,37 @@ package me.filoghost.fcommons.reflection;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-public interface ReflectField<T> {
+public interface ReflectField<T> extends ReflectElement {
 
     static <T> ReflectField<T> lookup(ClassToken<T> expectedClassToken, Class<?> declaringClass, String fieldName) {
         return lookup(expectedClassToken.asClass(), declaringClass, fieldName);
     }
     
     static <T> ReflectField<T> lookup(Class<T> expectedClass, Class<?> declaringClass, String fieldName) {
+        Field field;
         try {
-            Field field = declaringClass.getDeclaredField(fieldName);
-            return new ValidReflectField<>(expectedClass, field);
+            field = declaringClass.getDeclaredField(fieldName);
         } catch (Throwable t) {
-            return new UnknownReflectField<>(expectedClass, declaringClass, fieldName, t);
+            return new InvalidReflectField<>(expectedClass, declaringClass, fieldName, t);
         }
-    }
-
-    static <T> ReflectField<T> wrap(ClassToken<T> expectedClassToken, Field field) {
-        return new ValidReflectField<>(expectedClassToken.asClass(), field);
-    }
-
-    static <T> ReflectField<T> wrap(Class<T> expectedClass, Field field) {
-        return new ValidReflectField<>(expectedClass, field);
+        return wrap(expectedClass, field);
     }
 
     static ReflectField<?> wrap(Field field) {
-        return new ValidReflectField<>(field.getType(), field);
+        return wrap(field.getType(), field);
+    }
+
+    static <T> ReflectField<T> wrap(ClassToken<T> expectedClassToken, Field field) {
+        return wrap(expectedClassToken.asClass(), field);
+    }
+
+    static <T> ReflectField<T> wrap(Class<T> expectedClass, Field field) {
+        try {
+            field.setAccessible(true);
+        } catch (Throwable t) {
+            return new InvalidReflectField<>(expectedClass, field.getDeclaringClass(), field.getName(), t);
+        }
+        return new ValidReflectField<>(expectedClass, field);
     }
 
     Class<T> getExpectedClass();
@@ -46,10 +52,6 @@ public interface ReflectField<T> {
     void set(Object instance, T value) throws ReflectiveOperationException;
 
     void setStatic(T value) throws ReflectiveOperationException;
-
-    String getName();
-
-    Class<?> getDeclaringClass();
 
     int getModifiers();
 
