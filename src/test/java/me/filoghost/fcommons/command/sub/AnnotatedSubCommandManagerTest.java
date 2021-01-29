@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.multi;
+package me.filoghost.fcommons.command.sub;
 
 import me.filoghost.fcommons.command.CommandException;
 import me.filoghost.fcommons.command.annotation.DisplayPriority;
@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-class MultiCommandManagerTest {
+class AnnotatedSubCommandManagerTest {
 
     @Test
     void testSubCommandRegistrationAndOrder() {
-        MultiCommandTest multiCommandTest = new MultiCommandTest("test");
+        TestImplementation manager = new TestImplementation();
 
-        assertThat(multiCommandTest.getAllSubCommands()).extracting(SubCommand::getName).containsExactly(
+        assertThat(manager.getSubCommands()).extracting(SubCommand::getName).containsExactly(
                 "z",
                 "a",
                 "b",
@@ -31,26 +31,24 @@ class MultiCommandManagerTest {
 
     @Test
     void testSubCommandCall() throws CommandException {
-        MultiCommandTest multiCommandTest = new MultiCommandTest("test");
-        multiCommandTest.execute(null, "test", new String[]{"z", "arg"});
-        multiCommandTest.execute(null, "test", new String[]{"b"});
+        TestImplementation manager = new TestImplementation();
+        manager.execute(null, "test", new String[]{"z", "arg"});
+        manager.execute(null, "test", new String[]{"b"});
 
-        assertThat(multiCommandTest.zCalled).isTrue();
-        assertThat(multiCommandTest.bCalled).isTrue();
+        assertThat(manager.zCalled).isTrue();
+        assertThat(manager.bCalled).isTrue();
     }
 
-    private static class MultiCommandTest extends MultiCommandManager {
+    private static class TestImplementation extends AnnotatedSubCommandManager {
 
         private boolean zCalled;
         private boolean bCalled;
 
-        public MultiCommandTest(String label) {
-            super(label);
-
+        public TestImplementation() {
             registerSubCommand(new SimpleSubCommand("b") {
 
                 @Override
-                public void execute(SubCommandSession subCommandSession) {
+                public void execute(SubCommandExecution subCommandExecution) {
                     bCalled = true;
                 }
 

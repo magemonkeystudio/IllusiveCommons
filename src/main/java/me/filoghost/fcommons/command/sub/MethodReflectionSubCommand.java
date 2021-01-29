@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.multi;
+package me.filoghost.fcommons.command.sub;
 
 import me.filoghost.fcommons.command.CommandException;
 import me.filoghost.fcommons.command.annotation.Description;
@@ -23,12 +23,12 @@ import java.util.function.Function;
 
 public class MethodReflectionSubCommand extends SimpleSubCommand {
 
-    private static final Map<Class<?>, Function<SubCommandSession, ?>> parameterProviders = new HashMap<>();
+    private static final Map<Class<?>, Function<SubCommandExecution, ?>> parameterProviders = new HashMap<>();
     static {
-        parameterProviders.put(SubCommandSession.class, Function.identity());
-        parameterProviders.put(CommandSender.class, SubCommandSession::getSender);
-        parameterProviders.put(SubCommand.class, SubCommandSession::getSubCommand);
-        parameterProviders.put(String[].class, SubCommandSession::getArgs);
+        parameterProviders.put(SubCommandExecution.class, Function.identity());
+        parameterProviders.put(CommandSender.class, SubCommandExecution::getSender);
+        parameterProviders.put(SubCommand.class, SubCommandExecution::getSubCommand);
+        parameterProviders.put(String[].class, SubCommandExecution::getArgs);
     }
 
     private final Object instance;
@@ -90,10 +90,10 @@ public class MethodReflectionSubCommand extends SimpleSubCommand {
     }
 
     @Override
-    public void execute(SubCommandSession subCommandSession) throws CommandException {
+    public void execute(SubCommandExecution subCommandExecution) throws CommandException {
         Object[] methodParameters = new Object[methodParameterTypes.length];
         for (int i = 0; i < methodParameters.length; i++) {
-            methodParameters[i] = parameterProviders.get(methodParameterTypes[i]).apply(subCommandSession);
+            methodParameters[i] = parameterProviders.get(methodParameterTypes[i]).apply(subCommandExecution);
         }
 
         try {

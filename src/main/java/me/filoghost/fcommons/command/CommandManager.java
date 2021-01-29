@@ -7,6 +7,7 @@ package me.filoghost.fcommons.command;
 
 import me.filoghost.fcommons.command.annotation.Permission;
 import me.filoghost.fcommons.command.annotation.PermissionMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,22 +15,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Wrapper for the default command executor.
- */
+import java.util.logging.Level;
+
 public abstract class CommandManager implements CommandExecutor {
-
-    private final String label;
-
-    public CommandManager(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public boolean register(JavaPlugin plugin) {
+    
+    public boolean register(JavaPlugin plugin, String label) {
         PluginCommand pluginCommand = plugin.getCommand(label);
         if (pluginCommand == null) {
             return false;
@@ -57,16 +47,25 @@ public abstract class CommandManager implements CommandExecutor {
             execute(sender, label, args);
         } catch (CommandException ex) {
             if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
-                sender.sendMessage(formatCommandExceptionMessage(ex.getMessage()));
+                sendCommandExceptionMessage(sender, ex.getMessage());
+            } else {
+                sendCommandExceptionMessage(sender, "Error while executing command.");
             }
+        } catch (Exception ex) {
+            handleUnexpectedException(sender, label, ex);
         }
         return true;
     }
 
+    protected void handleUnexpectedException(CommandSender sender, String label, Exception ex) {
+        Bukkit.getLogger().log(Level.SEVERE, "Unhandled exception while executing /" + label, ex);
+        sender.sendMessage(ChatColor.RED + "Internal error while executing command.");
+    }
+
     public abstract void execute(CommandSender sender, String label, String[] args) throws CommandException;
 
-    protected String formatCommandExceptionMessage(String message) {
-        return ChatColor.RED + message;
+    protected void sendCommandExceptionMessage(CommandSender sender, String message) {
+        sender.sendMessage(ChatColor.RED + message);
     }
 
     protected String getDefaultPermissionMessage() {

@@ -3,13 +3,13 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.multi;
+package me.filoghost.fcommons.command.sub;
 
 import me.filoghost.fcommons.command.CommandException;
 
 public interface SubCommand {
 
-    void execute(SubCommandSession subCommandSession) throws CommandException;
+    void execute(SubCommandExecution subCommandExecution) throws CommandException;
 
     String getName();
 

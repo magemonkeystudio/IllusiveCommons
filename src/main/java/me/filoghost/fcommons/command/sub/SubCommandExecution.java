@@ -3,23 +3,23 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.multi;
+package me.filoghost.fcommons.command.sub;
 
 import org.bukkit.command.CommandSender;
 
-public class SubCommandSession {
+public class SubCommandExecution {
 
     private final CommandSender sender;
     private final SubCommand subCommand;
-    private final String rootLabelUsed;
-    private final String subLabelUsed;
+    private final String rootLabel;
+    private final String subLabel;
     private final String[] args;
 
-    public SubCommandSession(CommandSender sender, SubCommand subCommand, String rootLabelUsed, String subLabelUsed, String[] args) {
+    public SubCommandExecution(CommandSender sender, SubCommand subCommand, String rootLabel, String subLabel, String[] args) {
         this.sender = sender;
         this.subCommand = subCommand;
-        this.rootLabelUsed = rootLabelUsed;
-        this.subLabelUsed = subLabelUsed;
+        this.rootLabel = rootLabel;
+        this.subLabel = subLabel;
         this.args = args;
     }
 
@@ -31,12 +31,12 @@ public class SubCommandSession {
         return subCommand;
     }
 
-    public String getRootLabelUsed() {
-        return rootLabelUsed;
+    public String getRootLabel() {
+        return rootLabel;
     }
 
-    public String getSubLabelUsed() {
-        return subLabelUsed;
+    public String getSubLabel() {
+        return subLabel;
     }
 
     public String[] getArgs() {
