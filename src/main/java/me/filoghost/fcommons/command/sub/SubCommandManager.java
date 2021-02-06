@@ -5,106 +5,99 @@
  */
 package me.filoghost.fcommons.command.sub;
 
-import me.filoghost.fcommons.Strings;
-import me.filoghost.fcommons.command.CommandException;
-import me.filoghost.fcommons.command.CommandManager;
+import me.filoghost.fcommons.command.CommandContext;
+import me.filoghost.fcommons.command.CommandHelper;
+import me.filoghost.fcommons.command.validation.CommandException;
+import me.filoghost.fcommons.command.ConfigurableRootCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public abstract class SubCommandManager extends CommandManager {
+public abstract class SubCommandManager extends ConfigurableRootCommand {
+
+    protected abstract SubCommand getSubCommandByName(String name);
+
+    protected abstract Iterable<? extends SubCommand> getSubCommands();
     
     @Override
-    public final void execute(CommandSender sender, String rootLabel, String[] args) throws CommandException {
+    public final void execute(CommandSender sender, String[] args, CommandContext context) throws CommandException {
         if (args.length == 0) {
-            sendNoArgsMessage(sender, rootLabel);
+            sendNoArgsMessage(context);
             return;
         }
 
         String subLabel = args[0];
         SubCommand subCommand = getSubCommandByName(subLabel);
-        String[] subCommandArgs = Arrays.copyOfRange(args, 1, args.length);
-        SubCommandExecution subCommandExecution = new SubCommandExecution(sender, subCommand, rootLabel, subLabel, subCommandArgs);
+        String[] subCommandArgs = CommandHelper.getArgsFromIndex(args, 1);
+        SubCommandContext subContext = new SubCommandContext(
+                context.getSender(),
+                context.getRootLabel(),
+                subCommandArgs,
+                subCommand,
+                subLabel);
 
         if (subCommand == null) {
-            sendUnknownSubCommandMessage(subCommandExecution);
+            sendUnknownSubCommandMessage(subContext);
             return;
         }
-
-        String permission;
-        if (!Strings.isEmpty(subCommand.getPermission())) {
-            permission = subCommand.getPermission();
-        } else {
-            permission = getDefaultSubCommandPermission(subCommand);
-        }
-
-        if (!Strings.isEmpty(permission) && !sender.hasPermission(permission)) {
+        
+        if (!subCommand.hasPermission(sender)) {
             if (subCommand.getPermissionMessage() != null) {
                 sender.sendMessage(subCommand.getPermissionMessage());
             } else {
-                sendSubCommandDefaultPermissionMessage(subCommandExecution);
+                sendSubCommandDefaultPermissionMessage(subContext);
             }
             return;
         }
 
 
         if (subCommandArgs.length < subCommand.getMinArgs()) {
-            sendSubCommandUsage(subCommandExecution);
+            sendSubCommandUsage(subContext);
             return;
         }
 
-        subCommand.execute(subCommandExecution);
+        subCommand.execute(subContext.getSender(), subContext.getArgs(), subContext);
     }
 
-    protected final Iterable<? extends SubCommand> getAccessibleSubCommands(Permissible sender) {
+    protected Iterable<? extends SubCommand> getAccessibleSubCommands(Permissible sender) {
         List<SubCommand> list = new ArrayList<>();
         for (SubCommand subCommand : getSubCommands()) {
-            if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
+            if (subCommand.hasPermission(sender)) {
                 list.add(subCommand);
             }
         }
         return list;
     }
 
-    protected abstract SubCommand getSubCommandByName(String name);
-
-    protected abstract Iterable<? extends SubCommand> getSubCommands();
-
-    protected String getDefaultSubCommandPermission(SubCommand subCommand) {
-        return null;
+    protected void sendSubCommandUsage(SubCommandContext context) {
+        String usageText = getUsageText(context, context.getSubCommand());
+        context.getSender().sendMessage(ChatColor.RED + "Command usage: " + usageText);
     }
 
-    protected void sendSubCommandUsage(SubCommandExecution execution) {
-        String usageText = getUsageText(execution.getRootLabel(), execution.getSubCommand());
-        execution.getSender().sendMessage(ChatColor.RED + "Command usage: " + usageText);
+    protected void sendSubCommandDefaultPermissionMessage(SubCommandContext context) {
+        context.getSender().sendMessage(ChatColor.RED + "You don't have permission for this sub-command.");
     }
 
-    protected void sendSubCommandDefaultPermissionMessage(SubCommandExecution subCommandExecution) {
-        subCommandExecution.getSender().sendMessage(ChatColor.RED + "You don't have permission for this sub-command.");
+    protected void sendUnknownSubCommandMessage(SubCommandContext context) {
+        context.getSender().sendMessage(ChatColor.RED + "Unknown sub-command \"" + context.getSubLabel() + "\"." 
+                + " Use /" + context.getRootLabel() + " to see available commands.");
     }
 
-    protected void sendUnknownSubCommandMessage(SubCommandExecution execution) {
-        execution.getSender().sendMessage(ChatColor.RED + "Unknown sub-command \"" + execution.getSubLabel() 
-                + "\". Use /" + execution.getRootLabel() + " to see available commands.");
-    }
-
-    protected void sendNoArgsMessage(CommandSender sender, String rootLabel) {
-        sender.sendMessage("/" + rootLabel + " commands:");
-        for (SubCommand subCommand : getSubCommands()) {
-            sender.sendMessage(ChatColor.GRAY + getUsageText(rootLabel, subCommand));
+    protected void sendNoArgsMessage(CommandContext context) {
+        CommandSender sender = context.getSender();
+        sender.sendMessage(ChatColor.WHITE + "/" + context.getRootLabel() + " commands:");
+        for (SubCommand subCommand : getAccessibleSubCommands(sender)) {
+            sender.sendMessage(ChatColor.GRAY + getUsageText(context, subCommand));
         }
     }
 
-    protected final String getUsageText(String rootCommandName, SubCommand subCommand) {
-        return getUsageText(rootCommandName, subCommand.getName(), subCommand.getUsageArgs());
-    }
-
-    protected String getUsageText(String rootCommandName, String subCommandName, String usageArgs) {
-        return "/" + rootCommandName + " " + subCommandName + (usageArgs != null ? " " + usageArgs : "");
+    protected String getUsageText(CommandContext context, SubCommand subCommand) {
+        String rootLabel = context.getRootLabel();
+        String usageArgs = subCommand.getUsageArgs();
+        return "/" + rootLabel + " " + subCommand.getName() + (usageArgs != null ? " " + usageArgs : "");
     }
 
 }

@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.annotation;
+package me.filoghost.fcommons.command.sub.annotated;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Permission {
+public @interface UsageArgs {
 
     String value();
 

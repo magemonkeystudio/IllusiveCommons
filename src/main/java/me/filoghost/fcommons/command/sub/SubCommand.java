@@ -5,24 +5,12 @@
  */
 package me.filoghost.fcommons.command.sub;
 
-import me.filoghost.fcommons.command.CommandException;
+import me.filoghost.fcommons.command.CommandProperties;
+import me.filoghost.fcommons.command.validation.CommandException;
+import org.bukkit.command.CommandSender;
 
-public interface SubCommand {
+public interface SubCommand extends CommandProperties {
 
-    void execute(SubCommandExecution subCommandExecution) throws CommandException;
-
-    String getName();
-
-    String getPermission();
-
-    String getPermissionMessage();
-
-    String getUsageArgs();
-
-    int getMinArgs();
-
-    int getDisplayPriority();
-
-    String getDescription();
+    void execute(CommandSender sender, String[] args, SubCommandContext context) throws CommandException;
 
 }

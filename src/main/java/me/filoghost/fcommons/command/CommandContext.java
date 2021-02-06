@@ -3,23 +3,19 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command.sub;
+package me.filoghost.fcommons.command;
 
 import org.bukkit.command.CommandSender;
 
-public class SubCommandExecution {
+public class CommandContext {
 
     private final CommandSender sender;
-    private final SubCommand subCommand;
     private final String rootLabel;
-    private final String subLabel;
     private final String[] args;
 
-    public SubCommandExecution(CommandSender sender, SubCommand subCommand, String rootLabel, String subLabel, String[] args) {
+    public CommandContext(CommandSender sender, String rootLabel, String[] args) {
         this.sender = sender;
-        this.subCommand = subCommand;
         this.rootLabel = rootLabel;
-        this.subLabel = subLabel;
         this.args = args;
     }
 
@@ -27,20 +23,12 @@ public class SubCommandExecution {
         return sender;
     }
 
-    public SubCommand getSubCommand() {
-        return subCommand;
-    }
-
     public String getRootLabel() {
         return rootLabel;
-    }
-
-    public String getSubLabel() {
-        return subLabel;
     }
 
     public String[] getArgs() {
         return args;
     }
-
+    
 }

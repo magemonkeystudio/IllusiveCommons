@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.command;
+package me.filoghost.fcommons.command.validation;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
