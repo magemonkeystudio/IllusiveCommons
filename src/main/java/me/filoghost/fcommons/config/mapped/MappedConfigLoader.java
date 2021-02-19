@@ -12,56 +12,65 @@ import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.reflection.TypeInfo;
 
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfigLoader<T> {
+public class MappedConfigLoader<T extends MappedConfig> {
 
+    private final TypeInfo<T> mappedTypeInfo;
+    private ConfigMapper<T> configMapper;
     private final ConfigLoader configLoader;
 
     private Map<String, ConfigValue> defaultValues;
 
     public MappedConfigLoader(Path rootDataFolder, Path configPath, Class<T> mappedConfigClass) {
-        super(mappedConfigClass);
+        this.mappedTypeInfo = TypeInfo.of(mappedConfigClass);
         this.configLoader = new ConfigLoader(rootDataFolder, configPath);
     }
 
+    protected ConfigMapper<T> getMapper() throws ConfigMappingException {
+        if (configMapper == null) {
+            configMapper = new ConfigMapper<>(mappedTypeInfo);
+        }
+        return configMapper;
+    }
+    
     public T load() throws ConfigLoadException {
-        return load(null);
-    }
-
-    public T load(Object context) throws ConfigLoadException {
         Config config = configLoader.load();
-        return super.loadFromConfig(config, context);
+        T mappedObject;
+        try {
+            mappedObject = getMapper().newMappedObjectInstance();
+            getMapper().setFieldsFromConfig(mappedObject, config);
+        } catch (ConfigMappingException e) {
+            throw new ConfigLoadException(e.getMessage(), e);
+        }
+        return mappedObject;
     }
-
+    
     public T init() throws ConfigLoadException, ConfigSaveException {
-        return init(null);
-    }
-
-    public T init(Object context) throws ConfigLoadException, ConfigSaveException {
         Config config = configLoader.init();
 
         try {
             T mappedObject = getMapper().newMappedObjectInstance();
 
+            // On the first time, save defaults before modifying the config
             if (defaultValues == null) {
                 defaultValues = getMapper().getFieldsAsConfigValues(mappedObject);
             }
 
-            boolean modified = addMissingDefaultValues(config, defaultValues);
-            if (modified) {
-                config.setHeader(mappedObject.getHeader());
-                configLoader.save(config);
-            }
+            boolean fileSaveRequired = addMissingDefaultValues(config, defaultValues);
+            
+            getMapper().setFieldsFromConfig(mappedObject, config);
 
-            getMapper().setFieldsFromConfig(mappedObject, config, context);
+            saveInternal(mappedObject, config, false, fileSaveRequired);
+
             return mappedObject;
 
         } catch (ConfigMappingException e) {
-            throw new ConfigLoadException(e.getMessage(), e.getCause());
+            throw new ConfigLoadException(e.getMessage(), e);
         }
     }
 
@@ -78,36 +87,47 @@ public class MappedConfigLoader<T extends MappedConfig> extends BaseMappedConfig
         return modified;
     }
 
-    public void save(T mappedObject) throws ConfigSaveException {
-        Config config = new Config();
-
-        saveWithHeader(config, mappedObject);
-    }
-
     public boolean saveIfDifferent(T newMappedObject) throws ConfigLoadException, ConfigSaveException {
         if (!configLoader.fileExists()) {
-            saveWithHeader(new Config(), newMappedObject);
+            save(newMappedObject);
             return true;
         }
 
         Config config = configLoader.load();
-
+        
         try {
-            if (!getMapper().equalsConfig(newMappedObject, config)) {
-                saveWithHeader(config, newMappedObject);
-                return true;
-            }
+            boolean fileSaveRequired = !getMapper().equalsConfig(newMappedObject, config);
+            return saveInternal(newMappedObject, config, true, fileSaveRequired);
         } catch (ConfigMappingException e) {
-            throw new ConfigLoadException(e.getMessage(), e.getCause());
+            throw new ConfigLoadException(e.getMessage(), e);
         }
-
-        return false;
     }
 
-    private void saveWithHeader(Config config, T mappedObject) throws ConfigSaveException {
-        super.saveToConfig(mappedObject, config);
+    public void save(T mappedObject) throws ConfigSaveException {
+        saveInternal(mappedObject, new Config(), true, true);
+    }
+    
+    private boolean saveInternal(T mappedObject, Config config, boolean writeMappedObject, boolean fileSaveRequired)
+            throws ConfigSaveException {     
+        
+        if (writeMappedObject) {
+            try {
+                getMapper().setConfigFromFields(mappedObject, config);
+            } catch (ConfigMappingException e) {
+                throw new ConfigSaveException(e.getMessage(), e);
+            }
+        }
+
         config.setHeader(mappedObject.getHeader());
-        configLoader.save(config);
+        if (mappedObject.beforeSave(config)) {
+            fileSaveRequired = true;
+        }
+
+        if (fileSaveRequired) {
+            configLoader.save(config);
+        }
+        
+        return fileSaveRequired;
     }
 
     public Path getFile() {

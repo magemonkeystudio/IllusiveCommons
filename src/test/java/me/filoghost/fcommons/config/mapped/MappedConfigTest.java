@@ -5,10 +5,11 @@
  */
 package me.filoghost.fcommons.config.mapped;
 
-import me.filoghost.fcommons.test.AssertExtra;
+import me.filoghost.fcommons.config.Config;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
+import me.filoghost.fcommons.test.AssertExtra;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -92,6 +93,17 @@ class MappedConfigTest {
                 "# Header line",
                 "",
                 "integer: 1"
+        );
+    }
+
+    @Test
+    void testBeforeSave(@TempDir Path tempDir) throws ConfigException, IOException {
+        MappedConfigLoader<BeforeSaveConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, BeforeSaveConfig.class);
+        configLoader.init();
+
+        AssertExtra.fileContentMatches(configLoader.getFile(),
+                "integer: 1",
+                "beforeSave: true"
         );
     }
 
@@ -262,6 +274,18 @@ class MappedConfigTest {
         @Override
         public List<String> getHeader() {
             return Arrays.asList("Header line");
+        }
+
+    }
+
+    private static class BeforeSaveConfig implements MappedConfig {
+
+        private int integer = 1;
+
+        @Override
+        public boolean beforeSave(Config rawConfig) {
+            rawConfig.setBoolean("beforeSave", true);
+            return true;
         }
 
     }

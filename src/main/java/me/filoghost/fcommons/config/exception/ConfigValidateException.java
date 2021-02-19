@@ -5,13 +5,13 @@
  */
 package me.filoghost.fcommons.config.exception;
 
-public class ConfigPostLoadException extends ConfigLoadException {
+public class ConfigValidateException extends ConfigLoadException {
 
-    public ConfigPostLoadException(String message, Throwable cause) {
+    public ConfigValidateException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ConfigPostLoadException(String message) {
+    public ConfigValidateException(String message) {
         super(message);
     }
 

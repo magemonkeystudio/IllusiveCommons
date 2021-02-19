@@ -7,8 +7,8 @@ package me.filoghost.fcommons.config.mapped;
 
 import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
-import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -20,90 +20,73 @@ import static org.assertj.core.api.Assertions.*;
 class MappedConfigSectionTest {
 
     @Test
-    void testPostLoad(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
-        MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
+    void testAfterLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException {
+        MappedConfigLoader<AfterLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, AfterLoadConfig.class,
+                "string: xyz"
+        );
 
-        PostLoadConfig config = configLoader.init("abc");
+        AfterLoadConfig config = configLoader.load();
 
-        assertThat(config.postLoadCount).isEqualTo(1);
-        assertThat(config.postLoadContextCount).isEqualTo(1);
-        assertThat(config.postLoadContext).isEqualTo("abc");
+        assertThat(config.stringAfterLoad).isEqualTo("xyz");
     }
 
     @Test
-    void testPostLoadWrongTypedContext(@TempDir Path tempDir) {
-        MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
+    void testAfterLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
+        MappedConfigLoader<AfterLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, AfterLoadConfig.class);
 
-        assertThatExceptionOfType(ClassCastException.class).isThrownBy(() -> {
-            configLoader.init(123);
-        });
-    }
-
-    @Test
-    void testPostLoadNullContext(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
-        MappedConfigLoader<PostLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadConfig.class);
-
-        configLoader.init(null);
+        AfterLoadConfig config = configLoader.init();
+        
+        assertThat(config.stringAfterLoad).isEqualTo("abc");
     }
 
     @Test
     void testInitException(@TempDir Path tempDir) {
-        MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, PostLoadExceptionConfig.class);
+        MappedConfigLoader<AfterLoadExceptionConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, AfterLoadExceptionConfig.class);
 
-        assertThatExceptionOfType(ConfigPostLoadException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ConfigValidateException.class).isThrownBy(() -> {
             configLoader.init();
         });
     }
 
     @Test
     void testLoadException(@TempDir Path tempDir) throws IOException {
-        MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, PostLoadExceptionConfig.class,
+        MappedConfigLoader<AfterLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, AfterLoadExceptionConfig.class,
                 "string: abc"
         );
 
-        assertThatExceptionOfType(ConfigPostLoadException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ConfigValidateException.class).isThrownBy(() -> {
             configLoader.load();
         });
     }
 
     @Test
     void testSaveNotThrowException(@TempDir Path tempDir) throws IOException, ConfigException {
-        MappedConfigLoader<PostLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, PostLoadExceptionConfig.class,
+        MappedConfigLoader<AfterLoadExceptionConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, AfterLoadExceptionConfig.class,
                 "string: abc"
         );
 
-        // Save shouldn't invoke the postLoad() callback
-        configLoader.save(new PostLoadExceptionConfig());
+        // Save shouldn't invoke the afterLoad() callback
+        configLoader.save(new AfterLoadExceptionConfig());
     }
 
-    private static class PostLoadConfig implements MappedConfig, PostLoadCallback, ContextualPostLoadCallback<String> {
+    private static class AfterLoadConfig implements MappedConfig {
 
         private String string = "abc";
 
-        private transient int postLoadCount;
-        private transient int postLoadContextCount;
-        private transient String postLoadContext;
-
+        private transient String stringAfterLoad;
+        
         @Override
-        public void postLoad() {
-            postLoadCount++;
-        }
-
-        @Override
-        public void postLoad(String context) {
-            postLoadContext = context;
-            postLoadContextCount++;
+        public void afterLoad() {
+            stringAfterLoad = string;
         }
 
     }
 
-    private static class PostLoadExceptionConfig implements MappedConfig, PostLoadCallback {
-
-        private String string = "abc";
+    private static class AfterLoadExceptionConfig implements MappedConfig {
 
         @Override
-        public void postLoad() throws ConfigPostLoadException {
-            throw new ConfigPostLoadException("test");
+        public void afterLoad() throws ConfigValidateException {
+            throw new ConfigValidateException("test");
         }
 
     }

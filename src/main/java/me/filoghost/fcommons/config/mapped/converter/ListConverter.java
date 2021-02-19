@@ -8,7 +8,7 @@ package me.filoghost.fcommons.config.mapped.converter;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
 import me.filoghost.fcommons.config.mapped.MappingUtils;
 import me.filoghost.fcommons.reflection.TypeInfo;
@@ -38,11 +38,11 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected List<E> toFieldValue0(List<ConfigValue> configList, Object context) throws ConfigMappingException, ConfigPostLoadException {
+    protected List<E> toFieldValue0(List<ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
         List<E> fieldList = new ArrayList<>();
         for (ConfigValue configElement : configList) {
             if (isValidConfigListElement(configElement)) {
-                E fieldValue = elementConverter.toFieldValue(configElement, context);
+                E fieldValue = elementConverter.toFieldValue(configElement);
                 fieldList.add(fieldValue);
             }
         }

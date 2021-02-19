@@ -30,7 +30,7 @@ public class ConfigValueTypeConverter<T> extends Converter<T, T> {
     }
 
     @Override
-    protected T toFieldValue0(T configValue, Object context) {
+    protected T toFieldValue0(T configValue) {
         return configValue;
     }
 

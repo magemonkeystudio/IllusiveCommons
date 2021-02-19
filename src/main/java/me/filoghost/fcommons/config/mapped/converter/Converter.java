@@ -8,7 +8,7 @@ package me.filoghost.fcommons.config.mapped.converter;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigValueType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
 
 public abstract class Converter<F, V> {
 
@@ -29,16 +29,16 @@ public abstract class Converter<F, V> {
 
     protected abstract V toConfigValue0(F fieldValue) throws ConfigMappingException;
 
-    public final F toFieldValue(ConfigValue configValue, Object context) throws ConfigMappingException, ConfigPostLoadException {
+    public final F toFieldValue(ConfigValue configValue) throws ConfigMappingException, ConfigValidateException {
         V rawConfigValue = configValue.as(configValueType);
         if (rawConfigValue != null) {
-            return toFieldValue0(rawConfigValue, context);
+            return toFieldValue0(rawConfigValue);
         } else {
             return null;
         }
     }
 
-    protected abstract F toFieldValue0(V configValue, Object context) throws ConfigMappingException, ConfigPostLoadException;
+    protected abstract F toFieldValue0(V configValue) throws ConfigMappingException, ConfigValidateException;
 
     public final boolean equalsConfig(F fieldValue, ConfigValue configValue) throws ConfigMappingException {
         V rawConfigValue = configValue.as(configValueType);

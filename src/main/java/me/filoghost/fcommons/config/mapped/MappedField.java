@@ -10,7 +10,7 @@ import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
@@ -38,7 +38,11 @@ public class MappedField<T> {
     public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
         this.field = field;
         this.converter = ConverterRegistry.fromObjectType(getFieldTypeInfo(field));
-        this.configPath = field.getName().replace("__", ".").replace("_", "-");
+        if (field.isAnnotationPresent(ConfigPath.class)) {
+            this.configPath = field.getAnnotation(ConfigPath.class).value();
+        } else {
+            this.configPath = field.getName().replace("__", ".").replace("_", "-");
+        }
         this.annotations = Stream.concat(
                 Arrays.stream(field.getAnnotations()),
                 Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
@@ -79,15 +83,14 @@ public class MappedField<T> {
         }
     }
 
-    public void setFieldValueFromConfig(Object mappedObject, ConfigSection config, Object context)
-            throws ConfigMappingException, ConfigPostLoadException {
+    public void setFieldValueFromConfig(Object mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         ConfigValue configValue = config.get(configPath);
         if (configValue == null) {
             return;
         }
 
         try {
-            T fieldValue = converter.toFieldValue(configValue, context);
+            T fieldValue = converter.toFieldValue(configValue);
             if (fieldValue == null) {
                 return;
             }

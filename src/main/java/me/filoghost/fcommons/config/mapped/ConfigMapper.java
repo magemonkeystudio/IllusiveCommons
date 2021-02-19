@@ -10,7 +10,7 @@ import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.config.exception.ConfigPostLoadException;
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
 
@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigMapper<T> {
+public class ConfigMapper<T extends MappedConfigSection> {
 
     private final TypeInfo<T> mappedTypeInfo;
     private final List<MappedField<?>> mappedFields;
@@ -60,31 +60,20 @@ public class ConfigMapper<T> {
             config.set(mappedField.getConfigPath(), configValue);
         }
     }
-
-    @SuppressWarnings("unchecked")
-    public void setFieldsFromConfig(T mappedObject, ConfigSection config, Object context)
-            throws ConfigMappingException, ConfigPostLoadException {
+    
+    public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         for (MappedField<?> mappedField : mappedFields) {
-            mappedField.setFieldValueFromConfig(mappedObject, config, context);
+            mappedField.setFieldValueFromConfig(mappedObject, config);
         }
-
-        // After injecting fields, make sure the mapped config object is alerted
-        if (mappedObject instanceof PostLoadCallback) {
-            ((PostLoadCallback) mappedObject).postLoad();
-        }
-        if (mappedObject instanceof ContextualPostLoadCallback) {
-            ((ContextualPostLoadCallback<Object>) mappedObject).postLoad(context);
-        }
+        mappedObject.afterLoad();
     }
 
     private boolean isMappable(ReflectField<?> field) {
         int modifiers = field.getModifiers();
-        boolean includeStatic = field.isAnnotationPresent(IncludeStatic.class)
-                || field.getDeclaringClass().isAnnotationPresent(IncludeStatic.class);
 
-        return (!Modifier.isStatic(modifiers) || includeStatic)
-                || !Modifier.isTransient(modifiers)
-                || !Modifier.isFinal(modifiers);
+        return !Modifier.isStatic(modifiers)
+                && !Modifier.isTransient(modifiers)
+                && !Modifier.isFinal(modifiers);
     }
 
     public boolean equalsConfig(T mappedObject, ConfigSection config) throws ConfigMappingException {

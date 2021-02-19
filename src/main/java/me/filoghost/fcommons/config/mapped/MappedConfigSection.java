@@ -5,4 +5,14 @@
  */
 package me.filoghost.fcommons.config.mapped;
 
-public interface MappedConfigSection {}
+import me.filoghost.fcommons.config.exception.ConfigValidateException;
+
+public interface MappedConfigSection {
+
+    /**
+     * Optional hook called after fields are injected, can be used to set additional fields and
+     * to validate the configuration.
+     */
+    default void afterLoad() throws ConfigValidateException {}
+    
+}

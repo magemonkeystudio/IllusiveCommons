@@ -11,7 +11,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
-public @interface IncludeStatic {
+@Target(ElementType.FIELD)
+public @interface ConfigPath {
+    
+    String value();
 
 }
