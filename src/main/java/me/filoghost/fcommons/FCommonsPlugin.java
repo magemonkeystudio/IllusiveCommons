@@ -7,13 +7,12 @@ package me.filoghost.fcommons;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class BaseJavaPlugin extends JavaPlugin {
+public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
 
     @Override
     public final void onEnable() {
@@ -28,19 +27,18 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
         }
     }
 
+    protected abstract void onCheckedEnable() throws PluginEnableException;
+
     private void checkPackageRelocation() {
         // Prevent Maven's Relocate from changing strings too
         final String defaultPackage = "me-filoghost-fcommons".replace("-", ".");
 
         // Make sure package has been relocated
-        if (BaseJavaPlugin.class.getPackage().getName().equals(defaultPackage)) {
+        if (FCommonsPlugin.class.getPackage().getName().equals(defaultPackage)) {
             throw new IllegalStateException("FCommons must be relocated to another package");
         }
     }
-
-    protected abstract void onCheckedEnable() throws PluginEnableException;
-
-
+    
     private void criticalShutdown(List<String> errorMessageLines, Throwable throwable) {
         printCriticalError(errorMessageLines, throwable);
 
@@ -66,7 +64,7 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
         }
         if (throwable != null) {
             output.add("");
-            output.addAll(CommonsUtil.getStackTraceOutputLines(throwable));
+            output.addAll(ExceptionUtils.getStackTraceOutputLines(throwable));
             output.add("");
         }
         output.add(getDescription().getName() + " has been disabled.");
@@ -98,4 +96,5 @@ public abstract class BaseJavaPlugin extends JavaPlugin {
         }
 
     }
+    
 }

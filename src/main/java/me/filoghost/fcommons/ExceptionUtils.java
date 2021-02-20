@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
-public class CommonsUtil {
+public class ExceptionUtils {
 
     public static String getStackTraceOutput(Throwable throwable) {
         StringWriter stringWriter = new StringWriter();
