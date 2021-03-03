@@ -10,6 +10,12 @@ import org.bukkit.Material;
 public final class Preconditions {
 
 
+    public static void notNull(Object object) {
+        if (object == null) {
+            throw new NullPointerException();
+        }
+    }
+    
     public static void notNull(Object object, String objectName) {
         if (object == null) {
             throw new NullPointerException(objectName + " cannot be null");
@@ -23,9 +29,21 @@ public final class Preconditions {
         }
     }
 
+    public static void checkArgument(boolean expression) {
+        if (!expression) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public static void checkArgument(boolean expression, String errorMessage) {
         if (!expression) {
             throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    public static void checkState(boolean expression) {
+        if (!expression) {
+            throw new IllegalStateException();
         }
     }
 
