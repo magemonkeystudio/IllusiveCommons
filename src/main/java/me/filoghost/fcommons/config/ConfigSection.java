@@ -8,11 +8,13 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ConfigSection {
 
@@ -43,13 +45,21 @@ public class ConfigSection {
         return getOrDefault(path, configValueType, null);
     }
 
+    public <T> T get(ConfigPath configPath, ConfigValueType<T> configValueType) {
+        return getOrDefault(configPath, configValueType, null);
+    }
+
     public <T> T getRequired(String path, ConfigValueType<T> configValueType)
             throws MissingConfigValueException, InvalidConfigValueException {
         return configValueType.fromConfigValueRequired(path, getRawValue(path));
     }
 
     public <T> T getOrDefault(String path, ConfigValueType<T> configValueType, T defaultValue) {
-        return configValueType.fromConfigValueOrDefault(getRawValue(path), defaultValue);
+        return getOrDefault(ConfigPath.tokenDelimited(path), configValueType, defaultValue);
+    }
+
+    public <T> T getOrDefault(ConfigPath configPath, ConfigValueType<T> configValueType, T defaultValue) {
+        return configValueType.fromConfigValueOrDefault(getRawValue(configPath), defaultValue);
     }
 
     public <T> void set(String path, ConfigValue configValue) {
@@ -57,7 +67,11 @@ public class ConfigSection {
     }
 
     public <T> void set(String path, ConfigValueType<T> configValueType, T value) {
-        setRawValue(path, configValueType.toConfigValueOrNull(value));
+        set(ConfigPath.tokenDelimited(path), configValueType, value);
+    }
+
+    public <T> void set(ConfigPath configPath, ConfigValueType<T> configValueType, T value) {
+        setRawValue(configPath, configValueType.toConfigValueOrNull(value));
     }
 
     public boolean contains(String path) {
@@ -76,55 +90,85 @@ public class ConfigSection {
         }
         return section;
     }
+    
+    public Map<ConfigPath, ConfigValue> toMap() {
+        Map<ConfigPath, ConfigValue> map = new LinkedHashMap<>();
 
-    public Set<String> getKeys() {
-        return new LinkedHashSet<>(values.keySet());
+        for (Entry<String, Object> entry : values.entrySet()) {
+            ConfigPath path = ConfigPath.literal(entry.getKey());
+            ConfigValue value = ConfigValue.ofRawConfigValue(entry.getKey(), entry.getValue());
+            map.put(path, value);
+        }
+
+        return map;
     }
 
     private Object getRawValue(String path) {
-        Preconditions.notEmpty(path, "path");
-
-        int separatorIndex = path.indexOf('.');
-        if (separatorIndex >= 0) {
-            String firstPath = path.substring(0, separatorIndex);
-            String remainingPath = path.substring(separatorIndex + 1);
-            ConfigSection section = getConfigSection(firstPath);
-
-            if (section != null) {
-                return section.getRawValue(remainingPath);
-            } else {
-                return null;
-            }
-        } else {
-            return values.get(path);
+        return getRawValue(ConfigPath.tokenDelimited(path));
+    }
+    
+    private Object getRawValue(ConfigPath configPath) {
+        Preconditions.notNull(configPath, "configPath");
+        
+        if (configPath.getPartsLength() == 1) {
+            return values.get(configPath.getLastPart());
         }
+
+        ConfigSection targetSection = getSectionForPath(configPath);
+        if (targetSection == null) {
+            return null;
+        }
+        
+        return targetSection.values.get(configPath.getLastPart());
     }
 
     private void setRawValue(String path, Object value) {
-        Preconditions.notEmpty(path, "path");
-
-        int separatorIndex = path.indexOf('.');
-        if (separatorIndex >= 0) {
-            String firstPath = path.substring(0, separatorIndex);
-            String remainingPath = path.substring(separatorIndex + 1);
-            ConfigSection section = getConfigSection(firstPath);
-
-            if (section == null) {
-                if (value == null) {
-                    return;
-                } else {
-                    section = getOrCreateSection(firstPath);
-                }
-            }
-
-            section.setRawValue(remainingPath, value);
+        setRawValue(ConfigPath.tokenDelimited(path), value);
+    }
+    
+    private void setRawValue(ConfigPath configPath, Object value) {
+        Preconditions.notNull(configPath, "configPath");
+        
+        if (value != null) {
+            getOrCreateSectionForPath(configPath).values.put(configPath.getLastPart(), value);
         } else {
-            if (value != null) {
-                values.put(path, value);
-            } else {
-                values.remove(path);
+            ConfigSection section = getSectionForPath(configPath);
+            if (section != null) {
+                section.values.remove(configPath.getLastPart());
             }
         }
+    }
+    
+    @Nullable
+    private ConfigSection getSectionForPath(ConfigPath configPath) {
+        return getSectionForPath(configPath, false);
+    }
+
+    @NotNull
+    private ConfigSection getOrCreateSectionForPath(ConfigPath configPath) {
+        return getSectionForPath(configPath, true);
+    }
+
+    private ConfigSection getSectionForPath(ConfigPath configPath, boolean createIfNotExisting) {
+        ConfigSection currentSection = this;
+        
+        for (int i = 0; i < configPath.getPartsLength() - 1; i++) { // Exclude the last part of the path
+            String pathPart = configPath.getPart(i);
+            Object rawValue = currentSection.values.get(pathPart);
+            
+            if (createIfNotExisting && rawValue == null) {
+                ConfigSection innerSection = new ConfigSection();
+                currentSection.values.put(pathPart, ConfigValueType.SECTION.toConfigValue(innerSection));
+                currentSection = innerSection;
+            } else {
+                currentSection = ConfigValueType.SECTION.fromConfigValueOrNull(rawValue);
+                if (currentSection == null) {
+                    return null;
+                }
+            }
+        }
+        
+        return currentSection;
     }
 
     /*

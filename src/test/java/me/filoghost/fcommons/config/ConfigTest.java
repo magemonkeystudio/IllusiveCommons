@@ -135,4 +135,13 @@ class ConfigTest {
         );
     }
 
+    @Test
+    void testKeysWithPathSeparator() {
+        ConfigSection section = config.getConfigSection("keys-with-path-separator");
+        String value = section.get(ConfigPath.literal("..a..b.."), ConfigValueType.STRING);
+
+        assertThat(value).isEqualTo("value");
+        assertThat(section.toMap().keySet().iterator().next().getLastPart()).isEqualTo("..a..b..");
+    }
+
 }

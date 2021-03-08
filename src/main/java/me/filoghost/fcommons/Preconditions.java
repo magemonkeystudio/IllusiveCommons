@@ -7,6 +7,8 @@ package me.filoghost.fcommons;
 
 import org.bukkit.Material;
 
+import java.util.Collection;
+
 public final class Preconditions {
 
 
@@ -25,6 +27,20 @@ public final class Preconditions {
     public static void notEmpty(String string, String objectName) {
         notNull(string, objectName);
         if (string.isEmpty()) {
+            throw new IllegalArgumentException(objectName + " cannot be empty");
+        }
+    }
+
+    public static void notEmpty(Collection<?> collection, String objectName) {
+        notNull(collection, objectName);
+        if (collection.isEmpty()) {
+            throw new IllegalArgumentException(objectName + " cannot be empty");
+        }
+    }
+
+    public static void notEmpty(Object[] array, String objectName) {
+        notNull(array, objectName);
+        if (array.length == 0) {
             throw new IllegalArgumentException(objectName + " cannot be empty");
         }
     }

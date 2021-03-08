@@ -38,3 +38,5 @@ nested-sections-list:
       key1: value3
     nested2:
       key2: value4
+keys-with-path-separator:
+  ..a..b..: value
