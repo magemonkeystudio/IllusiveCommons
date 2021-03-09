@@ -6,6 +6,8 @@
 package me.filoghost.fcommons.config.type;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class StringConfigType extends ConfigType<String> {
 
@@ -14,17 +16,17 @@ class StringConfigType extends ConfigType<String> {
     }
 
     @Override
-    public boolean isValidRawValue(Object rawValue) {
+    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof String || rawValue instanceof Number || rawValue instanceof Boolean || rawValue instanceof Character;
     }
 
     @Override
-    protected String fromRawValue(Object rawValue) {
+    protected String fromRawValue(@NotNull Object rawValue) {
         return rawValue.toString();
     }
 
     @Override
-    public Object toRawValue(String configValue) {
+    public Object toRawValue(@NotNull String configValue) {
         return configValue;
     }
 

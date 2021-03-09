@@ -6,6 +6,8 @@
 package me.filoghost.fcommons.config.type;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,12 @@ class ListConfigType<E> extends ConfigType<List<E>> {
     }
 
     @Override
-    public boolean isValidRawValue(Object rawValue) {
+    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof List;
     }
 
     @Override
-    protected List<E> fromRawValue(Object rawValue) {
+    protected List<E> fromRawValue(@NotNull Object rawValue) {
         List<E> configValue = new ArrayList<>();
 
         for (Object rawElement : (List<?>) rawValue) {
@@ -39,7 +41,7 @@ class ListConfigType<E> extends ConfigType<List<E>> {
     }
 
     @Override
-    public Object toRawValue(List<E> configValue) {
+    public Object toRawValue(@NotNull List<E> configValue) {
         return new ArrayList<>(configValue);
     }
 

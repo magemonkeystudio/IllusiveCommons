@@ -6,6 +6,8 @@
 package me.filoghost.fcommons.config.type;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class BooleanConfigType extends ConfigType<Boolean> {
 
@@ -14,17 +16,17 @@ class BooleanConfigType extends ConfigType<Boolean> {
     }
 
     @Override
-    public boolean isValidRawValue(Object rawValue) {
+    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof Boolean;
     }
 
     @Override
-    protected Boolean fromRawValue(Object rawValue) {
+    protected Boolean fromRawValue(@NotNull Object rawValue) {
         return (Boolean) rawValue;
     }
 
     @Override
-    public Object toRawValue(Boolean configValue) {
+    public Object toRawValue(@NotNull Boolean configValue) {
         return configValue;
     }
 

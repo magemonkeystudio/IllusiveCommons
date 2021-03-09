@@ -11,6 +11,9 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -41,27 +44,28 @@ public abstract class ConfigType<T> {
         this.notConvertibleErrorMessage = notConvertibleErrorMessage;
     }
 
-    public abstract boolean isValidRawValue(Object rawValue);
+    @Contract("null -> false")
+    public abstract boolean isConvertibleRawValue(@Nullable Object rawValue);
 
-    public abstract Object toRawValue(T configValue);
+    public abstract Object toRawValue(@NotNull T configValue);
 
-    protected abstract T fromRawValue(Object rawValue);
-
-    public T fromRawValueOrNull(Object rawValue) {
+    protected abstract T fromRawValue(@NotNull Object rawValue);
+    
+    public T fromRawValueOrNull(@Nullable Object rawValue) {
         return fromRawValueOrDefault(rawValue, null);
     }
 
-    public T fromRawValueOrDefault(Object rawValue, T defaultValue) {
-        if (isValidRawValue(rawValue)) {
+    public T fromRawValueOrDefault(@Nullable Object rawValue, T defaultValue) {
+        if (isConvertibleRawValue(rawValue)) {
             return fromRawValue(rawValue);
         } else {
             return defaultValue;
         }
     }
 
-    public T fromRawValueRequired(Object rawValue, ConfigPath configPath)
+    public T fromRawValueRequired(@Nullable Object rawValue, @Nullable ConfigPath configPath)
             throws InvalidConfigValueException, MissingConfigValueException {
-        if (isValidRawValue(rawValue)) {
+        if (isConvertibleRawValue(rawValue)) {
             return fromRawValue(rawValue);
         } else {
             if (rawValue != null) {

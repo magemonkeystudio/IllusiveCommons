@@ -6,6 +6,8 @@
 package me.filoghost.fcommons.config.type;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -19,17 +21,17 @@ class NumberConfigType<T extends Number> extends ConfigType<T> {
     }
 
     @Override
-    public boolean isValidRawValue(Object rawValue) {
+    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof Number;
     }
 
     @Override
-    protected T fromRawValue(Object rawValue) {
+    protected T fromRawValue(@NotNull Object rawValue) {
         return toTypeFunction.apply((Number) rawValue);
     }
 
     @Override
-    public Object toRawValue(T configValue) {
+    public Object toRawValue(@NotNull T configValue) {
         return configValue;
     }
 
