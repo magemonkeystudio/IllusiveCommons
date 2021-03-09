@@ -65,10 +65,10 @@ class ConfigTest {
         List<ConfigSection> sections = config.get("nested-sections-list", ConfigType.SECTION_LIST);
 
         assertThat(sections).hasSize(2);
-        assertThat(sections.get(0).get("nested1")).satisfies(v -> v.isPresentAs(ConfigType.SECTION));
-        assertThat(sections.get(0).get("nested2")).satisfies(v -> v.isPresentAs(ConfigType.SECTION));
-        assertThat(sections.get(1).get("nested1")).satisfies(v -> v.isPresentAs(ConfigType.SECTION));
-        assertThat(sections.get(1).get("nested2")).satisfies(v -> v.isPresentAs(ConfigType.SECTION));
+        assertThat(sections.get(0).get("nested1")).matches(v -> v.isPresentAs(ConfigType.SECTION));
+        assertThat(sections.get(0).get("nested2")).matches(v -> v.isPresentAs(ConfigType.SECTION));
+        assertThat(sections.get(1).get("nested1")).matches(v -> v.isPresentAs(ConfigType.SECTION));
+        assertThat(sections.get(1).get("nested2")).matches(v -> v.isPresentAs(ConfigType.SECTION));
 
         assertThat(sections.get(0).get("nested1", ConfigType.SECTION).getString("key1")).isEqualTo("value1");
         assertThat(sections.get(0).get("nested2", ConfigType.SECTION).getString("key2")).isEqualTo("value2");
