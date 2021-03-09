@@ -6,45 +6,45 @@
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigValue;
-import me.filoghost.fcommons.config.ConfigValueType;
+import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 
-public abstract class Converter<F, V> {
+public abstract class Converter<F, C> {
 
-    protected final ConfigValueType<V> configValueType;
+    protected final ConfigType<C> configType;
 
-    protected Converter(ConfigValueType<V> configValueType) {
-        this.configValueType = configValueType;
+    protected Converter(ConfigType<C> configType) {
+        this.configType = configType;
     }
 
     public final ConfigValue toConfigValue(F fieldValue) throws ConfigMappingException {
-        V configValue = toConfigValue0(fieldValue);
+        C configValue = toConfigValue0(fieldValue);
         if (configValue != null) {
-            return ConfigValue.of(configValueType, configValue);
+            return ConfigValue.of(configType, configValue);
         } else {
             return ConfigValue.NULL;
         }
     }
 
-    protected abstract V toConfigValue0(F fieldValue) throws ConfigMappingException;
+    protected abstract C toConfigValue0(F fieldValue) throws ConfigMappingException;
 
-    public final F toFieldValue(ConfigValue configValue) throws ConfigMappingException, ConfigValidateException {
-        V rawConfigValue = configValue.as(configValueType);
-        if (rawConfigValue != null) {
-            return toFieldValue0(rawConfigValue);
+    public final F toFieldValue(ConfigValue wrappedConfigValue) throws ConfigMappingException, ConfigValidateException {
+        C configValue = wrappedConfigValue.as(configType);
+        if (configValue != null) {
+            return toFieldValue0(configValue);
         } else {
             return null;
         }
     }
 
-    protected abstract F toFieldValue0(V configValue) throws ConfigMappingException, ConfigValidateException;
+    protected abstract F toFieldValue0(C configValue) throws ConfigMappingException, ConfigValidateException;
 
-    public final boolean equalsConfig(F fieldValue, ConfigValue configValue) throws ConfigMappingException {
-        V rawConfigValue = configValue.as(configValueType);
-        return equalsConfig0(fieldValue, rawConfigValue);
+    public final boolean equalsConfig(F fieldValue, ConfigValue wrappedConfigValue) throws ConfigMappingException {
+        C configValue = wrappedConfigValue.as(configType);
+        return equalsConfig0(fieldValue, configValue);
     }
 
-    protected abstract boolean equalsConfig0(F fieldValue, V configValue) throws ConfigMappingException;
+    protected abstract boolean equalsConfig0(F fieldValue, C configValue) throws ConfigMappingException;
 
 }

@@ -7,9 +7,9 @@ package me.filoghost.fcommons.config.mapped;
 
 import com.google.common.collect.Lists;
 import me.filoghost.fcommons.config.ConfigSection;
-import me.filoghost.fcommons.config.ConfigValueType;
+import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
-import me.filoghost.fcommons.config.mapped.converter.ConfigValueTypeConverter;
+import me.filoghost.fcommons.config.mapped.converter.ConfigTypeConverter;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.converter.ListConverter;
 import me.filoghost.fcommons.config.mapped.converter.MappedConfigSectionConverter;
@@ -19,17 +19,17 @@ import java.util.List;
 
 public class ConverterRegistry {
 
-    private static final List<ConfigValueTypeConverter<?>> CONFIG_VALUE_TYPE_CONVERTERS = Lists.newArrayList(
-            new ConfigValueTypeConverter<>(ConfigValueType.DOUBLE, Double.class, double.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.FLOAT, Float.class, float.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.LONG, Long.class, long.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.INTEGER, Integer.class, int.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.SHORT, Short.class, short.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.BYTE, Byte.class, byte.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.BOOLEAN, Boolean.class, boolean.class),
+    private static final List<ConfigTypeConverter<?>> CONFIG_VALUE_TYPE_CONVERTERS = Lists.newArrayList(
+            new ConfigTypeConverter<>(ConfigType.DOUBLE, Double.class, double.class),
+            new ConfigTypeConverter<>(ConfigType.FLOAT, Float.class, float.class),
+            new ConfigTypeConverter<>(ConfigType.LONG, Long.class, long.class),
+            new ConfigTypeConverter<>(ConfigType.INTEGER, Integer.class, int.class),
+            new ConfigTypeConverter<>(ConfigType.SHORT, Short.class, short.class),
+            new ConfigTypeConverter<>(ConfigType.BYTE, Byte.class, byte.class),
+            new ConfigTypeConverter<>(ConfigType.BOOLEAN, Boolean.class, boolean.class),
 
-            new ConfigValueTypeConverter<>(ConfigValueType.STRING, String.class),
-            new ConfigValueTypeConverter<>(ConfigValueType.SECTION, ConfigSection.class)
+            new ConfigTypeConverter<>(ConfigType.STRING, String.class),
+            new ConfigTypeConverter<>(ConfigType.SECTION, ConfigSection.class)
     );
 
     @SuppressWarnings("unchecked")
@@ -37,9 +37,9 @@ public class ConverterRegistry {
         Class<T> typeClass = typeInfo.getTypeClass();
         
         if (typeClass != null) {
-            for (ConfigValueTypeConverter<?> configValueTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
-                if (configValueTypeConverter.supports(typeClass)) {
-                    return (Converter<T, ?>) configValueTypeConverter;
+            for (ConfigTypeConverter<?> configTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
+                if (configTypeConverter.supports(typeClass)) {
+                    return (Converter<T, ?>) configTypeConverter;
                 }
             }
 

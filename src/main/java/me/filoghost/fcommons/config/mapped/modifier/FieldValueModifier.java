@@ -7,16 +7,16 @@ package me.filoghost.fcommons.config.mapped.modifier;
 
 import java.lang.annotation.Annotation;
 
-public interface ValueModifier<V, A extends Annotation> {
+public interface FieldValueModifier<F, A extends Annotation> {
 
-    V transform(A annotation, V value);
+    F transform(A annotation, F fieldValue);
 
     Class<A> getAnnotationType();
 
-    Class<V> getValueType();
+    Class<F> getFieldType();
 
     default boolean isApplicable(Annotation annotation, Object value) {
-        return getAnnotationType().isInstance(annotation) && getValueType().isInstance(value);
+        return getAnnotationType().isInstance(annotation) && getFieldType().isInstance(value);
     }
 
 }

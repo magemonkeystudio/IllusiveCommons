@@ -8,49 +8,51 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
+import me.filoghost.fcommons.config.type.ConfigType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public final class ConfigValue {
 
     public static final ConfigValue NULL = new ConfigValue(null, null);
+    
+    private final ConfigPath sourcePath;
+    private final Object rawValue;
 
-    private final String path;
-    private final Object rawConfigValue;
-
-    public static <T> ConfigValue of(ConfigValueType<T> valueType, T value) {
-        Preconditions.notNull(valueType, "valueType");
+    public static <T> ConfigValue of(ConfigType<T> type, T value) {
+        Preconditions.notNull(type, "type");
         Preconditions.notNull(value, "value");
-        return new ConfigValue(null, valueType.toConfigValue(value));
+        return new ConfigValue(null, type.toRawValue(value));
     }
 
-    protected static ConfigValue ofRawConfigValue(String path, Object rawConfigValue) {
-        return new ConfigValue(path, rawConfigValue);
+    public static ConfigValue wrapRawConfigValue(ConfigPath configPath, @Nullable Object rawValue) {
+        return new ConfigValue(configPath, rawValue);
     }
 
-    private ConfigValue(String path, Object rawConfigValue) {
-        this.path = path;
-        this.rawConfigValue = rawConfigValue;
+    private ConfigValue(@Nullable ConfigPath sourcePath, Object rawValue) {
+        this.sourcePath = sourcePath;
+        this.rawValue = rawValue;
     }
 
-    protected Object getRawConfigValue() {
-        return rawConfigValue;
+    public Object getRawValue() {
+        return rawValue;
     }
 
-    public <T> T as(ConfigValueType<T> valueType) {
-        return valueType.fromConfigValueOrDefault(rawConfigValue, null);
+    public <T> T as(ConfigType<T> type) {
+        return type.fromRawValueOrNull(rawValue);
     }
 
-    public <T> T asRequired(ConfigValueType<T> valueType) throws MissingConfigValueException, InvalidConfigValueException {
-        return valueType.fromConfigValueRequired(path, rawConfigValue);
+    public <T> T asRequired(ConfigType<T> type) throws MissingConfigValueException, InvalidConfigValueException {
+        return type.fromRawValueRequired(rawValue, sourcePath);
     }
 
-    public <T> T asOrDefault(ConfigValueType<T> valueType, T defaultValue) {
-        return valueType.fromConfigValueOrDefault(rawConfigValue, defaultValue);
+    public <T> T asOrDefault(ConfigType<T> type, @Nullable T defaultValue) {
+        return type.fromRawValueOrDefault(rawValue, defaultValue);
     }
 
-    public boolean isPresentAs(ConfigValueType<?> configValueType) {
-        return configValueType.isValidNonNullConfigValue(rawConfigValue);
+    public boolean isPresentAs(ConfigType<?> type) {
+        return type.isValidRawValue(rawValue);
     }
 
     @Override
@@ -62,17 +64,17 @@ public final class ConfigValue {
             return false;
         }
         ConfigValue other = (ConfigValue) obj;
-        return Objects.equals(this.rawConfigValue, other.rawConfigValue);
+        return Objects.equals(this.rawValue, other.rawValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rawConfigValue);
+        return Objects.hash(rawValue);
     }
 
     @Override
     public String toString() {
-        return Objects.toString(rawConfigValue);
+        return Objects.toString(rawValue);
     }
 
 }

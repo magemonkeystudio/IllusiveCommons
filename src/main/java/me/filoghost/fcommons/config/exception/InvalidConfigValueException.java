@@ -5,10 +5,12 @@
  */
 package me.filoghost.fcommons.config.exception;
 
+import me.filoghost.fcommons.config.ConfigPath;
+
 public class InvalidConfigValueException extends ConfigValueException {
 
-    public InvalidConfigValueException(String path, String message) {
-        super(path, message);
+    public InvalidConfigValueException(ConfigPath configPath, String message) {
+        super(configPath, message);
     }
 
 }

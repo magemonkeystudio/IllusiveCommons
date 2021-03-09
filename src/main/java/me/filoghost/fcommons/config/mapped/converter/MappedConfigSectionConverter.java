@@ -6,7 +6,7 @@
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigSection;
-import me.filoghost.fcommons.config.ConfigValueType;
+import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConfigMapper;
@@ -18,7 +18,7 @@ public class MappedConfigSectionConverter<T extends MappedConfigSection> extends
     private final ConfigMapper<T> configMapper;
 
     public MappedConfigSectionConverter(TypeInfo<T> fieldTypeInfo) throws ConfigMappingException {
-        super(ConfigValueType.SECTION);
+        super(ConfigType.SECTION);
         this.configMapper = new ConfigMapper<>(fieldTypeInfo);
     }
 

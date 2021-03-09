@@ -7,6 +7,7 @@ package me.filoghost.fcommons.config.mapped;
 
 import me.filoghost.fcommons.config.Config;
 import me.filoghost.fcommons.config.ConfigLoader;
+import me.filoghost.fcommons.config.ConfigPath;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
@@ -24,7 +25,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
     private ConfigMapper<T> configMapper;
     private final ConfigLoader configLoader;
 
-    private Map<String, ConfigValue> defaultValues;
+    private Map<ConfigPath, ConfigValue> defaultValues;
 
     public MappedConfigLoader(Path rootDataFolder, Path configPath, Class<T> mappedConfigClass) {
         this.mappedTypeInfo = TypeInfo.of(mappedConfigClass);
@@ -74,10 +75,10 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
     }
 
-    private boolean addMissingDefaultValues(ConfigSection config, Map<String, ConfigValue> defaultValues) {
+    private boolean addMissingDefaultValues(ConfigSection config, Map<ConfigPath, ConfigValue> defaultValues) {
         boolean modified = false;
 
-        for (Entry<String, ConfigValue> entry : defaultValues.entrySet()) {
+        for (Entry<ConfigPath, ConfigValue> entry : defaultValues.entrySet()) {
             if (!config.contains(entry.getKey())) {
                 config.set(entry.getKey(), entry.getValue());
                 modified = true;

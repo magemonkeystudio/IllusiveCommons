@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class YamlSerializer {
+class YamlSerializer {
 
     private static final String COMMENT_PREFIX = "#";
     private static final String BLANK_CONFIG = "{}\n";
@@ -34,19 +34,19 @@ public class YamlSerializer {
         this.yaml = new Yaml(yamlOptions);
     }
 
-    public LinkedHashMap<String, Object> parseConfigValues(List<String> fileContents) throws ConfigLoadException {
+    public LinkedHashMap<String, Object> parseRawValues(List<String> fileContents) throws ConfigLoadException {
         Preconditions.notNull(fileContents, "fileContents cannot be null");
 
         Map<?, ?> yamlValues = parseYamlMap(String.join("\n", fileContents));
         if (yamlValues != null) {
-            return yamlMapToConfigValues(yamlValues);
+            return yamlMapToRawValues(yamlValues);
         } else {
             return null;
         }
     }
 
-    public String serializeConfigValues(LinkedHashMap<String, Object> configValues) {
-        Map<String, Object> yamlMap = configValuesToYamlMap(configValues);
+    public String serializeConfigValues(LinkedHashMap<String, Object> rawValues) {
+        Map<String, Object> yamlMap = rawValuesToYamlMap(rawValues);
         return serializeYamlMap(yamlMap);
     }
 
@@ -83,69 +83,69 @@ public class YamlSerializer {
         }
     }
 
-    public LinkedHashMap<String, Object> yamlMapToConfigValues(Map<?, ?> yamlMap) {
-        LinkedHashMap<String, Object> configValues = new LinkedHashMap<>();
+    public LinkedHashMap<String, Object> yamlMapToRawValues(Map<?, ?> yamlMap) {
+        LinkedHashMap<String, Object> rawValues = new LinkedHashMap<>();
 
         for (Map.Entry<?, ?> entry : yamlMap.entrySet()) {
             String key = entry.getKey().toString();
             Object value = entry.getValue();
 
-            configValues.put(key, yamlValueToConfigValue(value));
+            rawValues.put(key, yamlValueToRawValue(value));
         }
 
-        return configValues;
+        return rawValues;
     }
 
-    private Object yamlValueToConfigValue(Object yamlValue) {
+    private Object yamlValueToRawValue(Object yamlValue) {
         if (yamlValue instanceof Map) {
             Map<?, ?> yamlMap = (Map<?, ?>) yamlValue;
-            return new ConfigSection(yamlMapToConfigValues(yamlMap));
+            return new ConfigSection(yamlMapToRawValues(yamlMap));
 
         } else if (yamlValue instanceof List) {
             List<?> yamlList = (List<?>) yamlValue;
-            List<Object> configList = new ArrayList<>();
+            List<Object> rawList = new ArrayList<>();
 
-            for (Object element : yamlList) {
-                configList.add(yamlValueToConfigValue(element));
+            for (Object yamlElement : yamlList) {
+                rawList.add(yamlValueToRawValue(yamlElement));
             }
 
-            return configList;
+            return rawList;
 
         } else {
             return yamlValue;
         }
     }
 
-    public Map<String, Object> configValuesToYamlMap(Map<String, Object> configValues) {
+    public Map<String, Object> rawValuesToYamlMap(Map<String, Object> rawValues) {
         Map<String, Object> yamlMap = new LinkedHashMap<>();
 
-        for (Map.Entry<String, ?> entry : configValues.entrySet()) {
+        for (Map.Entry<String, ?> entry : rawValues.entrySet()) {
             String key = entry.getKey();
-            Object value = entry.getValue();
+            Object rawValue = entry.getValue();
 
-            yamlMap.put(key, configValueToYamlValue(value));
+            yamlMap.put(key, rawValueToYamlValue(rawValue));
         }
 
         return yamlMap;
     }
 
-    private Object configValueToYamlValue(Object configValue) {
-        if (configValue instanceof ConfigSection) {
-            ConfigSection configSection = (ConfigSection) configValue;
-            return configValuesToYamlMap(configSection.getInternalValues());
+    private Object rawValueToYamlValue(Object rawValue) {
+        if (rawValue instanceof ConfigSection) {
+            ConfigSection rawSection = (ConfigSection) rawValue;
+            return rawValuesToYamlMap(rawSection.getRawValues());
 
-        } else if (configValue instanceof List) {
-            List<?> configList = (List<?>) configValue;
+        } else if (rawValue instanceof List) {
+            List<?> rawList = (List<?>) rawValue;
             List<Object> yamlList = new ArrayList<>();
 
-            for (Object configElement : configList) {
-                yamlList.add(configValueToYamlValue(configElement));
+            for (Object rawElement : rawList) {
+                yamlList.add(rawValueToYamlValue(rawElement));
             }
 
             return yamlList;
 
         } else {
-            return configValue;
+            return rawValue;
         }
     }
 

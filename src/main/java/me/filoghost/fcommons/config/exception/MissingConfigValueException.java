@@ -5,10 +5,12 @@
  */
 package me.filoghost.fcommons.config.exception;
 
+import me.filoghost.fcommons.config.ConfigPath;
+
 public class MissingConfigValueException extends ConfigValueException {
 
-    public MissingConfigValueException(String path, String message) {
-        super(path, message);
+    public MissingConfigValueException(ConfigPath configPath, String message) {
+        super(configPath, message);
     }
 
 }

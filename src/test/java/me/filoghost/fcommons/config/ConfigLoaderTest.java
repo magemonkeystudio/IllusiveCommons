@@ -8,6 +8,7 @@ package me.filoghost.fcommons.config;
 import com.google.common.base.Strings;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.test.AssertExtra;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -38,10 +39,10 @@ class ConfigLoaderTest {
         config.setConfigSection("section", section);
 
         List<ConfigValue> listOfLists = new ArrayList<>();
-        listOfLists.add(ConfigValue.of(ConfigValueType.STRING_LIST, Arrays.asList("a", "b", "c")));
-        listOfLists.add(ConfigValue.of(ConfigValueType.INTEGER_LIST, Arrays.asList(1, 2, 3)));
-        listOfLists.add(ConfigValue.of(ConfigValueType.SECTION, section));
-        config.set("list-of-lists", ConfigValueType.LIST, listOfLists);
+        listOfLists.add(ConfigValue.of(ConfigType.STRING_LIST, Arrays.asList("a", "b", "c")));
+        listOfLists.add(ConfigValue.of(ConfigType.INTEGER_LIST, Arrays.asList(1, 2, 3)));
+        listOfLists.add(ConfigValue.of(ConfigType.SECTION, section));
+        config.set("list-of-lists", ConfigType.LIST, listOfLists);
 
         configLoader.save(config);
 

@@ -5,21 +5,21 @@
  */
 package me.filoghost.fcommons.config.mapped.converter;
 
-import me.filoghost.fcommons.config.ConfigValueType;
+import me.filoghost.fcommons.config.type.ConfigType;
 
 import java.util.Objects;
 
-public class ConfigValueTypeConverter<T> extends Converter<T, T> {
+public class ConfigTypeConverter<T> extends Converter<T, T> {
 
     private final Class<T> mainClass;
     private final Class<T> primitiveClass;
 
-    public ConfigValueTypeConverter(ConfigValueType<T> configValueType, Class<T> mainClass) {
-        this(configValueType, mainClass, null);
+    public ConfigTypeConverter(ConfigType<T> configType, Class<T> mainClass) {
+        this(configType, mainClass, null);
     }
 
-    public ConfigValueTypeConverter(ConfigValueType<T> configValueType, Class<T> mainClass, Class<T> primitiveClass) {
-        super(configValueType);
+    public ConfigTypeConverter(ConfigType<T> configType, Class<T> mainClass, Class<T> primitiveClass) {
+        super(configType);
         this.mainClass = mainClass;
         this.primitiveClass = primitiveClass;
     }

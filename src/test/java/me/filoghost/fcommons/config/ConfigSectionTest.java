@@ -9,6 +9,9 @@ import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 class ConfigSectionTest {
@@ -40,6 +43,17 @@ class ConfigSectionTest {
         assertThatExceptionOfType(MissingConfigValueException.class).isThrownBy(() -> {
             section.getRequiredString("string2");
         });
+    }
+
+    @Test
+    void testListReferenceModification() {
+        ConfigSection section = new ConfigSection();
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        section.setStringList("list", list);
+        list.add("b");
+        
+        assertThat(section.getStringList("list")).containsExactly("a");
     }
 
     @Test

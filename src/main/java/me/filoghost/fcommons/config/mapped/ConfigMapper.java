@@ -7,6 +7,7 @@ package me.filoghost.fcommons.config.mapped;
 
 import com.google.common.collect.ImmutableList;
 import me.filoghost.fcommons.config.ConfigErrors;
+import me.filoghost.fcommons.config.ConfigPath;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
@@ -43,8 +44,8 @@ public class ConfigMapper<T extends MappedConfigSection> {
         return MappingUtils.createInstance(mappedTypeInfo);
     }
 
-    public Map<String, ConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigMappingException {
-        Map<String, ConfigValue> configValues = new LinkedHashMap<>();
+    public Map<ConfigPath, ConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigMappingException {
+        Map<ConfigPath, ConfigValue> configValues = new LinkedHashMap<>();
 
         for (MappedField<?> mappedField : mappedFields) {
             ConfigValue configValue = mappedField.readConfigValueFromObject(mappedObject);

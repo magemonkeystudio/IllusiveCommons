@@ -7,11 +7,11 @@ package me.filoghost.fcommons.config.mapped.modifier;
 
 import me.filoghost.fcommons.Colors;
 
-public class ChatColorsModifier implements ValueModifier<String, ChatColors> {
+public class ChatColorsModifier implements FieldValueModifier<String, ChatColors> {
 
     @Override
-    public String transform(ChatColors annotation, String value) {
-        return Colors.addColors(value);
+    public String transform(ChatColors annotation, String fieldValue) {
+        return Colors.addColors(fieldValue);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class ChatColorsModifier implements ValueModifier<String, ChatColors> {
     }
 
     @Override
-    public Class<String> getValueType() {
+    public Class<String> getFieldType() {
         return String.class;
     }
 

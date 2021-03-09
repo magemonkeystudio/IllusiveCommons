@@ -11,14 +11,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.*;
 
-class ConfigPathTest {
+class PathTest {
 
     @Test
-    void testSaveConfig(@TempDir Path tempDir) throws ConfigException, IOException {
+    void testSaveConfig(@TempDir java.nio.file.Path tempDir) throws ConfigException, IOException {
         MappedConfigLoader<ConfigWithPaths> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, ConfigWithPaths.class);
         configLoader.init();
 
@@ -30,7 +29,7 @@ class ConfigPathTest {
     }
 
     @Test
-    void testLoadConfig(@TempDir Path tempDir) throws ConfigException, IOException {
+    void testLoadConfig(@TempDir java.nio.file.Path tempDir) throws ConfigException, IOException {
         MappedConfigLoader<ConfigWithPaths> configLoader = MappedTestCommons.newExistingConfig(tempDir, ConfigWithPaths.class,
                 "integer-alt: 5",
                 "string-alt: xyz"
@@ -43,10 +42,10 @@ class ConfigPathTest {
 
     private static class ConfigWithPaths implements MappedConfig {
 
-        @ConfigPath("integer-alt")
+        @Path("integer-alt")
         private int integer = 3;
         
-        @ConfigPath("string-alt")
+        @Path("string-alt")
         private String string = "abc";
 
     }

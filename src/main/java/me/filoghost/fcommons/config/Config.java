@@ -37,18 +37,18 @@ public class Config extends ConfigSection {
     protected void loadFromString(List<String> fileContents) throws ConfigLoadException {
         Preconditions.notNull(fileContents, "fileContents cannot be null");
 
-        LinkedHashMap<String, Object> internalValues = yamlSerializer.parseConfigValues(fileContents);
-        if (internalValues == null) {
-            internalValues = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> rawValues = yamlSerializer.parseRawValues(fileContents);
+        if (rawValues == null) {
+            rawValues = new LinkedHashMap<>();
         }
 
         setHeader(yamlSerializer.parseHeader(fileContents));
-        setInternalValues(internalValues);
+        setRawValues(rawValues);
     }
 
     protected String saveToString() {
         String serializedHeader = yamlSerializer.serializeHeader(header);
-        String serializedValues = yamlSerializer.serializeConfigValues(getInternalValues());
+        String serializedValues = yamlSerializer.serializeConfigValues(getRawValues());
 
         return serializedHeader + serializedValues;
     }

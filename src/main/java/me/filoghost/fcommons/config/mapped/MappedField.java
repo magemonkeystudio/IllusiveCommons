@@ -7,13 +7,14 @@ package me.filoghost.fcommons.config.mapped;
 
 import com.google.common.collect.ImmutableList;
 import me.filoghost.fcommons.config.ConfigErrors;
+import me.filoghost.fcommons.config.ConfigPath;
 import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
-import me.filoghost.fcommons.config.mapped.modifier.ValueModifier;
+import me.filoghost.fcommons.config.mapped.modifier.FieldValueModifier;
 import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import me.filoghost.fcommons.reflection.UnexpectedActualClassException;
@@ -26,22 +27,22 @@ import java.util.stream.Stream;
 
 public class MappedField<T> {
 
-    private static final List<ValueModifier<?, ?>> VALUE_MODIFIERS = ImmutableList.of(
+    private static final List<FieldValueModifier<?, ?>> VALUE_MODIFIERS = ImmutableList.of(
             new ChatColorsModifier()
     );
     
     private final ReflectField<T> field;
     private final Converter<T, ?> converter;
-    private final String configPath;
+    private final ConfigPath configPath;
     private final List<Annotation> annotations;
     
     public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
         this.field = field;
         this.converter = ConverterRegistry.fromObjectType(getFieldTypeInfo(field));
-        if (field.isAnnotationPresent(ConfigPath.class)) {
-            this.configPath = field.getAnnotation(ConfigPath.class).value();
+        if (field.isAnnotationPresent(Path.class)) {
+            this.configPath = ConfigPath.dotDelimited(field.getAnnotation(Path.class).value());
         } else {
-            this.configPath = field.getName().replace("__", ".").replace("_", "-");
+            this.configPath = ConfigPath.delimitedBy(field.getName(), "__").replace("_", "-");
         }
         this.annotations = Stream.concat(
                 Arrays.stream(field.getAnnotations()),
@@ -85,9 +86,6 @@ public class MappedField<T> {
 
     public void setFieldValueFromConfig(Object mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         ConfigValue configValue = config.get(configPath);
-        if (configValue == null) {
-            return;
-        }
 
         try {
             T fieldValue = converter.toFieldValue(configValue);
@@ -96,7 +94,7 @@ public class MappedField<T> {
             }
 
             for (Annotation annotation : annotations) {
-                fieldValue = applyValueModifiers(fieldValue, annotation);
+                fieldValue = applyFieldValueModifiers(fieldValue, annotation);
             }
 
             // Field is written only if new value is not null (default field value is kept)
@@ -125,10 +123,10 @@ public class MappedField<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private <F, A extends Annotation> F applyValueModifiers(F fieldValue, A annotation) {
-        for (ValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
+    private <F, A extends Annotation> F applyFieldValueModifiers(F fieldValue, A annotation) {
+        for (FieldValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
             if (modifier.isApplicable(annotation, fieldValue)) {
-                fieldValue = ((ValueModifier<F, A>) modifier).transform(annotation, fieldValue);
+                fieldValue = ((FieldValueModifier<F, A>) modifier).transform(annotation, fieldValue);
             }
         }
         return fieldValue;
@@ -142,7 +140,7 @@ public class MappedField<T> {
         return field.getDeclaringClass();
     }
 
-    public String getConfigPath() {
+    public ConfigPath getConfigPath() {
         return configPath;
     }
 

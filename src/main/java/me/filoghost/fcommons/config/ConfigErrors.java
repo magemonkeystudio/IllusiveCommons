@@ -17,7 +17,7 @@ public class ConfigErrors {
     public static final String writeDataIOException = "I/O exception while writing data to file";
     public static final String invalidYamlSyntax = "invalid YAML syntax";
 
-    public static final String valueNotSet = "value is not set";
+    public static final String valueIsMissing = "value is missing";
     public static final String valueNotList = "value is not a list";
     public static final String valueNotBoolean = "value is not a boolean";
     public static final String valueNotNumber = "value is not a number";

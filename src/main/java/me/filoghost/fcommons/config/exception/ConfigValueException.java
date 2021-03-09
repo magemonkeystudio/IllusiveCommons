@@ -5,17 +5,21 @@
  */
 package me.filoghost.fcommons.config.exception;
 
+import me.filoghost.fcommons.config.ConfigPath;
+import org.jetbrains.annotations.Nullable;
+
 public abstract class ConfigValueException extends ConfigException {
 
-    private final String path;
+    private final ConfigPath configPath;
 
-    public ConfigValueException(String path, String message) {
+    public ConfigValueException(ConfigPath configPath, String message) {
         super(message);
-        this.path = path;
+        this.configPath = configPath;
     }
 
-    public String getPath() {
-        return path;
+    @Nullable
+    public ConfigPath getConfigPath() {
+        return configPath;
     }
 
 }

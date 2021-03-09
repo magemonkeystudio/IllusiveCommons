@@ -6,7 +6,7 @@
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigValue;
-import me.filoghost.fcommons.config.ConfigValueType;
+import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
@@ -22,7 +22,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
 
     @SuppressWarnings("unchecked")
     public ListConverter(TypeInfo<List<E>> fieldTypeInfo) throws ConfigMappingException {
-        super(ConfigValueType.LIST);
+        super(ConfigType.LIST);
         TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
         this.elementConverter = ConverterRegistry.fromObjectType(elementTypeInfo);
     }
@@ -83,7 +83,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     private boolean isValidConfigListElement(ConfigValue configElement) {
-        return configElement.isPresentAs(elementConverter.configValueType);
+        return configElement.isPresentAs(elementConverter.configType);
     }
 
     public static boolean supports(Class<?> typeClass) {
