@@ -198,11 +198,29 @@ class MappedConfigLoaderTest {
     }
 
     @Test
-    void testSaveListOfObjectsDifference(@TempDir Path tempDir) throws ConfigException, IOException {
+    void testSaveListOfObjectsDifferentElement(@TempDir Path tempDir) throws ConfigException, IOException {
         MappedConfigLoader<TestListOfObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestListOfObject.class,
                 "list:",
-                "- normalPresent: 5",
-                "  normalMissing: 6"
+                "- normalPresent: 9",
+                "- normalPresent: 1",
+                "  normalMissing: 2"
+        );
+        boolean changed = configLoader.saveIfDifferent(new TestListOfObject());
+
+        assertThat(changed).isTrue();
+        AssertExtra.fileContentMatches(configLoader.getFile(),
+                "list:",
+                "- normalPresent: 10",
+                "- normalPresent: 1",
+                "  normalMissing: 2"
+        );
+    }
+    
+    @Test
+    void testSaveListOfObjectsMissingElement(@TempDir Path tempDir) throws ConfigException, IOException {
+        MappedConfigLoader<TestListOfObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestListOfObject.class,
+                "list:",
+                "- normalPresent: 10"
         );
         boolean changed = configLoader.saveIfDifferent(new TestListOfObject());
 
