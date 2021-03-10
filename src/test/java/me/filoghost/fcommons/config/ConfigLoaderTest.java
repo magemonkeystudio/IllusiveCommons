@@ -42,6 +42,10 @@ class ConfigLoaderTest {
         listOfLists.add(ConfigValue.of(ConfigType.STRING_LIST, Arrays.asList("a", "b", "c")));
         listOfLists.add(ConfigValue.of(ConfigType.INTEGER_LIST, Arrays.asList(1, 2, 3)));
         listOfLists.add(ConfigValue.of(ConfigType.SECTION, section));
+        listOfLists.add(ConfigValue.of(ConfigType.LIST, Arrays.asList(
+                ConfigValue.of(ConfigType.STRING, "x"),
+                ConfigValue.of(ConfigType.INTEGER, 9)
+        )));
         config.set("list-of-lists", ConfigType.LIST, listOfLists);
 
         configLoader.save(config);
@@ -64,7 +68,9 @@ class ConfigLoaderTest {
                 "- - 1",
                 "  - 2",
                 "  - 3",
-                "- sectionKey: value"
+                "- sectionKey: value",
+                "- - x",
+                "  - 9"
         );
     }
 
