@@ -138,7 +138,7 @@ class ConfigTest {
     @Test
     void testKeysWithPathSeparator() {
         ConfigSection section = config.getConfigSection("keys-with-path-separator");
-        String value = section.get(ConfigPath.exact("..a..b.."), ConfigType.STRING);
+        String value = section.get(ConfigPath.literal("..a..b.."), ConfigType.STRING);
 
         assertThat(value).isEqualTo("value");
         assertThat(section.toMap().keySet().iterator().next().getLastPart()).isEqualTo("..a..b..");

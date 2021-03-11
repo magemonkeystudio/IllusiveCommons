@@ -62,7 +62,7 @@ public class ConfigSection extends BaseConfigSection {
         Map<ConfigPath, ConfigValue> map = new LinkedHashMap<>();
 
         for (Entry<String, Object> entry : getRawValues().entrySet()) {
-            ConfigPath path = ConfigPath.exact(entry.getKey());
+            ConfigPath path = ConfigPath.literal(entry.getKey());
             ConfigValue value = ConfigValue.wrapRawValue(path, entry.getValue());
             map.put(path, value);
         }
@@ -74,7 +74,7 @@ public class ConfigSection extends BaseConfigSection {
         Map<ConfigPath, T> map = new LinkedHashMap<>();
 
         for (Entry<String, Object> entry : getRawValues().entrySet()) {
-            ConfigPath path = ConfigPath.exact(entry.getKey());
+            ConfigPath path = ConfigPath.literal(entry.getKey());
             T value = valueTypeFilter.fromRawValueOrNull(entry.getValue());
             if (value != null) {
                 map.put(path, value);

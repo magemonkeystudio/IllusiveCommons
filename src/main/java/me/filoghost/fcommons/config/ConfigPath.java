@@ -24,15 +24,15 @@ public class ConfigPath {
 
     public static ConfigPath delimitedBy(String delimitedPath, String delimiter) {
         Preconditions.notEmpty(delimitedPath, "delimitedPath");
-        return exact(Strings.split(delimitedPath, delimiter));
+        return literal(Strings.split(delimitedPath, delimiter));
     }
 
-    public static ConfigPath exact(String path) {
+    public static ConfigPath literal(String path) {
         Preconditions.notEmpty(path, "path");
         return new ConfigPath(ImmutableList.of(path));
     }
     
-    public static ConfigPath exact(String... parts) {
+    public static ConfigPath literal(String... parts) {
         Preconditions.notEmpty(parts, "parts");
         for (String part : parts) {
             Preconditions.notEmpty(part, "parts element");
@@ -52,6 +52,11 @@ public class ConfigPath {
         return parts.get(parts.size() - 1);
     }
 
+    public String asRawKey() {
+        Preconditions.checkState(getPartsLength() == 1, "must contain a single part");
+        return getPart(0);
+    }
+    
     public ConfigPath replace(String target, String replacement) {
         Builder<String> pathPartsBuilder = ImmutableList.builder();
         for (String pathPart : parts) {
