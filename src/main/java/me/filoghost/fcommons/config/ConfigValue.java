@@ -8,7 +8,6 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import me.filoghost.fcommons.config.type.ConfigType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,17 +27,13 @@ public final class ConfigValue {
         return new ConfigValue(null, type.toRawValue(value));
     }
 
-    public static ConfigValue wrapRawConfigValue(ConfigPath configPath, @Nullable Object rawValue) {
+    protected static ConfigValue wrapRawValue(ConfigPath configPath, @Nullable Object rawValue) {
         return new ConfigValue(configPath, rawValue);
     }
 
     private ConfigValue(@Nullable ConfigPath sourcePath, Object rawValue) {
         this.sourcePath = sourcePath;
         this.rawValue = rawValue;
-    }
-
-    public Object getRawValue() {
-        return rawValue;
     }
 
     @Nullable
@@ -60,6 +55,10 @@ public final class ConfigValue {
         return type.isConvertibleRawValue(rawValue);
     }
 
+    protected Object getRawValue() {
+        return rawValue;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -74,7 +73,7 @@ public final class ConfigValue {
 
     @Override
     public int hashCode() {
-        return Objects.hash(rawValue);
+        return Objects.hashCode(rawValue);
     }
 
     @Override

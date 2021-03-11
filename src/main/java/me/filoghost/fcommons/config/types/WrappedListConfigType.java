@@ -3,9 +3,10 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.config.type;
+package me.filoghost.fcommons.config.types;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.ConfigValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,14 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-class WrappedListConfigType extends ConfigType<List<ConfigValue>> {
+public class WrappedListConfigType extends ConfigType<List<ConfigValue>> {
 
     public WrappedListConfigType(String name) {
         super(name, ConfigErrors.valueNotList);
     }
 
     @Override
-    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
+    protected boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof List;
     }
 
@@ -29,18 +30,18 @@ class WrappedListConfigType extends ConfigType<List<ConfigValue>> {
         List<ConfigValue> configValue = new ArrayList<>();
 
         for (Object element : (List<?>) rawValue) {
-            configValue.add(ConfigValue.wrapRawConfigValue(null, element));
+            configValue.add(wrapRawValue(element));
         }
 
         return configValue;
     }
 
     @Override
-    public Object toRawValue(@NotNull List<ConfigValue> configValue) {
+    protected Object toRawValue(@NotNull List<ConfigValue> configValue) {
         List<Object> rawValue = new ArrayList<>();
 
         for (ConfigValue element : configValue) {
-            rawValue.add(element.getRawValue());
+            rawValue.add(getRawValue(element));
         }
 
         return rawValue;

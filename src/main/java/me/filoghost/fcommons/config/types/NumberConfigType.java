@@ -3,15 +3,16 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.config.type;
+package me.filoghost.fcommons.config.types;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import me.filoghost.fcommons.config.ConfigType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-class NumberConfigType<T extends Number> extends ConfigType<T> {
+public class NumberConfigType<T extends Number> extends ConfigType<T> {
 
     private final Function<Number, T> toTypeFunction;
 
@@ -21,7 +22,7 @@ class NumberConfigType<T extends Number> extends ConfigType<T> {
     }
 
     @Override
-    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
+    protected boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof Number;
     }
 
@@ -31,7 +32,7 @@ class NumberConfigType<T extends Number> extends ConfigType<T> {
     }
 
     @Override
-    public Object toRawValue(@NotNull T configValue) {
+    protected Object toRawValue(@NotNull T configValue) {
         return configValue;
     }
 

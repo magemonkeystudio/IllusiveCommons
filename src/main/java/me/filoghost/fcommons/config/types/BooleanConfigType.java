@@ -3,20 +3,21 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.config.type;
+package me.filoghost.fcommons.config.types;
 
 import me.filoghost.fcommons.config.ConfigErrors;
+import me.filoghost.fcommons.config.ConfigType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class BooleanConfigType extends ConfigType<Boolean> {
+public class BooleanConfigType extends ConfigType<Boolean> {
 
     public BooleanConfigType(String name) {
         super(name, ConfigErrors.valueNotBoolean);
     }
 
     @Override
-    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
+    protected boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof Boolean;
     }
 
@@ -26,7 +27,7 @@ class BooleanConfigType extends ConfigType<Boolean> {
     }
 
     @Override
-    public Object toRawValue(@NotNull Boolean configValue) {
+    protected Object toRawValue(@NotNull Boolean configValue) {
         return configValue;
     }
 

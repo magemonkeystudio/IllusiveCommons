@@ -3,21 +3,22 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.config.type;
+package me.filoghost.fcommons.config.types;
 
 import me.filoghost.fcommons.config.ConfigErrors;
 import me.filoghost.fcommons.config.ConfigSection;
+import me.filoghost.fcommons.config.ConfigType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class SectionConfigType extends ConfigType<ConfigSection> {
+public class SectionConfigType extends ConfigType<ConfigSection> {
 
     public SectionConfigType(String name) {
         super(name, ConfigErrors.valueNotSection);
     }
 
     @Override
-    public boolean isConvertibleRawValue(@Nullable Object rawValue) {
+    protected boolean isConvertibleRawValue(@Nullable Object rawValue) {
         return rawValue instanceof ConfigSection;
     }
 
@@ -27,7 +28,7 @@ class SectionConfigType extends ConfigType<ConfigSection> {
     }
 
     @Override
-    public Object toRawValue(@NotNull ConfigSection configValue) {
+    protected Object toRawValue(@NotNull ConfigSection configValue) {
         return configValue;
     }
 

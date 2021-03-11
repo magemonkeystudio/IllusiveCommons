@@ -3,14 +3,16 @@
  *
  * SPDX-License-Identifier: MIT
  */
-package me.filoghost.fcommons.config.type;
+package me.filoghost.fcommons.config;
 
-import me.filoghost.fcommons.config.ConfigErrors;
-import me.filoghost.fcommons.config.ConfigPath;
-import me.filoghost.fcommons.config.ConfigSection;
-import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
+import me.filoghost.fcommons.config.types.BooleanConfigType;
+import me.filoghost.fcommons.config.types.ListConfigType;
+import me.filoghost.fcommons.config.types.NumberConfigType;
+import me.filoghost.fcommons.config.types.SectionConfigType;
+import me.filoghost.fcommons.config.types.StringConfigType;
+import me.filoghost.fcommons.config.types.WrappedListConfigType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,17 +47,19 @@ public abstract class ConfigType<T> {
     }
 
     @Contract("null -> false")
-    public abstract boolean isConvertibleRawValue(@Nullable Object rawValue);
-
-    public abstract Object toRawValue(@NotNull T configValue);
+    protected abstract boolean isConvertibleRawValue(@Nullable Object rawValue);
+    
+    protected abstract Object toRawValue(@NotNull T configValue);
 
     protected abstract T fromRawValue(@NotNull Object rawValue);
     
-    public T fromRawValueOrNull(@Nullable Object rawValue) {
+    @Nullable
+    protected T fromRawValueOrNull(@Nullable Object rawValue) {
         return fromRawValueOrDefault(rawValue, null);
     }
 
-    public T fromRawValueOrDefault(@Nullable Object rawValue, T defaultValue) {
+    @Contract("_, !null -> !null")
+    protected T fromRawValueOrDefault(@Nullable Object rawValue, T defaultValue) {
         if (isConvertibleRawValue(rawValue)) {
             return fromRawValue(rawValue);
         } else {
@@ -63,7 +67,8 @@ public abstract class ConfigType<T> {
         }
     }
 
-    public T fromRawValueRequired(@Nullable Object rawValue, @Nullable ConfigPath configPath)
+    @NotNull
+    protected T fromRawValueRequired(@Nullable Object rawValue, @Nullable ConfigPath configPath)
             throws InvalidConfigValueException, MissingConfigValueException {
         if (isConvertibleRawValue(rawValue)) {
             return fromRawValue(rawValue);
@@ -76,6 +81,26 @@ public abstract class ConfigType<T> {
         }
     }
 
+    // Access for subclasses
+    protected static ConfigValue wrapRawValue(Object rawValue) {
+        return ConfigValue.wrapRawValue(null, rawValue);
+    }
+
+    // Access for subclasses
+    protected static Object getRawValue(ConfigValue configValue) {
+        return configValue.getRawValue();
+    }
+
+    // Access for subclasses
+    protected static <T> Object toRawValue(ConfigType<T> type, T configValue) {
+        return type.toRawValue(configValue);
+    }
+
+    // Access for subclasses
+    protected static <T> T fromRawValueOrNull(ConfigType<T> type, Object rawValue) {
+        return type.fromRawValueOrNull(rawValue);
+    }
+    
     @Override
     public String toString() {
         return name;

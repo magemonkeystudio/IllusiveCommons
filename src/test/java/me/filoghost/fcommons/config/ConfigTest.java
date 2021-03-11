@@ -9,7 +9,6 @@ import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.test.TestResources;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

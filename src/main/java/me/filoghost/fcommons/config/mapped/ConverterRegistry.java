@@ -7,7 +7,7 @@ package me.filoghost.fcommons.config.mapped;
 
 import com.google.common.collect.Lists;
 import me.filoghost.fcommons.config.ConfigSection;
-import me.filoghost.fcommons.config.type.ConfigType;
+import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.mapped.converter.ConfigTypeConverter;
 import me.filoghost.fcommons.config.mapped.converter.Converter;

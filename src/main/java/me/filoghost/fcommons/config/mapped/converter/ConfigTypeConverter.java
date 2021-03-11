@@ -5,7 +5,7 @@
  */
 package me.filoghost.fcommons.config.mapped.converter;
 
-import me.filoghost.fcommons.config.type.ConfigType;
+import me.filoghost.fcommons.config.ConfigType;
 
 import java.util.Objects;
 

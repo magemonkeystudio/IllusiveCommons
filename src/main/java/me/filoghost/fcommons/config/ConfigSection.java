@@ -7,7 +7,6 @@ package me.filoghost.fcommons.config;
 
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import me.filoghost.fcommons.config.type.ConfigType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +63,7 @@ public class ConfigSection extends BaseConfigSection {
 
         for (Entry<String, Object> entry : getRawValues().entrySet()) {
             ConfigPath path = ConfigPath.exact(entry.getKey());
-            ConfigValue value = ConfigValue.wrapRawConfigValue(path, entry.getValue());
+            ConfigValue value = ConfigValue.wrapRawValue(path, entry.getValue());
             map.put(path, value);
         }
 

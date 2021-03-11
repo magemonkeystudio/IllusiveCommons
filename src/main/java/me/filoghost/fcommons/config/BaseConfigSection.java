@@ -8,7 +8,6 @@ package me.filoghost.fcommons.config;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.config.exception.InvalidConfigValueException;
 import me.filoghost.fcommons.config.exception.MissingConfigValueException;
-import me.filoghost.fcommons.config.type.ConfigType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +33,7 @@ abstract class BaseConfigSection {
 
     @NotNull
     public ConfigValue get(ConfigPath path) {
-        return ConfigValue.wrapRawConfigValue(path, getRawValue(path));
+        return ConfigValue.wrapRawValue(path, getRawValue(path));
     }
 
     @Nullable

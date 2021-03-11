@@ -8,7 +8,6 @@ package me.filoghost.fcommons.config;
 import com.google.common.base.Strings;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
-import me.filoghost.fcommons.config.type.ConfigType;
 import me.filoghost.fcommons.test.AssertExtra;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
