@@ -7,6 +7,7 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Locale;
 import java.util.Map;
 
@@ -40,6 +41,42 @@ class CaseInsensitiveMapTest {
 
         assertThat(map.get("A")).isNull();
         assertThat(map).isEmpty();
+    }
+
+    @Test
+    void removeThroughValues() {
+        Map<String, Integer> map = new CaseInsensitiveMap<>();
+        map.put("A", 1);
+        map.put("B", 2);
+        map.values().remove(2);
+
+        assertThat(map).containsOnlyKeys("a");
+    }
+
+    @Test
+    void entriesAreLowercase() {
+        Map<String, Integer> map = new CaseInsensitiveMap<>();
+        map.put("A", 1);
+        
+        assertThat(map.keySet()).containsExactly("a");
+        assertThat(map.keySet()).doesNotContain("A");
+    }
+
+    @Test
+    void cannotPutThroughViews() {
+        Map<String, Integer> map = new CaseInsensitiveMap<>();
+        
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
+            map.entrySet().add(new SimpleEntry<>("A", 1));
+        });
+
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
+            map.keySet().add("A");
+        });
+
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
+            map.values().add(1);
+        });
     }
 
     @Test
