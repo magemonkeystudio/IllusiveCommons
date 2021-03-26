@@ -5,155 +5,151 @@
  */
 package me.filoghost.fcommons.collection;
 
-import me.filoghost.fcommons.Preconditions;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
- * A map which converts keys to lowercase before any operation, internally using a delegate map.
- * 
- * Some methods, such as {@link CaseInsensitiveMap#keySet()} and {@link CaseInsensitiveMap#entrySet()},
- * return collections with lowercase strings that are NOT case insensitive.
- * 
- * Some methods, such as {@link CaseInsensitiveMap#forEach(BiConsumer)}, provide lowercase strings.
+ * A class similar to a map with case-insensitive keys, which internally uses a delegate map.
+ * Null keys are not permitted.
  */
-public class CaseInsensitiveMap<V> implements Map<String, V> {
+public class CaseInsensitiveMap<V> {
 
-    private final Map<String, V> delegate;
-
-    public CaseInsensitiveMap() {
-        this(new HashMap<>());
+    private final Map<CaseInsensitiveString, V> delegate;
+    
+    public static <V> CaseInsensitiveMap<V> create() {
+        return new CaseInsensitiveMap<>(new HashMap<>());
     }
 
-    public CaseInsensitiveMap(Map<String, V> delegate) {
+    public static <V> CaseInsensitiveMap<V> createConcurrent() {
+        return new CaseInsensitiveMap<>(new ConcurrentHashMap<>());
+    }
+
+    public static <V> CaseInsensitiveMap<V> createLinked() {
+        return new CaseInsensitiveMap<>(new LinkedHashMap<>());
+    }
+
+    public static <V> CaseInsensitiveMap<V> createSynchronizedLinked() {
+        return new CaseInsensitiveMap<>(Collections.synchronizedMap(new LinkedHashMap<>()));
+    }
+
+    private CaseInsensitiveMap(@NotNull Map<CaseInsensitiveString, V> delegate) {
         this.delegate = delegate;
     }
-
-    @Override
-    public V put(String key, V value) {
-        return delegate.put(getLowercaseKey(key), value);
+    
+    public Map<CaseInsensitiveString, V> asMap() {
+        return delegate;
+    }
+    
+    public V put(@NotNull String key, V value) {
+        return delegate.put(transformKey(key), value);
     }
 
-    @Override
-    public V get(Object key) {
-        return delegate.get(getLowercaseKey(key));
+    public V remove(@NotNull String key) {
+        return delegate.remove(transformKey(key));
     }
 
-    @Override
-    public boolean containsKey(Object key) {
-        return delegate.containsKey(getLowercaseKey(key));
+    public V get(@NotNull String key) {
+        return delegate.get(transformKey(key));
     }
 
-    @Override
-    public V remove(Object key) {
-        return delegate.remove(getLowercaseKey(key));
+    public V getOrDefault(@NotNull String key, V defaultValue) {
+        return delegate.getOrDefault(transformKey(key), defaultValue);
     }
 
-    @Override
+    public boolean containsKey(@NotNull String key) {
+        return delegate.containsKey(transformKey(key));
+    }
+
+    public boolean containsValue(V value) {
+        return delegate.containsValue(value);
+    }
+
+    public boolean remove(@NotNull String key, V value) {
+        return delegate.remove(transformKey(key), value);
+    }
+
+    public boolean removeIf(@NotNull String key, @NotNull Predicate<V> filter) {
+        AtomicBoolean removed = new AtomicBoolean(false);
+        
+        delegate.computeIfPresent(transformKey(key), (k, value) -> {
+            if (filter.test(value)) {
+                removed.set(true);
+                return null;
+            } else {
+                return value;
+            }
+        });
+        
+        return removed.get();
+    }
+
+    public boolean removeAllIf(@NotNull BiPredicate<CaseInsensitiveString, V> filter) {
+        return delegate.entrySet().removeIf(entry -> filter.test(entry.getKey(), entry.getValue()));
+    }
+
+    public boolean removeKeysIf(@NotNull Predicate<CaseInsensitiveString> filter) {
+        return delegate.keySet().removeIf(filter);
+    }
+
+    public boolean removeValuesIf(@NotNull Predicate<V> filter) {
+        return delegate.values().removeIf(filter);
+    }
+    
+    public void putAll(@NotNull Map<? extends String, ? extends V> map) {
+        Map<CaseInsensitiveString, V> transformedMap = new LinkedHashMap<>(); // Preserve iteration order
+        for (Entry<? extends String, ? extends V> entry : map.entrySet()) {
+            transformedMap.put(transformKey(entry.getKey()), entry.getValue());
+        }
+        delegate.putAll(transformedMap); // Single operation to preserve atomicity (if present)
+    }
+
+    public V putIfAbsent(@NotNull String key, V value) {
+        return delegate.putIfAbsent(transformKey(key), value);
+    }
+
+    public V computeIfAbsent(@NotNull String key, Supplier<V> valueSupplier) {
+        return delegate.computeIfAbsent(transformKey(key), k -> valueSupplier.get());
+    }
+
+    public V merge(@NotNull String key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        return delegate.merge(transformKey(key), value, remappingFunction);
+    }
+
+    public void clear() {
+        delegate.clear();
+    }
+
     public int size() {
         return delegate.size();
     }
 
-    @Override
     public boolean isEmpty() {
         return delegate.isEmpty();
     }
 
-    @Override
-    public boolean containsValue(Object value) {
-        return delegate.containsValue(value);
-    }
-
-    @Override
-    public void putAll(Map<? extends String, ? extends V> map) {
-        Map<String, V> lowercaseMap = new LinkedHashMap<>(); // Maintain order in case the given map is sorted
-        for (Entry<? extends String, ? extends V> entry : map.entrySet()) {
-            lowercaseMap.put(getLowercaseKey(entry.getKey()), entry.getValue());
-        }
-        delegate.putAll(lowercaseMap);
-    }
-
-    @Override
-    public void clear() {
-        delegate.clear();
-    }
-    
-    @Override
-    public Set<String> keySet() {
-        return delegate.keySet();
-    }
-
-    @Override
-    public Collection<V> values() {
-        return delegate.values();
-    }
-
-    @Override
-    public Set<Entry<String, V>> entrySet() {
-        return delegate.entrySet();
-    }
-
-    @Override
-    public V getOrDefault(Object key, V defaultValue) {
-        return delegate.getOrDefault(getLowercaseKey(key), defaultValue);
-    }
-
-    @Override
-    public void forEach(BiConsumer<? super String, ? super V> action) {
+    public void forEach(@NotNull BiConsumer<CaseInsensitiveString, V> action) {
         delegate.forEach(action);
     }
 
-    @Override
-    public void replaceAll(BiFunction<? super String, ? super V, ? extends V> function) {
-        delegate.replaceAll(function);
-    }
-    
-    @Override
-    public V putIfAbsent(String key, V value) {
-        return delegate.putIfAbsent(getLowercaseKey(key), value);
+    public void forEachKey(@NotNull Consumer<CaseInsensitiveString> action) {
+        delegate.forEach((key, value) -> action.accept(key));
     }
 
-    @Override
-    public boolean remove(Object key, Object value) {
-        return delegate.remove(getLowercaseKey(key), value);
-    }
-
-    @Override
-    public boolean replace(String key, V oldValue, V newValue) {
-        return delegate.replace(getLowercaseKey(key), oldValue, newValue);
-    }
-    
-    @Override
-    public V replace(String key, V value) {
-        return delegate.replace(getLowercaseKey(key), value);
-    }
-
-    @Override
-    public V computeIfAbsent(String key, Function<? super String, ? extends V> mappingFunction) {
-        return delegate.computeIfAbsent(getLowercaseKey(key), mappingFunction);
-    }
-
-    @Override
-    public V computeIfPresent(String key, BiFunction<? super String, ? super V, ? extends V> remappingFunction) {
-        return delegate.computeIfPresent(getLowercaseKey(key), remappingFunction);
-    }
-    
-    @Override
-    public V compute(String key, BiFunction<? super String, ? super V, ? extends V> remappingFunction) {
-        return delegate.compute(getLowercaseKey(key), remappingFunction);
-    }
-
-    @Override
-    public V merge(String key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-        return delegate.merge(getLowercaseKey(key), value, remappingFunction);
+    public void forEachValue(@NotNull Consumer<V> action) {
+        delegate.forEach((key, value) -> action.accept(value));
     }
 
     @Override
@@ -162,8 +158,15 @@ public class CaseInsensitiveMap<V> implements Map<String, V> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return delegate.equals(obj);
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        return ((CaseInsensitiveMap<?>) other).delegate.equals(delegate);
     }
 
     @Override
@@ -171,15 +174,8 @@ public class CaseInsensitiveMap<V> implements Map<String, V> {
         return delegate.toString();
     }
 
-    private String getLowercaseKey(Object key) {
-        Preconditions.notNull(key, "key");
-        Preconditions.checkArgument(key instanceof String, "key must be a string");
-        return ((String) key).toLowerCase(Locale.ROOT);
-    }
-    
-    private String getLowercaseKey(String key) {
-        Preconditions.notNull(key, "key");
-        return key.toLowerCase(Locale.ROOT);
+    private CaseInsensitiveString transformKey(String key) {
+        return new CaseInsensitiveString(key);
     }
 
 }

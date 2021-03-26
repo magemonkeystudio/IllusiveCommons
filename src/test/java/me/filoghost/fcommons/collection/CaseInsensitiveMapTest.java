@@ -7,9 +7,8 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -17,7 +16,7 @@ class CaseInsensitiveMapTest {
 
     @Test
     void get() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
         map.put("A", 1);
 
         assertThat(map.get("a")).isEqualTo(1);
@@ -25,78 +24,104 @@ class CaseInsensitiveMapTest {
 
     @Test
     void putOverwrite() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
-        map.put("A", 1);
-        map.put("a", 2);
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("a", 1);
+        map.put("A", 2);
 
-        assertThat(map.get("A")).isEqualTo(2);
-        assertThat(map).hasSize(1);
+        assertThat(map.get("a")).isEqualTo(2);
     }
 
     @Test
     void remove() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
-        map.put("A", 1);
-        map.remove("a");
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("a", 1);
+        map.remove("A");
 
-        assertThat(map.get("A")).isNull();
-        assertThat(map).isEmpty();
+        assertThat(map.isEmpty()).isTrue();
     }
 
     @Test
-    void removeThroughValues() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
+    void putPreservesInitialCase() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("A", 1);
+        map.put("a", 2);
+
+        assertThat(getStringKeys(map)).containsExactly("A");
+    }
+
+    @Test
+    void entriesPreserveCase() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("A", 1);
+        map.put("b", 2);
+        
+        assertThat(getStringKeys(map)).containsExactly("A", "b");
+    }
+
+    @Test
+    void removeIf() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
         map.put("A", 1);
         map.put("B", 2);
-        map.values().remove(2);
-
-        assertThat(map).containsOnlyKeys("a");
+        map.put("C", 3);
+        boolean removedA = map.removeIf("a", value -> value == 10); // Should NOT be removed
+        boolean removedB = map.removeIf("b", value -> value == 2); // Should be removed
+        boolean removedNonExisting = map.removeIf("d", value -> true);
+        
+        assertThat(removedA).isFalse();
+        assertThat(removedB).isTrue();
+        assertThat(removedNonExisting).isFalse();
+        assertThat(map.containsKey("a")).isTrue();
+        assertThat(map.containsKey("c")).isTrue();
+        assertThat(map.size()).isEqualTo(2);
     }
 
     @Test
-    void entriesAreLowercase() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
+    void removeAllIf() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
         map.put("A", 1);
-        
-        assertThat(map.keySet()).containsExactly("a");
-        assertThat(map.keySet()).doesNotContain("A");
+        map.put("B", 2);
+        map.put("C", 3);
+        map.removeAllIf((key, value) -> key.equalsIgnoreCase("a") || value == 3);
+
+        assertThat(map.containsKey("b")).isTrue();
+        assertThat(map.size()).isEqualTo(1);
     }
 
     @Test
-    void cannotPutThroughViews() {
-        Map<String, Integer> map = new CaseInsensitiveMap<>();
-        
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
-            map.entrySet().add(new SimpleEntry<>("A", 1));
-        });
+    void removeKeysIf() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("A", 1);
+        map.put("B", 2);
+        map.put("C", 3);
+        map.removeKeysIf(key -> !key.equalsIgnoreCase("b"));
 
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
-            map.keySet().add("A");
-        });
-
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> {
-            map.values().add(1);
-        });
+        assertThat(map.containsKey("b")).isTrue();
+        assertThat(map.size()).isEqualTo(1);
     }
 
     @Test
-    void turkeyLocale() {
-        Locale systemLocale = Locale.getDefault();
-        try {
-            // Turkey locale has two types of lowercase "i" characters and two types of uppercase "I" characters,
-            // which may cause issues with case insensitive comparisons.
-            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+    void removeValuesIf() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.put("A", 1);
+        map.put("B", 2);
+        map.put("C", 3);
+        map.removeValuesIf(value -> value != 2);
 
-            Map<String, Integer> map = new CaseInsensitiveMap<>();
-            map.put("i", 1);
-            map.put("II", 2);
+        assertThat(map.containsKey("b")).isTrue();
+        assertThat(map.size()).isEqualTo(1);
+    }
 
-            assertThat(map.get("I")).isEqualTo(1);
-            assertThat(map.get("ii")).isEqualTo(2);
+    @Test
+    void editWithMapView() {
+        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        map.asMap().put(new CaseInsensitiveString("a"), 1);
 
-        } finally {
-            Locale.setDefault(systemLocale);
-        }
+        assertThat(map.containsKey("a")).isTrue();
+    }
+    
+    private Set<String> getStringKeys(CaseInsensitiveMap<?> map) {
+        return map.asMap().keySet().stream().map(CaseInsensitiveString::getOriginalString).collect(Collectors.toSet());
     }
 
 }
