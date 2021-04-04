@@ -7,8 +7,8 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -61,16 +61,10 @@ class CaseInsensitiveSetTest {
         assertThat(set.size()).isEqualTo(1);
     }
 
-    @Test
-    void editWithSetView() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
-        set.asSet().add(new CaseInsensitiveString("a"));
-        
-        assertThat(set.contains("a")).isTrue();
-    }
-
-    private Set<String> getStringElements(CaseInsensitiveSet set) {
-        return set.asSet().stream().map(CaseInsensitiveString::getOriginalString).collect(Collectors.toSet());
+    private List<String> getStringElements(CaseInsensitiveSet set) {
+        List<String> stringElements = new ArrayList<>();
+        set.forEach(element -> stringElements.add(element.getOriginalString()));
+        return stringElements;
     }
 
 }

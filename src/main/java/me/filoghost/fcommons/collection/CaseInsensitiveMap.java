@@ -20,6 +20,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * A class similar to a map with case-insensitive keys, which internally uses a delegate map.
@@ -47,10 +48,6 @@ public class CaseInsensitiveMap<V> {
 
     private CaseInsensitiveMap(@NotNull Map<CaseInsensitiveString, V> delegate) {
         this.delegate = delegate;
-    }
-    
-    public Map<CaseInsensitiveString, V> asMap() {
-        return delegate;
     }
     
     public V put(@NotNull String key, V value) {
@@ -122,6 +119,10 @@ public class CaseInsensitiveMap<V> {
 
     public V computeIfAbsent(@NotNull String key, Supplier<V> valueSupplier) {
         return delegate.computeIfAbsent(transformKey(key), k -> valueSupplier.get());
+    }
+
+    public V computeIfPresent(@NotNull String key, UnaryOperator<V> remappingFunction) {
+        return delegate.computeIfPresent(transformKey(key), (k, v) -> remappingFunction.apply(v));
     }
 
     public V merge(@NotNull String key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {

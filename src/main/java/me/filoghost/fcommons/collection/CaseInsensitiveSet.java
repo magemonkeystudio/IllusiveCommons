@@ -10,11 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -23,7 +21,7 @@ import java.util.function.Predicate;
  * A class similar to a set with case-insensitive elements, which internally uses a delegate set.
  * Null elements are not permitted.
  */
-public class CaseInsensitiveSet implements Iterable<CaseInsensitiveString> {
+public class CaseInsensitiveSet {
 
     private final Set<CaseInsensitiveString> delegate;
     
@@ -47,10 +45,6 @@ public class CaseInsensitiveSet implements Iterable<CaseInsensitiveString> {
         this.delegate = delegate;
     }
     
-    public Set<CaseInsensitiveString> asSet() {
-        return delegate;
-    }
-    
     public boolean add(@NotNull String element) {
         return delegate.add(transformElement(element));
     }
@@ -61,6 +55,10 @@ public class CaseInsensitiveSet implements Iterable<CaseInsensitiveString> {
     
     public boolean contains(@NotNull String element) {
         return delegate.contains(transformElement(element));
+    }
+
+    public void forEach(@NotNull Consumer<? super CaseInsensitiveString> action) {
+        delegate.forEach(action);
     }
 
     public boolean removeIf(@NotNull Predicate<String> filter) {
@@ -85,21 +83,6 @@ public class CaseInsensitiveSet implements Iterable<CaseInsensitiveString> {
 
     public boolean isEmpty() {
         return delegate.isEmpty();
-    }
-    
-    @Override
-    public Iterator<CaseInsensitiveString> iterator() {
-        return delegate.iterator();
-    }
-
-    @Override
-    public void forEach(@NotNull Consumer<? super CaseInsensitiveString> action) {
-        delegate.forEach(action);
-    }
-
-    @Override
-    public Spliterator<CaseInsensitiveString> spliterator() {
-        return delegate.spliterator();
     }
 
     @Override

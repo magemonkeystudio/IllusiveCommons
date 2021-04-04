@@ -7,8 +7,8 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -111,17 +111,11 @@ class CaseInsensitiveMapTest {
         assertThat(map.containsKey("b")).isTrue();
         assertThat(map.size()).isEqualTo(1);
     }
-
-    @Test
-    void editWithMapView() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
-        map.asMap().put(new CaseInsensitiveString("a"), 1);
-
-        assertThat(map.containsKey("a")).isTrue();
-    }
     
-    private Set<String> getStringKeys(CaseInsensitiveMap<?> map) {
-        return map.asMap().keySet().stream().map(CaseInsensitiveString::getOriginalString).collect(Collectors.toSet());
+    private List<String> getStringKeys(CaseInsensitiveMap<?> map) {
+        List<String> stringKeys = new ArrayList<>();
+        map.forEachKey(key -> stringKeys.add(key.getOriginalString()));
+        return stringKeys;
     }
 
 }
