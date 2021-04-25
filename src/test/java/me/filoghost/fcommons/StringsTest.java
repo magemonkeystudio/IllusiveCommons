@@ -18,14 +18,14 @@ class StringsTest {
     }
 
     @Test
-    void trimPreserveInput() {
+    void trimDoesNotChangeInput() {
         String[] input = {" a "};
         Strings.trim(input);
         assertThat(input).containsExactly(" a ");
     }
 
     @Test
-    void splitNoRegex() {
+    void splitDoesNotUseRegex() {
         assertThat(Strings.split("ab.cd", ".")).containsExactly("ab", "cd");
     }
 
@@ -40,7 +40,7 @@ class StringsTest {
     }
 
     @Test
-    void splitMissingDelimiter() {
+    void splitNotContainDelimiter() {
         assertThat(Strings.split("abc", "/", 2)).containsExactly("abc");
     }
 

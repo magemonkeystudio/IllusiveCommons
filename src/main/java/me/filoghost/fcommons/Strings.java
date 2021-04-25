@@ -5,13 +5,27 @@
  */
 package me.filoghost.fcommons;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Strings {
+    
+    public static boolean isEmpty(@Nullable String string) {
+        return string == null || string.isEmpty();
+    }
 
+    public static String truncate(@Nullable String string, int maxLength) {
+        if (string != null && string.length() > maxLength) {
+            return string.substring(0, maxLength);
+        } else {
+            return string;
+        }
+    }
 
-    public static String[] trim(String... strings) {
+    public static String[] trim(@NotNull String... strings) {
         String[] result = new String[strings.length];
         for (int i = 0; i < strings.length; i++) {
             result[i] = strings[i].trim();
@@ -20,30 +34,39 @@ public final class Strings {
     }
 
     /**
-     * Splits a string without using regular expressions and keeps empty trailing strings.
+     * Splits a string without using regular expressions, keeping empty leading and trailing strings.
      */
-    public static String[] split(String string, String delimiter) {
+    public static String[] split(@NotNull String string, @NotNull String delimiter) {
         return split(string, delimiter, 0);
     }
 
     /**
-     * Splits a string without using regular expressions and keeps empty trailing strings.
+     * Splits a string without using regular expressions, keeping empty leading and trailing strings.
      */
-    public static String[] split(String string, String delimiter, int limit) {
+    public static String[] split(@NotNull String string, @NotNull String delimiter, int limit) {
         Preconditions.notNull(string, "string");
-        Preconditions.checkArgument(!delimiter.isEmpty(), "delimiter cannot be empty");
+        Preconditions.notEmpty(delimiter, "delimiter");
         Preconditions.checkArgument(limit >= 0, "limit cannot be negative");
 
         if (string.isEmpty() || limit == 1) {
             // Optimization for trivial cases where no splits would occur
             return new String[]{string};
         }
+        
+        int firstIndex = string.indexOf(delimiter);
+        if (firstIndex == -1) {
+            return new String[]{string};
+        }
 
-        List<String> result = new ArrayList<>();
+        List<String> result = null;
         int fromIndex = 0;
         int matchIndex;
 
         while ((matchIndex = string.indexOf(delimiter, fromIndex)) != -1) {
+            if (result == null) {
+                result = new ArrayList<>();
+            }
+            
             if (limit > 0 && result.size() >= limit - 1) {
                 // Limit reached (keep one slot for the remaining part)
                 break;
@@ -53,7 +76,7 @@ public final class Strings {
             fromIndex = matchIndex + delimiter.length();
         }
 
-        if (result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             // No match found, return the full input string
             return new String[]{string};
         }
@@ -64,15 +87,20 @@ public final class Strings {
         return result.toArray(new String[0]);
     }
 
-    public static String[] splitAndTrim(String string, String delimiter) {
+    public static String[] splitAndTrim(@NotNull String string, @NotNull String delimiter) {
         return splitAndTrim(string, delimiter, 0);
     }
 
-    public static String[] splitAndTrim(String string, String delimiter, int limit) {
-        return trim(split(string, delimiter, limit));
+    public static String[] splitAndTrim(@NotNull String string, @NotNull String delimiter, int limit) {
+        String[] parts = split(string, delimiter, limit);
+        // Apply "trim" in place to avoid creating a new array
+        for (int i = 0; i < parts.length; i++) {
+            parts[i] = parts[i].trim();
+        }
+        return parts;
     }
 
-    public static String stripChars(String string, char... charsToRemove) {
+    public static String stripChars(@Nullable String string, char... charsToRemove) {
         if (isEmpty(string) || charsToRemove.length == 0) {
             return string;
         }
@@ -99,7 +127,7 @@ public final class Strings {
         return false;
     }
 
-    public static String capitalizeFully(String string) {
+    public static String capitalizeFully(@Nullable String string) {
         if (isEmpty(string)) {
             return string;
         }
@@ -125,7 +153,7 @@ public final class Strings {
         return result.toString();
     }
 
-    public static String capitalizeFirst(String string) {
+    public static String capitalizeFirst(@Nullable String string) {
         if (isEmpty(string)) {
             return string;
         }
@@ -133,11 +161,7 @@ public final class Strings {
         return Character.toTitleCase(string.charAt(0)) + string.substring(1);
     }
 
-    public static boolean isEmpty(String string) {
-        return string == null || string.isEmpty();
-    }
-
-    public static boolean isWhitespace(String string) {
+    public static boolean isWhitespace(@Nullable String string) {
         if (isEmpty(string)) {
             return true;
         }
