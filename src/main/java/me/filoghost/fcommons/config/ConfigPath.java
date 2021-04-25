@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 
-public class ConfigPath {
+public final class ConfigPath {
     
     private final ImmutableList<String> parts;
     
@@ -67,6 +67,24 @@ public class ConfigPath {
     
     public String format(String delimiter) {
         return String.join(delimiter, parts);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        ConfigPath other = (ConfigPath) obj;
+        return this.parts.equals(other.parts);
+    }
+
+    @Override
+    public int hashCode() {
+        return parts.hashCode();
     }
 
     @Override
