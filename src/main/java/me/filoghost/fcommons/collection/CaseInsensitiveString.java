@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Case insensitive string for use inside collections.
  */
-public class CaseInsensitiveString {
+public final class CaseInsensitiveString {
 
     private final String originalString;
     private final String uppercaseString;
