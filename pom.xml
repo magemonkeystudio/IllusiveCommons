@@ -6,7 +6,7 @@
     <groupId>me.filoghost.fcommons</groupId>
     <artifactId>fcommons</artifactId>
     <name>FCommons</name>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
 
     <licenses>
