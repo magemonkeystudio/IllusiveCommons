@@ -9,11 +9,17 @@ import java.lang.reflect.Method;
 
 public interface ReflectMethod<T> extends ReflectElement {
 
-    static <T> ReflectMethod<T> lookup(ClassToken<T> expectedReturnClassToken, Class<?> declaringClass, String name, Class<?>... parameterTypes) {
+    static <T> ReflectMethod<T> lookup(ClassToken<T> expectedReturnClassToken,
+                                       Class<?> declaringClass,
+                                       String name,
+                                       Class<?>... parameterTypes) {
         return lookup(expectedReturnClassToken.asClass(), declaringClass, name, parameterTypes);
     }
 
-    static <T> ReflectMethod<T> lookup(Class<T> expectedReturnClass, Class<?> declaringClass, String name, Class<?>... parameterTypes) {
+    static <T> ReflectMethod<T> lookup(Class<T> expectedReturnClass,
+                                       Class<?> declaringClass,
+                                       String name,
+                                       Class<?>... parameterTypes) {
         Method method;
         try {
             method = declaringClass.getDeclaredMethod(name, parameterTypes);

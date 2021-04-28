@@ -82,7 +82,7 @@ public abstract class SubCommandManager extends ConfigurableRootCommand {
     }
 
     protected void sendUnknownSubCommandMessage(SubCommandContext context) {
-        context.getSender().sendMessage(ChatColor.RED + "Unknown sub-command \"" + context.getSubLabel() + "\"." 
+        context.getSender().sendMessage(ChatColor.RED + "Unknown sub-command \"" + context.getSubLabel() + "\"."
                 + " Use /" + context.getRootLabel() + " to see available commands.");
     }
 

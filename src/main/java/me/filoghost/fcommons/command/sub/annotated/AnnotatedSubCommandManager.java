@@ -11,11 +11,12 @@ import me.filoghost.fcommons.command.sub.SubCommandManager;
 
 import java.lang.reflect.Method;
 import java.util.Comparator;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class AnnotatedSubCommandManager extends SubCommandManager {
 
-    private final TreeSet<AnnotatedSubCommand> subCommands;
+    private final SortedSet<AnnotatedSubCommand> subCommands;
 
     public AnnotatedSubCommandManager() {
         this.subCommands = new TreeSet<>(Comparator

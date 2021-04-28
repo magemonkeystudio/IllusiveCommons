@@ -26,7 +26,7 @@ class YamlSerializer {
 
     private final Yaml yaml;
 
-    public YamlSerializer() {
+    YamlSerializer() {
         DumperOptions yamlOptions = new DumperOptions();
         yamlOptions.setIndent(2);
         yamlOptions.setWidth(Integer.MAX_VALUE); // Avoid lines wrapping

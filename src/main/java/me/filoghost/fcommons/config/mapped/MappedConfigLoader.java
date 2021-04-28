@@ -109,7 +109,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
     }
     
     private boolean saveInternal(T mappedObject, Config config, boolean writeMappedObject, boolean fileSaveRequired)
-            throws ConfigSaveException {     
+            throws ConfigSaveException {
         
         if (writeMappedObject) {
             try {

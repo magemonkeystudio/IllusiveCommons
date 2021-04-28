@@ -92,7 +92,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.42</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <configLocation>${project.basedir}/checkstyle/checkstyle.xml</configLocation>
                     <propertyExpansion>samedir=${project.basedir}/checkstyle</propertyExpansion>

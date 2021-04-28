@@ -11,7 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Used to capture a parameterized class, for example:
+ * Used to capture a parameterized class. Example:
  * {@code new ClassToken<List<String>>(){}}
  */
 public abstract class ClassToken<T> {
