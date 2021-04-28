@@ -7,108 +7,35 @@ package me.filoghost.fcommons.collection;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
-/**
- * A class similar to a set with case-insensitive elements, which internally uses a delegate set.
- * Null elements are not permitted.
- */
-public class CaseInsensitiveSet {
-
-    private final Set<CaseInsensitiveString> delegate;
+public interface CaseInsensitiveSet extends Set<CaseInsensitiveString> {
     
-    public static CaseInsensitiveSet create() {
-        return new CaseInsensitiveSet(new HashSet<>());
-    }
-
-    public static CaseInsensitiveSet createConcurrent() {
-        return new CaseInsensitiveSet(ConcurrentHashMap.newKeySet());
-    }
-
-    public static CaseInsensitiveSet createLinked() {
-        return new CaseInsensitiveSet(new LinkedHashSet<>());
-    }
-
-    public static CaseInsensitiveSet createSynchronizedLinked() {
-        return new CaseInsensitiveSet(Collections.synchronizedSet(new LinkedHashSet<>()));
-    }
-
-    private CaseInsensitiveSet(@NotNull Set<CaseInsensitiveString> delegate) {
-        this.delegate = delegate;
+    default boolean add(@NotNull String element) {
+        return this.add(new CaseInsensitiveString(element));
     }
     
-    public boolean add(@NotNull String element) {
-        return delegate.add(transformElement(element));
-    }
-
-    public boolean remove(@NotNull String element) {
-        return delegate.remove(transformElement(element));
+    default boolean remove(@NotNull String element) {
+        return this.remove(new CaseInsensitiveString(element));
     }
     
-    public boolean contains(@NotNull String element) {
-        return delegate.contains(transformElement(element));
+    default boolean contains(@NotNull String element) {
+        return this.contains(new CaseInsensitiveString(element));
     }
 
-    public void forEach(@NotNull Consumer<? super CaseInsensitiveString> action) {
-        delegate.forEach(action);
+    default void addAll(@NotNull String... elements) {
+        this.addAllString(Arrays.asList(elements));
     }
-
-    public boolean removeIf(@NotNull Predicate<String> filter) {
-        return delegate.removeIf(element -> filter.test(element.getOriginalString()));
-    }
-
-    public void addAll(@NotNull Collection<? extends String> collection) {
-        Collection<CaseInsensitiveString> transformedCollection = new LinkedList<>(); // Preserve iteration order
+    
+    default void addAllString(@NotNull Collection<? extends String> collection) {
+        Collection<CaseInsensitiveString> caseInsensitiveStrings = new LinkedList<>(); // Preserve iteration order
         for (String element : collection) {
-            transformedCollection.add(transformElement(element));
+            caseInsensitiveStrings.add(new CaseInsensitiveString(element));
         }
-        delegate.addAll(transformedCollection);
-    }
-
-    public void clear() {
-        delegate.clear();
-    }
-
-    public int size() {
-        return delegate.size();
-    }
-
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
-    @Override
-    public int hashCode() {
-        return delegate.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        return ((CaseInsensitiveSet) other).delegate.equals(delegate);
-    }
-
-    @Override
-    public String toString() {
-        return delegate.toString();
-    }
-
-    private CaseInsensitiveString transformElement(String element) {
-        return new CaseInsensitiveString(element);
+        this.addAll(caseInsensitiveStrings); // Preserve atomicity
     }
 
 }

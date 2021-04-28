@@ -7,62 +7,51 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 
-class CaseInsensitiveSetTest {
+abstract class CaseInsensitiveSetTest {
+
+    protected abstract CaseInsensitiveSet createCaseInsensitiveSet();
 
     @Test
-    void add() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
+    void contains() {
+        CaseInsensitiveSet set = createCaseInsensitiveSet();
         set.add("A");
 
         assertThat(set.contains("a")).isTrue();
     }
 
     @Test
-    void addNoDuplicates() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
-        set.add("a");
+    void add() {
+        CaseInsensitiveSet set = createCaseInsensitiveSet();
         set.add("A");
+        set.add("a");
 
-        assertThat(set.size()).isEqualTo(1);
+        assertThat(getStringElements(set)).containsExactly("A"); // The first value is not overridden
     }
 
     @Test
     void remove() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
+        CaseInsensitiveSet set = createCaseInsensitiveSet();
         set.add("a");
         set.remove("A");
 
-        assertThat(set.isEmpty()).isTrue();
+        assertThat(set).isEmpty();
     }
 
     @Test
-    void addPreservesInitialCase() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
-        set.add("A");
-        set.add("a");
+    void addAll() {
+        CaseInsensitiveSet set = createCaseInsensitiveSet();
+        set.addAll("A", "b", "C");
 
-        assertThat(getStringElements(set)).containsExactly("A");
+        assertThat(getStringElements(set)).containsExactly("A", "b", "C");
     }
 
-    @Test
-    void removeIf() {
-        CaseInsensitiveSet set = CaseInsensitiveSet.create();
-        set.add("A");
-        set.add("B");
-        set.add("C");
-        set.removeIf(element -> !element.equalsIgnoreCase("b"));
-
-        assertThat(set.contains("b")).isTrue();
-        assertThat(set.size()).isEqualTo(1);
-    }
-
-    private List<String> getStringElements(CaseInsensitiveSet set) {
-        List<String> stringElements = new ArrayList<>();
+    private Set<String> getStringElements(CaseInsensitiveSet set) {
+        Set<String> stringElements = new HashSet<>();
         set.forEach(element -> stringElements.add(element.getOriginalString()));
         return stringElements;
     }

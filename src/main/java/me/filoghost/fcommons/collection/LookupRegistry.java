@@ -29,7 +29,7 @@ public class LookupRegistry<V> {
     }
 
     protected LookupRegistry() {
-        this.valuesMap = CaseInsensitiveMap.create();
+        this.valuesMap = new CaseInsensitiveHashMap<>();
     }
 
     @Nullable

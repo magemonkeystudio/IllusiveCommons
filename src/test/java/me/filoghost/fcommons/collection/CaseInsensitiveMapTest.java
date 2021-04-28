@@ -7,24 +7,37 @@ package me.filoghost.fcommons.collection;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
-class CaseInsensitiveMapTest {
+abstract class CaseInsensitiveMapTest {
+
+    protected abstract CaseInsensitiveMap<Integer> createCaseInsensitiveMap();
 
     @Test
     void get() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         map.put("A", 1);
 
         assertThat(map.get("a")).isEqualTo(1);
     }
 
     @Test
+    void remove() {
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
+        map.put("a", 1);
+        map.remove("A");
+
+        assertThat(map).isEmpty();
+    }
+
+    @Test
     void putOverwrite() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         map.put("a", 1);
         map.put("A", 2);
 
@@ -32,17 +45,8 @@ class CaseInsensitiveMapTest {
     }
 
     @Test
-    void remove() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
-        map.put("a", 1);
-        map.remove("A");
-
-        assertThat(map.isEmpty()).isTrue();
-    }
-
-    @Test
-    void putPreservesInitialCase() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+    void putDoesNotChangeKeyCase() {
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         map.put("A", 1);
         map.put("a", 2);
 
@@ -50,17 +54,21 @@ class CaseInsensitiveMapTest {
     }
 
     @Test
-    void entriesPreserveCase() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
-        map.put("A", 1);
-        map.put("b", 2);
+    void putAll() {
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         
-        assertThat(getStringKeys(map)).containsExactly("A", "b");
+        Map<String, Integer> stringMap = new HashMap<>();
+        stringMap.put("A", 1);
+        stringMap.put("b", 2);
+        stringMap.put("C", 3);
+        map.putAllString(stringMap);
+        
+        assertThat(getStringKeys(map)).containsExactly("A", "b", "C");
     }
 
     @Test
     void removeIf() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -78,7 +86,7 @@ class CaseInsensitiveMapTest {
 
     @Test
     void removeAllIf() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
+        CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
         map.put("A", 1);
         map.put("B", 2);
         map.put("C", 3);
@@ -88,34 +96,8 @@ class CaseInsensitiveMapTest {
         assertThat(map.size()).isEqualTo(1);
     }
 
-    @Test
-    void removeKeysIf() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
-        map.put("A", 1);
-        map.put("B", 2);
-        map.put("C", 3);
-        map.removeKeysIf(key -> !key.equalsIgnoreCase("b"));
-
-        assertThat(map.containsKey("b")).isTrue();
-        assertThat(map.size()).isEqualTo(1);
-    }
-
-    @Test
-    void removeValuesIf() {
-        CaseInsensitiveMap<Integer> map = CaseInsensitiveMap.create();
-        map.put("A", 1);
-        map.put("B", 2);
-        map.put("C", 3);
-        map.removeValuesIf(value -> value != 2);
-
-        assertThat(map.containsKey("b")).isTrue();
-        assertThat(map.size()).isEqualTo(1);
-    }
-    
     private List<String> getStringKeys(CaseInsensitiveMap<?> map) {
-        List<String> stringKeys = new ArrayList<>();
-        map.forEachKey(key -> stringKeys.add(key.getOriginalString()));
-        return stringKeys;
+        return map.keySet().stream().map(CaseInsensitiveString::getOriginalString).collect(Collectors.toList());
     }
 
 }
