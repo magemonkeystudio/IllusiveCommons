@@ -53,6 +53,8 @@ public class AnnotatedSubCommandManager extends SubCommandManager {
     protected final void registerSubCommand(AnnotatedSubCommand subCommand) {
         Preconditions.notNull(subCommand, "subCommand");
         subCommand.validate();
+        Preconditions.checkState(getSubCommandByName(subCommand.getName()) == null, 
+                "subCommand with same name already registered");
         
         if (subCommand.getPermission() == null) {
             subCommand.setPermission(getDefaultSubCommandPermission(subCommand));

@@ -43,6 +43,27 @@ class AnnotatedSubCommandManagerTest {
         assertThat(manager.bArg0).isEqualTo("testArgB");
     }
 
+    @Test
+    void testOverwriteThrowsException() {
+        TestImplementation manager = new TestImplementation();
+
+        AnnotatedSubCommand testOverrideCommand = new AnnotatedSubCommand() {
+            
+            {
+                setName("Z"); // Use different case
+                setDisplayPriority(99); // Use different priority
+            }
+            
+            @Override
+            public void execute(CommandSender sender, String[] args, SubCommandContext context) {}
+            
+        };
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+                () -> manager.registerSubCommand(testOverrideCommand));
+    }
+    
+
     private static class TestImplementation extends AnnotatedSubCommandManager {
 
         private String bArg0;
