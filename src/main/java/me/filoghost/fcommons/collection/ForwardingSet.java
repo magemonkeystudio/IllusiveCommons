@@ -75,7 +75,7 @@ public class ForwardingSet<E> implements Set<E> {
     }
     
     @Override
-    public <T> T[] toArray(@NotNull T[] array) {
+    public <T> T[] toArray(T @NotNull [] array) {
         return delegate.toArray(array);
     }
 
