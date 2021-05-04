@@ -26,11 +26,11 @@ public final class Strings {
     }
 
     public static String[] trim(@NotNull String... strings) {
-        String[] result = new String[strings.length];
+        String[] output = new String[strings.length];
         for (int i = 0; i < strings.length; i++) {
-            result[i] = strings[i].trim();
+            output[i] = strings[i].trim();
         }
-        return result;
+        return output;
     }
 
     /**
@@ -58,33 +58,33 @@ public final class Strings {
             return new String[]{string};
         }
 
-        List<String> result = null;
+        List<String> parts = null;
         int fromIndex = 0;
         int matchIndex;
 
         while ((matchIndex = string.indexOf(delimiter, fromIndex)) != -1) {
-            if (result == null) {
-                result = new ArrayList<>();
+            if (parts == null) {
+                parts = new ArrayList<>();
             }
             
-            if (limit > 0 && result.size() >= limit - 1) {
+            if (limit > 0 && parts.size() >= limit - 1) {
                 // Limit reached (keep one slot for the remaining part)
                 break;
             }
 
-            result.add(string.substring(fromIndex, matchIndex));
+            parts.add(string.substring(fromIndex, matchIndex));
             fromIndex = matchIndex + delimiter.length();
         }
 
-        if (result == null || result.isEmpty()) {
+        if (parts == null || parts.isEmpty()) {
             // No match found, return the full input string
             return new String[]{string};
         }
 
         // Add the remaining part of the string
-        result.add(string.substring(fromIndex));
+        parts.add(string.substring(fromIndex));
 
-        return result.toArray(new String[0]);
+        return parts.toArray(new String[0]);
     }
 
     public static String[] splitAndTrim(@NotNull String string, @NotNull String delimiter) {
@@ -122,17 +122,17 @@ public final class Strings {
             throw new ArrayIndexOutOfBoundsException("toIndex (" + toIndex + ") cannot be greater than array length (" + elements.length + ")");
         }
         
-        StringBuilder result = new StringBuilder();
+        StringBuilder output = new StringBuilder();
         
         for (int i = fromIndex; i < toIndex; i++) {
-            if (result.length() != 0) {
-                result.append(separator);
+            if (output.length() != 0) {
+                output.append(separator);
             }
 
-            result.append(elements[i]);
+            output.append(elements[i]);
         }
         
-        return result.toString();
+        return output.toString();
     }
 
     public static String stripChars(@Nullable String string, char... charsToRemove) {
@@ -140,16 +140,16 @@ public final class Strings {
             return string;
         }
 
-        StringBuilder result = new StringBuilder(string.length());
+        StringBuilder output = new StringBuilder(string.length());
 
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
             if (!arrayContains(charsToRemove, c)) {
-                result.append(c);
+                output.append(c);
             }
         }
 
-        return result.toString();
+        return output.toString();
     }
 
     private static boolean arrayContains(char[] array, char valueToFind) {
@@ -169,23 +169,23 @@ public final class Strings {
 
         string = string.toLowerCase();
         int length = string.length();
-        StringBuilder result = new StringBuilder(length);
+        StringBuilder output = new StringBuilder(length);
         boolean capitalizeNext = true;
 
         for (int i = 0; i < length; i++) {
             char c = string.charAt(i);
 
             if (Character.isWhitespace(c)) {
-                result.append(c);
+                output.append(c);
                 capitalizeNext = true;
             } else if (capitalizeNext) {
-                result.append(Character.toTitleCase(c));
+                output.append(Character.toTitleCase(c));
                 capitalizeNext = false;
             } else {
-                result.append(c);
+                output.append(c);
             }
         }
-        return result.toString();
+        return output.toString();
     }
 
     public static String capitalizeFirst(@Nullable String string) {

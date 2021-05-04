@@ -73,11 +73,11 @@ public final class CollectionUtils {
             return null;
         }
         
-        List<B> result = new ArrayList<>(collection.size());
+        List<B> output = new ArrayList<>(collection.size());
         for (A element : collection) {
-            result.add(transformFunction.apply(element));
+            output.add(transformFunction.apply(element));
         }
-        return result;
+        return output;
     }
 
     @Contract("null, _ -> null; !null, _ -> !null")
@@ -89,11 +89,11 @@ public final class CollectionUtils {
         // Taken from the HashSet constructor that has a Collection parameter, to fit initial items
         int initialSize = Math.max((int) (collection.size() / 0.75f) + 1, 16);
         
-        Set<B> result = new HashSet<>(initialSize);
+        Set<B> output = new HashSet<>(initialSize);
         for (A element : collection) {
-            result.add(transformFunction.apply(element));
+            output.add(transformFunction.apply(element));
         }
-        return result;
+        return output;
     }
 
     @Contract("null, _ -> null; !null, _ -> !null")
