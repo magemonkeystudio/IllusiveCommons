@@ -55,6 +55,42 @@ class StringsTest {
     }
 
     @Test
+    void joinFrom() {
+        assertThat(Strings.joinFrom(".", new String[]{"a", "b", "c"}, 1)).isEqualTo("b.c");
+    }
+
+    @Test
+    void joinRange() {
+        assertThat(Strings.joinRange(".", new String[]{"a", "b", "c"}, 0, 3)).isEqualTo("a.b.c");
+    }
+
+    @Test
+    void joinRangeSameIndex() {
+        assertThat(Strings.joinRange(".", new String[]{"a", "b", "c"}, 1, 1)).isEmpty();
+    }
+
+    @Test
+    void joinRangeInvalidToIndex() {
+        assertThatExceptionOfType(ArrayIndexOutOfBoundsException.class).isThrownBy(() -> {
+            Strings.joinRange(".", new String[]{"a", "b", "c"}, 0, 3 + 1);
+        });
+    }
+
+    @Test
+    void joinRangeInvalidFromIndex() {
+        assertThatExceptionOfType(ArrayIndexOutOfBoundsException.class).isThrownBy(() -> {
+            Strings.joinRange(".", new String[]{"a", "b", "c"}, -1, 3);
+        });
+    }
+
+    @Test
+    void joinRangeInvalidInvertedIndexes() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
+            Strings.joinRange(".", new String[]{"a", "b", "c"}, 2, 1);
+        });
+    }
+
+    @Test
     void stripChars() {
         assertThat(Strings.stripChars("./ab/./cd/.", '.', '/')).isEqualTo("abcd");
     }

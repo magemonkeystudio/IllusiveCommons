@@ -100,6 +100,41 @@ public final class Strings {
         return parts;
     }
 
+    /**
+     * @param fromIndex the index of the first element, inclusive
+     */
+    public static String joinFrom(@NotNull String separator, String @NotNull [] elements, int fromIndex) {
+        return joinRange(separator, elements, fromIndex, elements.length);
+    }
+
+    /**
+     * @param fromIndex the index of the first element, inclusive
+     * @param toIndex the index of the last element, exclusive
+     */
+    public static String joinRange(@NotNull String separator, String @NotNull [] elements, int fromIndex, int toIndex) {
+        Preconditions.notNull(separator, "separator");
+        Preconditions.notNull(elements, "elements");
+        Preconditions.checkArgument(fromIndex <= toIndex, "fromIndex (" + fromIndex + ") cannot be greater than toIndex (" + toIndex + ")");
+        if (fromIndex < 0) {
+            throw new ArrayIndexOutOfBoundsException("fromIndex (" + fromIndex + ") cannot be negative");
+        }
+        if (toIndex > elements.length) {
+            throw new ArrayIndexOutOfBoundsException("toIndex (" + toIndex + ") cannot be greater than array length (" + elements.length + ")");
+        }
+        
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = fromIndex; i < toIndex; i++) {
+            if (result.length() != 0) {
+                result.append(separator);
+            }
+
+            result.append(elements[i]);
+        }
+        
+        return result.toString();
+    }
+
     public static String stripChars(@Nullable String string, char... charsToRemove) {
         if (isEmpty(string) || charsToRemove.length == 0) {
             return string;
