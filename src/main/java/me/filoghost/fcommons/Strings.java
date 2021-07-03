@@ -209,4 +209,14 @@ public final class Strings {
 
         return true;
     }
+
+    public static boolean hasSentenceEnding(@Nullable String string) {
+        if (isEmpty(string)) {
+            return false;
+        }
+
+        char lastChar = string.charAt(string.length() - 1);
+        return lastChar == '.' || lastChar == '?' || lastChar == '!';
+    }
+
 }
