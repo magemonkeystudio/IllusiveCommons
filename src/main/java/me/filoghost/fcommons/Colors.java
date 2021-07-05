@@ -74,4 +74,83 @@ public final class Colors {
         return "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(c) > -1;
     }
 
+    /**
+     * Color-aware equivalent of {@link String#trim()}.
+     * <p>
+     * Removes leading and trailing transparent whitespace, ignoring colors and formats.
+     * Does not remove whitespace made visible by {@link ChatColor#STRIKETHROUGH} and {@link ChatColor#UNDERLINE}.
+     */
+    public static String trimTransparentWhitespace(String string) {
+        if (Strings.isEmpty(string)) {
+            return string;
+        }
+
+        int firstVisibleChar = -1;
+        int lastVisibleChar = -1;
+
+        int length = string.length();
+        boolean whitespaceVisible = false;
+
+        for (int i = 0; i < length; i++) {
+            char currentChar = string.charAt(i);
+
+            if (currentChar == ' ' && !whitespaceVisible) {
+                // Not visible, space if it's fully transparent
+            } else if (currentChar == ChatColor.COLOR_CHAR) {
+                // Not visible, COLOR_CHAR is not rendered
+
+                if (i < length - 1) {
+                    ChatColor chatColor = ChatColor.getByChar(string.charAt(i + 1));
+
+                    if (chatColor != null) {
+                        if (chatColor == ChatColor.STRIKETHROUGH || chatColor == ChatColor.UNDERLINE) {
+                            // The above formats make whitespace visible
+                            whitespaceVisible = true;
+                        } else if (chatColor == ChatColor.RESET || chatColor.isColor()) {
+                            // Colors and "reset" make whitespace transparent again
+                            whitespaceVisible = false;
+                        }
+                    }
+
+                    // Skip the next character because COLOR_CHAR prevents if from rendering, even if it's not a valid color or format
+                    i++;
+                }
+            } else {
+                // Visible character
+
+                if (firstVisibleChar == -1) {
+                    // Save the position of the first visible character once
+                    firstVisibleChar = i;
+                }
+                lastVisibleChar = i + 1; // +1 because substring() ending index is not inclusive
+            }
+        }
+
+        if (firstVisibleChar == -1) {
+            // The whole string is whitespace, only keep colors and formats
+            return string.replace(" ", "");
+        }
+
+        // Add the visible central part of the string, as is
+        String result = string.substring(firstVisibleChar, lastVisibleChar);
+
+        if (firstVisibleChar > 0) {
+            // Add the transparent left part of the string, stripping whitespace
+            String leftPart = string.substring(0, firstVisibleChar).replace(" ", "");
+            if (!leftPart.isEmpty()) {
+                result = leftPart + result;
+            }
+        }
+
+        if (lastVisibleChar < string.length()) {
+            // Add the transparent right part of the string, stripping whitespace
+            String rightPart = string.substring(lastVisibleChar).replace(" ", "");
+            if (!rightPart.isEmpty()) {
+                result = result + rightPart;
+            }
+        }
+
+        return result;
+    }
+
 }

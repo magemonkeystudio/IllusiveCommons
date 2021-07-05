@@ -8,6 +8,8 @@ package me.filoghost.fcommons;
 import org.assertj.core.api.AbstractStringAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
@@ -93,6 +95,26 @@ class ColorsTest {
 
     private AbstractStringAssert<?> assertThatColored(String actual) {
         return assertThat(Colors.addColors(actual));
+    }
+
+    @ParameterizedTest
+    @MethodSource("trimTransparentWhitespaceArguments")
+    void trimTransparentWhitespace(String input, String expectedOutput) {
+        assertThat(Colors.trimTransparentWhitespace(input)).isEqualTo(expectedOutput);
+    }
+
+    static Stream<Arguments> trimTransparentWhitespaceArguments() {
+        return Stream.of(
+                Arguments.of("__", "__"),
+                Arguments.of(" _ _ ", "_ _"),
+                Arguments.of(" § § ", "§§"),
+                Arguments.of(" §r §r ", "§r§r"),
+                Arguments.of("_§r §r_", "_§r §r_"),
+                Arguments.of(" §r _ §r ", "§r_§r"),
+                Arguments.of(" §n _ §r ", "§n _ §r"),
+                Arguments.of(" §n§r _ §n§r ", "§n§r_§n§r"),
+                Arguments.of("§n§a _", "§n§a_") // Colors partially behave like "reset": they remove formats
+        );
     }
 
 }
