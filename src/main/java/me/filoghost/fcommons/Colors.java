@@ -6,59 +6,60 @@
 package me.filoghost.fcommons;
 
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.Nullable;
 
 public final class Colors {
 
     private static final int HEX_COLOR_LENGTH = 6;
 
-    public static String addColors(String input) {
-        if (Strings.isEmpty(input) || !input.contains("&")) {
-            return input;
+    public static String addColors(@Nullable String string) {
+        if (Strings.isEmpty(string) || !string.contains("&")) {
+            return string;
         }
 
-        StringBuilder output = new StringBuilder(input.length());
+        StringBuilder result = new StringBuilder(string.length());
 
-        for (int i = 0; i < input.length(); i++) {
-            char current = input.charAt(i);
+        for (int i = 0; i < string.length(); i++) {
+            char current = string.charAt(i);
 
-            if (current == '&' && i + 1 < input.length()) {
-                char next = input.charAt(i + 1);
+            if (current == '&' && i + 1 < string.length()) {
+                char next = string.charAt(i + 1);
 
-                if (next == '#' && FeatureSupport.HEX_CHAT_COLORS && isValidHexColor(input, i + 2)) {
-                    output.append(ChatColor.COLOR_CHAR);
-                    output.append('x');
+                if (next == '#' && FeatureSupport.HEX_CHAT_COLORS && isValidHexColor(string, i + 2)) {
+                    result.append(ChatColor.COLOR_CHAR);
+                    result.append('x');
 
                     for (int j = 0; j < HEX_COLOR_LENGTH; j++) {
-                        output.append(ChatColor.COLOR_CHAR);
-                        output.append(Character.toLowerCase(input.charAt(i + 2 + j)));
+                        result.append(ChatColor.COLOR_CHAR);
+                        result.append(Character.toLowerCase(string.charAt(i + 2 + j)));
                     }
 
                     i += 1 + HEX_COLOR_LENGTH; // Skip '#' and hex string, which are already converted and added
 
                 } else if (isColorCode(next)) {
-                    output.append(ChatColor.COLOR_CHAR);
-                    output.append(Character.toLowerCase(next));
+                    result.append(ChatColor.COLOR_CHAR);
+                    result.append(Character.toLowerCase(next));
 
                     i++; // Skip next character, which is already added
 
                 } else {
-                    output.append(current);
+                    result.append(current);
                 }
             } else {
-                output.append(current);
+                result.append(current);
             }
         }
 
-        return output.toString();
+        return result.toString();
     }
 
-    private static boolean isValidHexColor(String input, int startIndex) {
-        if (input.length() - startIndex < HEX_COLOR_LENGTH) {
+    private static boolean isValidHexColor(String string, int startIndex) {
+        if (string.length() - startIndex < HEX_COLOR_LENGTH) {
             return false;
         }
 
         for (int i = 0; i < HEX_COLOR_LENGTH; i++) {
-            if (!isHexCode(input.charAt(startIndex + i))) {
+            if (!isHexCode(string.charAt(startIndex + i))) {
                 return false;
             }
         }
@@ -80,7 +81,7 @@ public final class Colors {
      * Removes leading and trailing transparent whitespace, ignoring colors and formats.
      * Does not remove whitespace made visible by {@link ChatColor#STRIKETHROUGH} and {@link ChatColor#UNDERLINE}.
      */
-    public static String trimTransparentWhitespace(String string) {
+    public static String trimTransparentWhitespace(@Nullable String string) {
         if (Strings.isEmpty(string)) {
             return string;
         }
@@ -156,7 +157,7 @@ public final class Colors {
     /**
      * Removes repeated combinations of color and formats from a string without changing how the string is rendered.
      */
-    public static String optimize(String string) {
+    public static String optimize(@Nullable String string) {
         if (Strings.isEmpty(string) || string.indexOf(ChatColor.COLOR_CHAR) == -1) {
             return string;
         }
