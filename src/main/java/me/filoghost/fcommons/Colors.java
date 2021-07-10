@@ -153,4 +153,66 @@ public final class Colors {
         return result;
     }
 
+    /**
+     * Removes repeated combinations of color and formats from a string without changing how the string is rendered.
+     */
+    public static String optimize(String string) {
+        if (Strings.isEmpty(string) || string.indexOf(ChatColor.COLOR_CHAR) == -1) {
+            return string;
+        }
+
+        int length = string.length();
+        StringBuilder result = new StringBuilder(length);
+        StringBuilder previousColors = new StringBuilder();
+        StringBuilder newColors = new StringBuilder();
+
+        int i = 0;
+        while (i < length) {
+            char currentChar = string.charAt(i);
+
+            if (currentChar == ChatColor.COLOR_CHAR && i < length - 1) {
+                newColors.append(currentChar);
+                newColors.append(string.charAt(i + 1));
+                i += 2;
+            } else {
+                if (newColors.length() > 0) {
+                    // Append new colors only if necessary
+                    if (!contentEquals(newColors, previousColors)) {
+                        result.append(newColors);
+                    }
+
+                    // Equivalent to, but more efficient:
+                    // previousColors = newColors
+                    // newColors = new StringBuilder()
+                    previousColors.setLength(0);
+                    previousColors.append(newColors);
+                    newColors.setLength(0);
+                }
+
+                result.append(currentChar);
+                i++;
+            }
+        }
+
+        if (newColors.length() > 0) {
+            result.append(newColors);
+        }
+
+        return result.toString();
+    }
+
+    private static boolean contentEquals(StringBuilder stringBuilder1, StringBuilder stringBuilder2) {
+        if (stringBuilder1.length() != stringBuilder2.length()) {
+            return false;
+        }
+
+        for (int i = 0; i < stringBuilder1.length(); i++) {
+            if (stringBuilder1.charAt(i) != stringBuilder2.charAt(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

@@ -117,4 +117,21 @@ class ColorsTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("optimizeArguments")
+    void optimize(String input, String expectedOutput) {
+        assertThat(Colors.optimize(input)).isEqualTo(expectedOutput);
+    }
+
+    static Stream<Arguments> optimizeArguments() {
+        return Stream.of(
+                Arguments.of("§a_§a_", "§a__"),
+                Arguments.of("§a_§b§l_§c_", "§a_§b§l_§c_"),
+                Arguments.of("§a§l_§l§a_", "§a§l_§l§a_"),
+                Arguments.of("§a§x§0_§a§x§0_", "§a§x§0__"),
+                Arguments.of("_§a", "_§a"),
+                Arguments.of("__", "__")
+        );
+    }
+
 }
