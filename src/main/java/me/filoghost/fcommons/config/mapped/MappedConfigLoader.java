@@ -44,6 +44,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         T mappedObject;
         try {
             mappedObject = getMapper().newMappedObjectInstance();
+            mappedObject.beforeLoad(config);
             getMapper().setFieldsFromConfig(mappedObject, config);
         } catch (ConfigMappingException e) {
             throw new ConfigLoadException(e.getMessage(), e);
@@ -56,17 +57,19 @@ public class MappedConfigLoader<T extends MappedConfig> {
 
         try {
             T mappedObject = getMapper().newMappedObjectInstance();
+            boolean modifiedBeforeLoad = mappedObject.beforeLoad(config);
 
             // On the first time, save defaults before modifying the config
             if (defaultValues == null) {
                 defaultValues = getMapper().getFieldsAsConfigValues(mappedObject);
             }
 
-            boolean fileSaveRequired = addMissingDefaultValues(config, defaultValues);
-            
+            boolean addedNewDefaultValues = addMissingDefaultValues(config, defaultValues);
+
             getMapper().setFieldsFromConfig(mappedObject, config);
 
-            saveInternal(mappedObject, config, false, fileSaveRequired);
+            boolean saveRequired = modifiedBeforeLoad || addedNewDefaultValues;
+            saveInternal(mappedObject, config, false, saveRequired);
 
             return mappedObject;
 

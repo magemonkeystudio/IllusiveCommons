@@ -17,6 +17,15 @@ public interface MappedConfig extends MappedConfigSection {
     }
 
     /**
+     * Applies changes to the raw config before loading.
+     *
+     * @return true if the applied changes should trigger a file save, false otherwise
+     */
+    default boolean beforeLoad(Config rawConfig) {
+        return false;
+    }
+
+    /**
      * Applies changes to the raw config before saving.
      *
      * @return true if the applied changes should trigger a file save, false otherwise

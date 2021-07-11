@@ -5,10 +5,13 @@
  */
 package me.filoghost.fcommons.config.mapped;
 
+import me.filoghost.fcommons.config.Config;
+import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.test.AssertExtra;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -37,6 +40,34 @@ class MappedConfigSectionTest {
         AfterLoadConfig config = configLoader.init();
         
         assertThat(config.stringAfterLoad).isEqualTo("abc");
+    }
+
+    @Test
+    void testBeforeLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException {
+        MappedConfigLoader<BeforeLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, BeforeLoadConfig.class,
+                "oldString: oldValue"
+        );
+
+        BeforeLoadConfig config = configLoader.load();
+
+        assertThat(config.string).isEqualTo("oldValue");
+        AssertExtra.fileContentMatches(configLoader.getFile(),
+                "oldString: oldValue"
+        );
+    }
+
+    @Test
+    void testBeforeLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException, IOException {
+        MappedConfigLoader<BeforeLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, BeforeLoadConfig.class,
+                "oldString: oldValue"
+        );
+
+        BeforeLoadConfig config = configLoader.init();
+
+        assertThat(config.string).isEqualTo("oldValue");
+        AssertExtra.fileContentMatches(configLoader.getFile(),
+                "string: oldValue"
+        );
     }
 
     @Test
@@ -87,6 +118,22 @@ class MappedConfigSectionTest {
         @Override
         public void afterLoad() throws ConfigValidateException {
             throw new ConfigValidateException("test");
+        }
+
+    }
+
+    private static class BeforeLoadConfig implements MappedConfig {
+
+        private String string = "abc";
+
+        public boolean beforeLoad(Config rawConfig) {
+            if (rawConfig.get("oldString").isPresentAs(ConfigType.STRING)) {
+                rawConfig.setString("string", rawConfig.getString("oldString"));
+                rawConfig.remove("oldString");
+                return true;
+            } else {
+                return false;
+            }
         }
 
     }
