@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  * {@code new ClassToken<List<String>>(){}}
  */
 public abstract class ClassToken<T> {
-    
+
     private final Class<T> typeClass;
 
     @SuppressWarnings("unchecked")
@@ -27,7 +27,7 @@ public abstract class ClassToken<T> {
         Preconditions.checkArgument(typeClass != null, runtimeType + " doesn't declare a class");
         this.typeClass = (Class<T>) typeClass;
     }
-    
+
     public final Class<T> asClass() {
         return typeClass;
     }

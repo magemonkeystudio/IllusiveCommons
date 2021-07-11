@@ -38,7 +38,7 @@ public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
             throw new IllegalStateException("FCommons must be relocated to another package");
         }
     }
-    
+
     private void criticalShutdown(List<String> errorMessageLines, Throwable throwable) {
         printCriticalError(errorMessageLines, throwable);
 
@@ -96,5 +96,5 @@ public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
         }
 
     }
-    
+
 }

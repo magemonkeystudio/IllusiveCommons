@@ -30,12 +30,12 @@ public class MappedField<T> {
     private static final List<FieldValueModifier<?, ?>> VALUE_MODIFIERS = ImmutableList.of(
             new ChatColorsModifier()
     );
-    
+
     private final ReflectField<T> field;
     private final Converter<T, ?> converter;
     private final ConfigPath configPath;
     private final List<Annotation> annotations;
-    
+
     public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
         this.field = field;
         this.converter = ConverterRegistry.fromObjectType(getFieldTypeInfo(field));
@@ -49,7 +49,7 @@ public class MappedField<T> {
                 Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
                 .collect(Collectors.toList());
     }
-    
+
     @SuppressWarnings("unchecked")
     private TypeInfo<T> getFieldTypeInfo(ReflectField<T> field) throws ReflectiveOperationException {
         TypeInfo<?> typeInfo = TypeInfo.of(field);

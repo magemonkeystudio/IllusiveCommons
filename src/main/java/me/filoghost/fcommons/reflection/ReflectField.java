@@ -13,7 +13,7 @@ public interface ReflectField<T> extends ReflectElement {
     static <T> ReflectField<T> lookup(ClassToken<T> expectedClassToken, Class<?> declaringClass, String fieldName) {
         return lookup(expectedClassToken.asClass(), declaringClass, fieldName);
     }
-    
+
     static <T> ReflectField<T> lookup(Class<T> expectedClass, Class<?> declaringClass, String fieldName) {
         Field field;
         try {

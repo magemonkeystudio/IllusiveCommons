@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Strings {
-    
+
     public static boolean isEmpty(@Nullable String string) {
         return string == null || string.isEmpty();
     }
@@ -52,7 +52,7 @@ public final class Strings {
             // Optimization for trivial cases where no splits would occur
             return new String[]{string};
         }
-        
+
         int firstIndex = string.indexOf(delimiter);
         if (firstIndex == -1) {
             return new String[]{string};
@@ -66,7 +66,7 @@ public final class Strings {
             if (parts == null) {
                 parts = new ArrayList<>();
             }
-            
+
             if (limit > 0 && parts.size() >= limit - 1) {
                 // Limit reached (keep one slot for the remaining part)
                 break;
@@ -121,9 +121,9 @@ public final class Strings {
         if (toIndex > elements.length) {
             throw new ArrayIndexOutOfBoundsException("toIndex (" + toIndex + ") cannot be greater than array length (" + elements.length + ")");
         }
-        
+
         StringBuilder output = new StringBuilder();
-        
+
         for (int i = fromIndex; i < toIndex; i++) {
             if (output.length() != 0) {
                 output.append(separator);
@@ -131,7 +131,7 @@ public final class Strings {
 
             output.append(elements[i]);
         }
-        
+
         return output.toString();
     }
 

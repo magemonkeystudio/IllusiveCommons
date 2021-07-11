@@ -9,7 +9,7 @@ import me.filoghost.fcommons.Preconditions;
 import org.bukkit.permissions.Permissible;
 
 public interface CommandProperties {
-    
+
     String getName();
 
     String getPermission();
@@ -19,7 +19,7 @@ public interface CommandProperties {
     String getUsageArgs();
 
     int getMinArgs();
-    
+
     default boolean hasPermission(Permissible permissible) {
         String permission = getPermission();
         if (permission != null) {

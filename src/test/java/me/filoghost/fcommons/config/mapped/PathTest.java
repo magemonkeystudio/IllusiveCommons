@@ -35,7 +35,7 @@ class PathTest {
                 "string-alt: xyz"
         );
         ConfigWithPaths configWithPaths = configLoader.load();
-        
+
         assertThat(configWithPaths.integer).isEqualTo(5);
         assertThat(configWithPaths.string).isEqualTo("xyz");
     }
@@ -44,7 +44,7 @@ class PathTest {
 
         @Path("integer-alt")
         private int integer = 3;
-        
+
         @Path("string-alt")
         private String string = "abc";
 

@@ -21,13 +21,13 @@ public class ValidReflectMethod<T> implements ReflectMethod<T> {
         this.boxedExpectedReturnClass = ReflectUtils.boxPrimitiveClass(expectedReturnClass);
         this.method = method;
     }
-    
+
     @Override
     public T invoke(Object instance, Object... args) throws ReflectiveOperationException {
         if (!Modifier.isStatic(method.getModifiers()) && instance == null) {
             throw new InvalidInstanceException("instance cannot be null when method is not static");
         }
-        
+
         try {
             return boxedExpectedReturnClass.cast(method.invoke(instance, args));
         } catch (ReflectiveOperationException e) {

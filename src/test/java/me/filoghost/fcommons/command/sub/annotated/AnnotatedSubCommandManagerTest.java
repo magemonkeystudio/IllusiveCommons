@@ -32,13 +32,13 @@ class AnnotatedSubCommandManagerTest {
     @Test
     void testSubCommandCall() throws CommandException {
         TestImplementation manager = new TestImplementation();
-        
+
         CommandContext contextZ = new CommandContext(null, null, new String[]{"z", "testArgZ"});
         manager.execute(contextZ.getSender(), contextZ.getArgs(), contextZ);
 
         CommandContext contextB = new CommandContext(null, null, new String[]{"b", "testArgB"});
         manager.execute(contextB.getSender(), contextB.getArgs(), contextB);
-        
+
         assertThat(manager.zArg0).isEqualTo("testArgZ");
         assertThat(manager.bArg0).isEqualTo("testArgB");
     }
@@ -48,21 +48,21 @@ class AnnotatedSubCommandManagerTest {
         TestImplementation manager = new TestImplementation();
 
         AnnotatedSubCommand testOverrideCommand = new AnnotatedSubCommand() {
-            
+
             {
                 setName("Z"); // Use different case
                 setDisplayPriority(99); // Use different priority
             }
-            
+
             @Override
             public void execute(CommandSender sender, String[] args, SubCommandContext context) {}
-            
+
         };
 
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
                 () -> manager.registerSubCommand(testOverrideCommand));
     }
-    
+
 
     private static class TestImplementation extends AnnotatedSubCommandManager {
 
@@ -71,7 +71,7 @@ class AnnotatedSubCommandManagerTest {
 
         public TestImplementation() {
             registerSubCommand(new AnnotatedSubCommand() {
-                
+
                 {
                     setName("B");
                 }

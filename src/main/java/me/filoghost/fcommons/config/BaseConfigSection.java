@@ -44,7 +44,7 @@ abstract class BaseConfigSection {
     public <T> T getOrDefault(ConfigPath path, @NotNull ConfigType<T> type, @Nullable T defaultValue) {
         return type.fromRawValueOrDefault(getRawValue(path), defaultValue);
     }
-    
+
     @NotNull
     public <T> T getRequired(ConfigPath path, @NotNull ConfigType<T> type)
             throws MissingConfigValueException, InvalidConfigValueException {
@@ -76,18 +76,18 @@ abstract class BaseConfigSection {
     @Nullable
     private Object getRawValue(ConfigPath path) {
         Preconditions.notNull(path, "path");
-        
+
         BaseConfigSection targetSection = getParentSectionForPath(path);
         if (targetSection == null) {
             return null;
         }
-        
+
         return targetSection.rawValues.get(path.getLastPart());
     }
-    
+
     private void setRawValue(ConfigPath path, @Nullable Object value) {
         Preconditions.notNull(path, "path");
-        
+
         if (value != null) {
             getOrCreateParentSectionForPath(path).rawValues.put(path.getLastPart(), value);
         } else {
@@ -116,7 +116,7 @@ abstract class BaseConfigSection {
         for (int i = 0; i < path.getPartsLength() - 1; i++) {
             String pathPart = path.getPart(i);
             Object rawSectionValue = currentSection.rawValues.get(pathPart);
-            
+
             if (createIfNotExisting && rawSectionValue == null) {
                 ConfigSection innerSection = new ConfigSection();
                 currentSection.rawValues.put(pathPart, ConfigType.SECTION.toRawValue(innerSection));
@@ -128,7 +128,7 @@ abstract class BaseConfigSection {
                 }
             }
         }
-        
+
         return currentSection;
     }
 

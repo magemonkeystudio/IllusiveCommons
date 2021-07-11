@@ -38,7 +38,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
         return configMapper;
     }
-    
+
     public T load() throws ConfigLoadException {
         Config config = configLoader.load();
         T mappedObject;
@@ -51,7 +51,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
         return mappedObject;
     }
-    
+
     public T init() throws ConfigLoadException, ConfigSaveException {
         Config config = configLoader.init();
 
@@ -98,7 +98,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
 
         Config config = configLoader.load();
-        
+
         try {
             boolean fileSaveRequired = !getMapper().equalsConfig(newMappedObject, config);
             return saveInternal(newMappedObject, config, true, fileSaveRequired);
@@ -110,10 +110,10 @@ public class MappedConfigLoader<T extends MappedConfig> {
     public void save(T mappedObject) throws ConfigSaveException {
         saveInternal(mappedObject, new Config(), true, true);
     }
-    
+
     private boolean saveInternal(T mappedObject, Config config, boolean writeMappedObject, boolean fileSaveRequired)
             throws ConfigSaveException {
-        
+
         if (writeMappedObject) {
             try {
                 getMapper().setConfigFromFields(mappedObject, config);
@@ -130,7 +130,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         if (fileSaveRequired) {
             configLoader.save(config);
         }
-        
+
         return fileSaveRequired;
     }
 

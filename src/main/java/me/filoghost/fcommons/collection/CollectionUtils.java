@@ -27,7 +27,7 @@ public final class CollectionUtils {
         if (collection == null) {
             return null;
         }
-        
+
         return new ArrayList<>(collection);
     }
 
@@ -45,16 +45,16 @@ public final class CollectionUtils {
         if (map == null) {
             return null;
         }
-        
+
         return new HashMap<>(map);
     }
-    
+
     @Contract("null -> null; !null -> !null")
     public static <E> ImmutableList<E> newImmutableList(@Nullable Collection<E> collection) {
         if (collection == null) {
             return null;
         }
-        
+
         return ImmutableList.copyOf(collection);
     }
 
@@ -72,7 +72,7 @@ public final class CollectionUtils {
         if (collection == null) {
             return null;
         }
-        
+
         List<B> output = new ArrayList<>(collection.size());
         for (A element : collection) {
             output.add(transformFunction.apply(element));
@@ -88,7 +88,7 @@ public final class CollectionUtils {
 
         // Taken from the HashSet constructor that has a Collection parameter, to fit initial items
         int initialSize = Math.max((int) (collection.size() / 0.75f) + 1, 16);
-        
+
         Set<B> output = new HashSet<>(initialSize);
         for (A element : collection) {
             output.add(transformFunction.apply(element));
@@ -101,7 +101,7 @@ public final class CollectionUtils {
         if (collection == null) {
             return null;
         }
-        
+
         ImmutableList.Builder<B> builder = ImmutableList.builder();
         for (A element : collection) {
             builder.add(transformFunction.apply(element));

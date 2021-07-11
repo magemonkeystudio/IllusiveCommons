@@ -15,13 +15,13 @@ public class LookupRegistry<V> {
 
     // Characters to ignore when searching values by name
     private static final char[] KEY_IGNORE_CHARS = {'-', '_', ' '};
-    
+
     private final CaseInsensitiveMap<V> valuesMap;
 
     public static <V> LookupRegistry<V> fromValues(V[] values, Function<V, String> keyExtractor) {
         return fromValues(Arrays.asList(values), keyExtractor);
     }
-    
+
     public static <V> LookupRegistry<V> fromValues(Iterable<V> values, Function<V, String> keyExtractor) {
         LookupRegistry<V> registry = new LookupRegistry<>();
         registry.putAll(values, keyExtractor);
@@ -39,7 +39,7 @@ public class LookupRegistry<V> {
         }
         return valuesMap.get(removeIgnoredChars(key));
     }
-    
+
     protected void putAll(Iterable<V> values, Function<V, String> keyExtractor) {
         for (V value : values) {
             put(keyExtractor.apply(value), value);

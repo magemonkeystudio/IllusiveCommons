@@ -12,7 +12,7 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.*;
 
 class CaseInsensitiveStringTest {
-    
+
     @Test
     void originalString() {
         assertThat(new CaseInsensitiveString("Abc").getOriginalString()).isEqualTo("Abc");

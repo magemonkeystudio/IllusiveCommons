@@ -61,7 +61,7 @@ public class ConfigMapper<T extends MappedConfigSection> {
             config.set(mappedField.getConfigPath(), configValue);
         }
     }
-    
+
     public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         for (MappedField<?> mappedField : mappedFields) {
             mappedField.setFieldValueFromConfig(mappedObject, config);

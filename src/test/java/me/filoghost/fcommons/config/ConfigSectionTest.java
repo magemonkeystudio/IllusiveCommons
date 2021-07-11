@@ -52,7 +52,7 @@ class ConfigSectionTest {
         list.add("a");
         section.setStringList("list", list);
         list.add("b");
-        
+
         assertThat(section.getStringList("list")).containsExactly("a");
     }
 

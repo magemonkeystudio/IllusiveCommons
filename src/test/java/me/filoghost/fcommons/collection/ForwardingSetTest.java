@@ -33,12 +33,12 @@ class ForwardingSetTest {
     void testEqualsAndHashCode() {
         ForwardingSet<String> forwardingSet = new ForwardingSet<>(new HashSet<>());
         Set<String> set = new LinkedHashSet<>();
-        
+
         for (char c : "ecdab".toCharArray()) {
             forwardingSet.add(String.valueOf(c));
             set.add(String.valueOf(c));
         }
-        
+
         assertThat(forwardingSet).isEqualTo(set);
         assertThat(set).isEqualTo(forwardingSet);
         assertThat(forwardingSet).hasSameHashCodeAs(set);

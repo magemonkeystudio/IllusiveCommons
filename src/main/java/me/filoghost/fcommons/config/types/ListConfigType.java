@@ -44,7 +44,7 @@ public class ListConfigType<E> extends ConfigType<List<E>> {
     @Override
     protected Object toRawValue(@NotNull List<E> configValue) {
         List<Object> rawValue = new ArrayList<>();
-        
+
         for (E configElement : configValue) {
             Object rawElement = toRawValue(elementType, configElement);
             rawValue.add(rawElement);

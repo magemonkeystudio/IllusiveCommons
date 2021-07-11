@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class ForwardingSet<E> implements Set<E> {
 
     private final Set<E> delegate;
-    
+
     protected ForwardingSet(Set<E> delegate) {
         this.delegate = delegate;
     }
@@ -26,13 +26,13 @@ public class ForwardingSet<E> implements Set<E> {
     /**
      * Returns the mutex object to synchronize on, to be used when the delegate is created with
      * {@link java.util.Collections#synchronizedSet(Set)}.
-     * 
+     *
      * The method can be exposed by subclasses when necessary.
      */
     protected Object getMutex() {
         return delegate;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         return obj == this || delegate.equals(obj);
@@ -68,12 +68,12 @@ public class ForwardingSet<E> implements Set<E> {
     public Iterator<E> iterator() {
         return delegate.iterator();
     }
-    
+
     @Override
     public Object[] toArray() {
         return delegate.toArray();
     }
-    
+
     @Override
     public <T> T[] toArray(T @NotNull [] array) {
         return delegate.toArray(array);
@@ -113,7 +113,7 @@ public class ForwardingSet<E> implements Set<E> {
     public void clear() {
         delegate.clear();
     }
-    
+
     @Override
     public Spliterator<E> spliterator() {
         return delegate.spliterator();

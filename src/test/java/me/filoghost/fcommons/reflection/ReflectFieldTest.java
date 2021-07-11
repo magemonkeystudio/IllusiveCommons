@@ -14,7 +14,7 @@ class ReflectFieldTest {
     @Test
     void notExisting() {
         ReflectField<Object> field = ReflectField.lookup(Object.class, ClassWithFields.class, "notExisting");
-        
+
         assertThatExceptionOfType(NoSuchFieldException.class).isThrownBy(() -> {
             assertThat(field.get(new ClassWithFields()));
         });
@@ -36,7 +36,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         field.set(instance, true);
-        
+
         assertThat(instance.privateObject).isEqualTo(true);
     }
 
@@ -53,10 +53,10 @@ class ReflectFieldTest {
     @Test
     void setStatic() throws ReflectiveOperationException {
         ReflectField<Object> field = ReflectField.lookup(Object.class, ClassWithFields.class, "staticObject");
-        
+
         field.set(null, 1);
         assertThat(ClassWithFields.staticObject).isEqualTo(1);
-        
+
         field.setStatic(2);
         assertThat(ClassWithFields.staticObject).isEqualTo(2);
     }
@@ -105,7 +105,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         instance.primitiveInt = 1;
-        
+
         assertThat(field.get(instance)).isEqualTo(1);
     }
 
@@ -125,7 +125,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         instance.number = 1;
-        
+
         assertThat(field.get(instance)).isEqualTo(1);
     }
 
@@ -163,8 +163,8 @@ class ReflectFieldTest {
         ReflectField<Double> field = ReflectField.lookup(Double.class, ClassWithFields.class, "number");
 
         ClassWithFields instance = new ClassWithFields();
-        instance.number = 1;  
-        
+        instance.number = 1;
+
         assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
             // Cannot get Double where field type is Number (and actual value is Integer)
             field.get(instance);
@@ -194,7 +194,7 @@ class ReflectFieldTest {
     @Test
     void setPrimitiveAsBoxedNull() {
         ReflectField<Integer> field = ReflectField.lookup(Integer.class, ClassWithFields.class, "primitiveInt");
-        
+
         assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
             field.set(new ClassWithFields(), null);
         });
@@ -206,7 +206,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         instance.primitiveInt = 1;
-        
+
         assertThat(field.get(instance)).isEqualTo(1);
     }
 
@@ -236,7 +236,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         instance.boxedInt = 1;
-        
+
         assertThat(field.get(instance)).isEqualTo(1);
     }
 
@@ -246,7 +246,7 @@ class ReflectFieldTest {
 
         ClassWithFields instance = new ClassWithFields();
         instance.string = "abc";
-        
+
         assertThatExceptionOfType(ReflectiveOperationException.class).isThrownBy(() -> {
             field.get(instance);
         });
@@ -260,8 +260,8 @@ class ReflectFieldTest {
             field.set(new ClassWithFields(), true);
         });
     }
-    
-    
+
+
     private static class ClassWithFields {
 
         private Object privateObject;
@@ -270,7 +270,7 @@ class ReflectFieldTest {
         public Integer boxedInt;
         public String string;
         public Number number;
-        
+
     }
 
 }

@@ -56,13 +56,13 @@ abstract class CaseInsensitiveMapTest {
     @Test
     void putAll() {
         CaseInsensitiveMap<Integer> map = createCaseInsensitiveMap();
-        
+
         Map<String, Integer> stringMap = new HashMap<>();
         stringMap.put("A", 1);
         stringMap.put("b", 2);
         stringMap.put("C", 3);
         map.putAllString(stringMap);
-        
+
         assertThat(getStringKeys(map)).containsExactly("A", "b", "C");
     }
 
@@ -75,7 +75,7 @@ abstract class CaseInsensitiveMapTest {
         boolean removedA = map.removeIf("a", value -> value == 10); // Should NOT be removed
         boolean removedB = map.removeIf("b", value -> value == 2); // Should be removed
         boolean removedNonExisting = map.removeIf("d", value -> true);
-        
+
         assertThat(removedA).isFalse();
         assertThat(removedB).isTrue();
         assertThat(removedNonExisting).isFalse();

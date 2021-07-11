@@ -30,5 +30,5 @@ public class CommandContext {
     public String[] getArgs() {
         return args;
     }
-    
+
 }

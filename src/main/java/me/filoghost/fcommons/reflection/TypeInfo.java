@@ -29,7 +29,7 @@ public class TypeInfo<T> {
     public Type getType() {
         return type;
     }
-    
+
     @Nullable
     public Class<T> getTypeClass() {
         return typeClass;
@@ -44,14 +44,14 @@ public class TypeInfo<T> {
         if (typeClass == null) {
             throw new TypeWithoutClassException("cannot read fields of type without class: " + type);
         }
-        
+
         Field[] declaredFields;
         try {
             declaredFields = typeClass.getDeclaredFields();
         } catch (Throwable t) {
             throw new ReflectiveOperationException(t);
         }
-        
+
         ReflectField<?>[] output = new ReflectField[declaredFields.length];
         for (int i = 0; i < declaredFields.length; i++) {
             output[i] = ReflectField.wrap(declaredFields[i]);

@@ -14,5 +14,5 @@ public interface MappedConfigSection {
      * to validate the configuration.
      */
     default void afterLoad() throws ConfigValidateException {}
-    
+
 }

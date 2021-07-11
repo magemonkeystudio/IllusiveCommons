@@ -38,7 +38,7 @@ class MappedConfigSectionTest {
         MappedConfigLoader<AfterLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, AfterLoadConfig.class);
 
         AfterLoadConfig config = configLoader.init();
-        
+
         assertThat(config.stringAfterLoad).isEqualTo("abc");
     }
 
@@ -105,7 +105,7 @@ class MappedConfigSectionTest {
         private String string = "abc";
 
         private transient String stringAfterLoad;
-        
+
         @Override
         public void afterLoad() {
             stringAfterLoad = string;

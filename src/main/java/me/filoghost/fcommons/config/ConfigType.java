@@ -48,11 +48,11 @@ public abstract class ConfigType<T> {
 
     @Contract("null -> false")
     protected abstract boolean isConvertibleRawValue(@Nullable Object rawValue);
-    
+
     protected abstract Object toRawValue(@NotNull T configValue);
 
     protected abstract T fromRawValue(@NotNull Object rawValue);
-    
+
     @Nullable
     protected T fromRawValueOrNull(@Nullable Object rawValue) {
         return fromRawValueOrDefault(rawValue, null);
@@ -100,7 +100,7 @@ public abstract class ConfigType<T> {
     protected static <T> T fromRawValueOrNull(ConfigType<T> type, Object rawValue) {
         return type.fromRawValueOrNull(rawValue);
     }
-    
+
     @Override
     public String toString() {
         return name;

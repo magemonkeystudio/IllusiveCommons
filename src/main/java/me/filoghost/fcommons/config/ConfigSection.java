@@ -97,11 +97,11 @@ public class ConfigSection extends BaseConfigSection {
     /*
      * Getters and setters with specialized type: String
      */
-    
+
     public String getString(ConfigPath path) {
         return getOrDefault(path, ConfigType.STRING, null);
     }
-    
+
     public String getString(String path) {
         return getString(ConfigPath.dotDelimited(path));
     }
@@ -345,5 +345,5 @@ public class ConfigSection extends BaseConfigSection {
     public void setSectionList(String path, List<ConfigSection> value) {
         setSectionList(ConfigPath.dotDelimited(path), value);
     }
-    
+
 }

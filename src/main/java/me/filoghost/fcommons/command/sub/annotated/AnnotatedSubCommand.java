@@ -15,7 +15,7 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
 
     private int displayPriority;
     private String description;
-    
+
     protected AnnotatedElement getAnnotatedElement() {
         return null;
     }
@@ -25,7 +25,7 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
         if (annotatedElement == null) {
             return null;
         }
-        
+
         return annotatedElement.getAnnotation(annotationClass);
     }
 
@@ -34,7 +34,7 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
         if (annotatedElement == null) {
             return;
         }
-        
+
         Name name = annotatedElement.getAnnotation(Name.class);
         if (name != null) {
             setName(name.value());
@@ -70,7 +70,7 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
             setDescription(description.value());
         }
     }
-    
+
     public int getDisplayPriority() {
         return displayPriority;
     }
@@ -78,7 +78,7 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
     public void setDisplayPriority(int displayPriority) {
         this.displayPriority = displayPriority;
     }
-    
+
     public String getDescription() {
         return description;
     }
@@ -86,5 +86,5 @@ public abstract class AnnotatedSubCommand extends ConfigurableCommandProperties 
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
 }

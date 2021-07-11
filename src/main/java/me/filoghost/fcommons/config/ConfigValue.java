@@ -17,7 +17,7 @@ import java.util.Objects;
 public final class ConfigValue {
 
     public static final ConfigValue NULL = new ConfigValue(null, null);
-    
+
     private final ConfigPath sourcePath;
     private final Object rawValue;
 

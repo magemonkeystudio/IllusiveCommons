@@ -21,7 +21,7 @@ public abstract class SubCommandManager extends ConfigurableRootCommand {
     protected abstract SubCommand getSubCommandByName(String name);
 
     protected abstract Iterable<? extends SubCommand> getSubCommands();
-    
+
     @Override
     public final void execute(CommandSender sender, String[] args, CommandContext context) throws CommandException {
         if (args.length == 0) {
@@ -43,7 +43,7 @@ public abstract class SubCommandManager extends ConfigurableRootCommand {
             sendUnknownSubCommandMessage(subContext);
             return;
         }
-        
+
         if (!subCommand.hasPermission(sender)) {
             if (subCommand.getPermissionMessage() != null) {
                 sender.sendMessage(subCommand.getPermissionMessage());

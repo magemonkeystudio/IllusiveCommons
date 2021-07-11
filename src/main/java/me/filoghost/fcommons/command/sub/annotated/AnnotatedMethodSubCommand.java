@@ -37,7 +37,7 @@ public class AnnotatedMethodSubCommand extends AnnotatedSubCommand {
         this.instance = instance;
         this.method = method;
         this.method.setAccessible(true);
-        
+
         super.readPropertiesFromAnnotations();
 
         this.methodParameterProviders = Arrays.stream(method.getParameterTypes()).map((Class<?> paramType) -> {
@@ -71,7 +71,7 @@ public class AnnotatedMethodSubCommand extends AnnotatedSubCommand {
             throw new RuntimeException(t);
         }
     }
-    
+
 
     private interface MethodParameterProvider {
 

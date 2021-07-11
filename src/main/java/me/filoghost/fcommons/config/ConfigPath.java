@@ -11,9 +11,9 @@ import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 
 public final class ConfigPath {
-    
+
     private final ImmutableList<String> parts;
-    
+
     private ConfigPath(ImmutableList<String> parts) {
         this.parts = parts;
     }
@@ -31,7 +31,7 @@ public final class ConfigPath {
         Preconditions.notEmpty(path, "path");
         return new ConfigPath(ImmutableList.of(path));
     }
-    
+
     public static ConfigPath literal(String... parts) {
         Preconditions.notEmpty(parts, "parts");
         for (String part : parts) {
@@ -43,7 +43,7 @@ public final class ConfigPath {
     public int getPartsLength() {
         return parts.size();
     }
-    
+
     public String getPart(int index) {
         return parts.get(index);
     }
@@ -56,7 +56,7 @@ public final class ConfigPath {
         Preconditions.checkState(getPartsLength() == 1, "must contain a single part");
         return getPart(0);
     }
-    
+
     public ConfigPath replace(String target, String replacement) {
         Builder<String> pathPartsBuilder = ImmutableList.builder();
         for (String pathPart : parts) {
@@ -64,7 +64,7 @@ public final class ConfigPath {
         }
         return new ConfigPath(pathPartsBuilder.build());
     }
-    
+
     public String format(String delimiter) {
         return String.join(delimiter, parts);
     }

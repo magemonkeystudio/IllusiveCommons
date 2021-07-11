@@ -216,7 +216,7 @@ class MappedConfigLoaderTest {
                 "  normalMissing: 2"
         );
     }
-    
+
     @Test
     void testSaveListOfObjectsMissingElement(@TempDir Path tempDir) throws ConfigException, IOException {
         MappedConfigLoader<TestListOfObject> configLoader = MappedTestCommons.newExistingConfig(tempDir, TestListOfObject.class,

@@ -22,7 +22,7 @@ public class AnnotatedSubCommandManager extends SubCommandManager {
         this.subCommands = new TreeSet<>(Comparator
                 .comparing(AnnotatedSubCommand::getDisplayPriority).reversed()
                 .thenComparing(SubCommand::getName, String.CASE_INSENSITIVE_ORDER));
-        
+
         scanMethodsSubCommands(getClass());
     }
 
@@ -53,13 +53,13 @@ public class AnnotatedSubCommandManager extends SubCommandManager {
     protected final void registerSubCommand(AnnotatedSubCommand subCommand) {
         Preconditions.notNull(subCommand, "subCommand");
         subCommand.validate();
-        Preconditions.checkState(getSubCommandByName(subCommand.getName()) == null, 
+        Preconditions.checkState(getSubCommandByName(subCommand.getName()) == null,
                 "subCommand with same name already registered");
-        
+
         if (subCommand.getPermission() == null) {
             subCommand.setPermission(getDefaultSubCommandPermission(subCommand));
         }
-        
+
         subCommands.add(subCommand);
     }
 

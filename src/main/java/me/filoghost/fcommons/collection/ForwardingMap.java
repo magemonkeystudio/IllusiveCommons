@@ -153,7 +153,7 @@ public class ForwardingMap<K, V> implements Map<K, V> {
     public V computeIfAbsent(K key, @NotNull Function<? super K, ? extends V> mappingFunction) {
         return delegate.computeIfAbsent(key, mappingFunction);
     }
-    
+
     @Override
     public V computeIfPresent(K key, @NotNull BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         return delegate.computeIfPresent(key, remappingFunction);

@@ -35,7 +35,7 @@ public class ConverterRegistry {
     @SuppressWarnings("unchecked")
     public static <T> Converter<T, ?> fromObjectType(TypeInfo<T> typeInfo) throws ConfigMappingException {
         Class<T> typeClass = typeInfo.getTypeClass();
-        
+
         if (typeClass != null) {
             for (ConfigTypeConverter<?> configTypeConverter : CONFIG_VALUE_TYPE_CONVERTERS) {
                 if (configTypeConverter.supports(typeClass)) {

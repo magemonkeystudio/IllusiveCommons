@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public interface CaseInsensitiveMap<V> extends Map<CaseInsensitiveString, V> {
-    
+
     default V put(@NotNull String key, V value) {
         return put(new CaseInsensitiveString(key), value);
     }
@@ -73,7 +73,7 @@ public interface CaseInsensitiveMap<V> extends Map<CaseInsensitiveString, V> {
     /*
      * Additional utility methods
      */
-    
+
     default boolean removeIf(@NotNull String key, @NotNull Predicate<V> filter) {
         AtomicBoolean removed = new AtomicBoolean(false);
 

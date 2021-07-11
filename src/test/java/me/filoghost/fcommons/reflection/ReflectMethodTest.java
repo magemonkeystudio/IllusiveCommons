@@ -19,7 +19,7 @@ class ReflectMethodTest {
             field.invoke(new ClassWithMethods());
         });
     }
-    
+
     @Test
     void testReturn() throws ReflectiveOperationException {
         ReflectMethod<Integer> field = ReflectMethod.lookup(Integer.class, ClassWithMethods.class, "boxedInteger", Integer.class);
@@ -30,7 +30,7 @@ class ReflectMethodTest {
     @Test
     void testPrivate() throws ReflectiveOperationException {
         ReflectMethod<Void> field = ReflectMethod.lookup(Void.class, ClassWithMethods.class, "privateMethod");
-        
+
         field.invoke(new ClassWithMethods());
     }
 
@@ -66,7 +66,7 @@ class ReflectMethodTest {
     @Test
     void wrongReturnTypeSuperClass() throws ReflectiveOperationException {
         ReflectMethod<Object> field = ReflectMethod.lookup(Object.class, ClassWithMethods.class, "number", Number.class);
-        
+
         field.invoke(new ClassWithMethods(), 1); // Allowed
     }
 
@@ -113,20 +113,20 @@ class ReflectMethodTest {
             field.invoke(new ClassWithMethods(), 1);
         });
     }
-    
-    
+
+
     private static class ClassWithMethods {
 
         private void privateMethod() {}
 
         public static void staticMethod() {}
-        
+
         public void voidMethod() {}
 
         public Number number(Number number) {
             return number;
         }
-        
+
         public Integer boxedInteger(Integer integer) {
             return integer;
         }
@@ -134,7 +134,7 @@ class ReflectMethodTest {
         public int primitiveInteger(int i) {
             return i;
         }
-        
+
     }
 
 }

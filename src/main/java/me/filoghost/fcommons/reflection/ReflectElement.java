@@ -6,7 +6,7 @@
 package me.filoghost.fcommons.reflection;
 
 public interface ReflectElement {
-    
+
     boolean isValid();
 
     String getName();

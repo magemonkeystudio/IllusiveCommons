@@ -172,16 +172,16 @@ class MappedConfigTest {
     @Test
     void testWildcardGenerics(@TempDir Path tempDir) {
         MappedConfigLoader<WildcardGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, WildcardGenericsConfig.class);
-        
+
         assertThatExceptionOfType(ConfigLoadException.class).isThrownBy(() -> {
             configLoader.init();
         });
     }
-    
+
     @Test
     void testMissingGenerics(@TempDir Path tempDir) {
         MappedConfigLoader<MissingGenericsConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, MissingGenericsConfig.class);
-        
+
         assertThatExceptionOfType(ConfigLoadException.class).isThrownBy(() -> {
             configLoader.init();
         });

@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class ValidReflectField<T> implements ReflectField<T> {
-    
+
     private final Class<T> expectedClass;
     private final Class<T> boxedExpectedClass;
     private final Field field;
@@ -24,7 +24,7 @@ public class ValidReflectField<T> implements ReflectField<T> {
         this.boxedExpectedClass = ReflectUtils.boxPrimitiveClass(expectedClass);
         this.field = field;
     }
-    
+
     @Override
     public Class<T> getExpectedClass() {
         return expectedClass;
@@ -43,7 +43,7 @@ public class ValidReflectField<T> implements ReflectField<T> {
     @Override
     public T get(Object instance) throws ReflectiveOperationException {
         checkInstance(instance);
-        
+
         try {
             return boxedExpectedClass.cast(field.get(instance));
         } catch (ReflectiveOperationException e) {
@@ -61,7 +61,7 @@ public class ValidReflectField<T> implements ReflectField<T> {
     @Override
     public void set(Object instance, T value) throws ReflectiveOperationException {
         checkInstance(instance);
-        
+
         try {
             field.set(instance, boxedExpectedClass.cast(value));
         } catch (ReflectiveOperationException e) {

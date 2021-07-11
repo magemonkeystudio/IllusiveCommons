@@ -41,7 +41,7 @@ public final class CaseInsensitiveString {
     public int hashCode() {
         return uppercaseString.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {

@@ -12,7 +12,7 @@ public abstract class ConfigurableCommandProperties implements CommandProperties
     private String permissionMessage;
     private String usageArgs;
     private int minArgs;
-    
+
     @Override
     public final String getName() {
         return name;

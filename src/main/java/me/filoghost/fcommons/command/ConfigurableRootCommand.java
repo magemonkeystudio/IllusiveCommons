@@ -20,12 +20,12 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
 
     public final boolean register(JavaPlugin plugin) {
         super.validate();
-        
+
         PluginCommand pluginCommand = plugin.getCommand(getName());
         if (pluginCommand == null) {
             return false;
         }
-        
+
         if (getPermission() != null) {
             pluginCommand.setPermission(getPermission());
         }
@@ -38,7 +38,7 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
         pluginCommand.setExecutor(new BukkitCommandExecutorAdapter(this));
         return true;
     }
-    
+
     protected void handleUnexpectedException(CommandContext context, Throwable t) {
         Bukkit.getLogger().log(Level.SEVERE, "Internal error while executing /" + context.getRootLabel(), t);
         context.getSender().sendMessage(ChatColor.RED + "Internal error while executing command.");
