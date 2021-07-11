@@ -68,6 +68,7 @@ class MappedConfigLoaderTest {
         TestConfig config = configLoader.load();
 
         assertThat(config.normalMissing).isEqualTo(5);
+        assertThat(config.normalPresent).isEqualTo(10);
         AssertExtra.fileContentMatches(configLoader.getFile(),
                 "normalMissing: 5"
         );
