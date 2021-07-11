@@ -5,12 +5,9 @@
  */
 package me.filoghost.fcommons;
 
-import org.assertj.core.api.AbstractStringAssert;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
@@ -18,83 +15,38 @@ import static org.assertj.core.api.Assertions.*;
 
 class ColorsTest {
 
-    @Test
-    void nullString() {
-        assertThatColored(null).isNull();
-    }
-
-    @Test
-    void emptyString() {
-        assertThatColored("").isEqualTo("");
-    }
-
-    @Test
-    void color() {
-        testStringPositions("&a").forEach(input -> {
-            assertThatColored(input).isEqualTo(input.replace("&", "§"));
-        });
-    }
-
     @ParameterizedTest
-    @ValueSource(strings = {"&0", "&9", "&a", "&f", "&k", "&l", "&m", "&o", "&r"})
-    void colorsAndFormatting(String input) {
-        assertThatColored(input).isEqualTo(input.replace("&", "§"));
+    @MethodSource("addColorsArguments")
+    void addColors(String input, String expectedOutput) {
+        assertThat(Colors.addColors(input)).isEqualTo(expectedOutput);
     }
 
-    @Test
-    void uppercaseColor() {
-        assertThatColored("&A").isEqualTo("§a");
-    }
+    static Stream<Arguments> addColorsArguments() {
+        String validHexInput = "&#00ff00";
+        String validHexOutput = "§x§0§0§f§f§0§0";
 
-    @Test
-    void invalidColorChar() {
-        assertThatColored("&z").isEqualTo("&z");
-    }
-
-    @Test
-    void incompleteColor() {
-        assertThatColored("&").isEqualTo("&");
-    }
-
-    @Test
-    void hexColor() {
-        String hexColor = "&#09af00";
-        String hexColorOutput = "§x§0§9§a§f§0§0";
-        testStringPositions(hexColor).forEach(input -> {
-            assertThatColored(input).isEqualTo(input.replace(hexColor, hexColorOutput));
-        });
-    }
-
-    @Test
-    void uppercaseHexColor() {
-        assertThatColored("&#00FF00").isEqualTo("§x§0§0§f§f§0§0");
-    }
-
-    @Test
-    void longHexColor() {
-        assertThatColored("&#1234567890").isEqualTo("§x§1§2§3§4§5§67890");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"&#12345", "&#123#456", "&#bcdefg", "&z#123456", "#123456", "&##123456"})
-    void invalidHexColors(String input) {
-        testStringPositions(input).forEach(s -> {
-            assertThatColored(s).isEqualTo(s);
-        });
-    }
-
-    private Stream<String> testStringPositions(String colorString) {
         return Stream.of(
-                colorString,
-                colorString + colorString,
-                "z" + colorString,
-                "z" + colorString + "z",
-                colorString + "z"
-        );
-    }
+                Arguments.of(null, null),
+                Arguments.of("", ""),
+                Arguments.of("&0&9&a&f&k&l&m&o&r", "§0§9§a§f§k§l§m§o§r"), // Standard colors
+                Arguments.of("&A", "§a"), // Uppercase color
+                Arguments.of("&z", "&z"), // Invalid color
+                Arguments.of("&", "&"), // Incomplete color
 
-    private AbstractStringAssert<?> assertThatColored(String actual) {
-        return assertThat(Colors.addColors(actual));
+                // Valid HEX colors
+                Arguments.of(validHexInput + "7890", validHexOutput + "7890"), // Long HEX color, should not read more than 6 chars
+                Arguments.of(validHexInput.toUpperCase(), validHexOutput),
+                Arguments.of(validHexInput + validHexInput, validHexOutput + validHexOutput),
+                Arguments.of("&" + validHexInput + "&", "&" + validHexOutput + "&"),
+
+                // Invalid HEX colors
+                Arguments.of("&#12345", "&#12345"),
+                Arguments.of("&#123#456", "&#123#456"),
+                Arguments.of("&#bcdefg", "&#bcdefg"),
+                Arguments.of("&z#123456", "&z#123456"),
+                Arguments.of("#123456", "#123456"),
+                Arguments.of("&##123456", "&##123456")
+        );
     }
 
     @ParameterizedTest
