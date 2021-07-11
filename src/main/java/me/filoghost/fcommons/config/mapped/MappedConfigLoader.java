@@ -41,15 +41,15 @@ public class MappedConfigLoader<T extends MappedConfig> {
 
     public T load() throws ConfigLoadException {
         Config config = configLoader.load();
-        T mappedObject;
+
         try {
-            mappedObject = getMapper().newMappedObjectInstance();
+            T mappedObject = getMapper().newMappedObjectInstance();
             mappedObject.beforeLoad(config);
             getMapper().setFieldsFromConfig(mappedObject, config);
+            return mappedObject;
         } catch (ConfigMappingException e) {
             throw new ConfigLoadException(e.getMessage(), e);
         }
-        return mappedObject;
     }
 
     public T init() throws ConfigLoadException, ConfigSaveException {
@@ -68,8 +68,8 @@ public class MappedConfigLoader<T extends MappedConfig> {
 
             getMapper().setFieldsFromConfig(mappedObject, config);
 
-            boolean saveRequired = modifiedBeforeLoad || addedNewDefaultValues;
-            saveInternal(mappedObject, config, false, saveRequired);
+            boolean fileSaveRequired = modifiedBeforeLoad || addedNewDefaultValues;
+            saveInternal(mappedObject, config, false, fileSaveRequired);
 
             return mappedObject;
 
