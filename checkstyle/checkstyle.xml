@@ -41,7 +41,9 @@
     <module name="TreeWalker">
         <!-- Blocks -->
         <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="expected|ignore"/>
         </module>
