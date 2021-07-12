@@ -29,7 +29,7 @@ class ChatColorsTest {
         );
         TestColors testColors = configLoader.load();
 
-        assertThat(testColors.message).isEqualTo(Colors.addColors(modifiedMessage));
+        assertThat(testColors.message).isEqualTo(Colors.colorize(modifiedMessage));
     }
 
     @Test
@@ -37,7 +37,7 @@ class ChatColorsTest {
         MappedConfigLoader<TestColors> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, TestColors.class);
         TestColors testColors = configLoader.init();
 
-        assertThat(testColors.message).isEqualTo(Colors.addColors(new TestColors().message));
+        assertThat(testColors.message).isEqualTo(Colors.colorize(new TestColors().message));
         AssertExtra.fileContentMatches(configLoader.getFile(),
                 "message: '" + new TestColors().message + "'"
         );

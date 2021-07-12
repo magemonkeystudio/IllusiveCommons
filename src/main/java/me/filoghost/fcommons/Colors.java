@@ -10,56 +10,66 @@ import org.jetbrains.annotations.Nullable;
 
 public final class Colors {
 
-    private static final int HEX_COLOR_LENGTH = 6;
+    public static final char ALT_COLOR_CHAR = '&';
+    private static final CharArray ALT_COLOR_CODES = new CharArray("0123456789AaBbCcDdEeFfKkLlMmNnOoRr");
+    private static final CharArray ALT_HEX_CODES = new CharArray("0123456789AaBbCcDdEeFf");
+    private static final int ALT_HEX_COLOR_LENGTH = 6;
 
-    public static String addColors(@Nullable String string) {
-        if (Strings.isEmpty(string) || !string.contains("&")) {
+    private static final CharArray STANDARD_COLOR_CODES = new CharArray("0123456789abcdefklmnor");
+    private static final CharArray STANDARD_HEX_CODES = new CharArray("0123456789abcdef");
+    private static final int STANDARD_HEX_COLOR_LENGTH = ALT_HEX_COLOR_LENGTH * 2; // Double because of the extra color chars
+
+    /**
+     * Replaces alternate color codes with standard chat color codes.
+     */
+    public static String colorize(@Nullable String string) {
+        if (Strings.isEmpty(string) || string.indexOf(ALT_COLOR_CHAR) < 0) {
             return string;
         }
 
         StringBuilder result = new StringBuilder(string.length());
 
-        for (int i = 0; i < string.length(); i++) {
-            char current = string.charAt(i);
+        int i = 0;
+        while (i < string.length()) {
+            char currentChar = string.charAt(i);
 
-            if (current == '&' && i + 1 < string.length()) {
-                char next = string.charAt(i + 1);
+            if (currentChar == ALT_COLOR_CHAR && i + 1 < string.length()) {
+                char nextChar = string.charAt(i + 1);
 
-                if (next == '#' && FeatureSupport.HEX_CHAT_COLORS && isValidHexColor(string, i + 2)) {
+                if (nextChar == '#' && FeatureSupport.HEX_CHAT_COLORS && isAltHexColor(string, i + 2)) {
                     result.append(ChatColor.COLOR_CHAR);
                     result.append('x');
+                    translateAltHexColor(string, i + 2, result);
 
-                    for (int j = 0; j < HEX_COLOR_LENGTH; j++) {
-                        result.append(ChatColor.COLOR_CHAR);
-                        result.append(Character.toLowerCase(string.charAt(i + 2 + j)));
-                    }
-
-                    i += 1 + HEX_COLOR_LENGTH; // Skip '#' and hex string, which are already converted and added
-
-                } else if (isColorCode(next)) {
-                    result.append(ChatColor.COLOR_CHAR);
-                    result.append(Character.toLowerCase(next));
-
-                    i++; // Skip next character, which is already added
-
-                } else {
-                    result.append(current);
+                    i += 2 + ALT_HEX_COLOR_LENGTH; // Skip prefix and hex string
+                    continue;
                 }
-            } else {
-                result.append(current);
+
+                if (ALT_COLOR_CODES.contains(nextChar)) {
+                    result.append(ChatColor.COLOR_CHAR);
+                    result.append(Character.toLowerCase(nextChar));
+
+                    i += 2; // Skip color char and color code
+                    continue;
+                }
             }
+
+            // Normal char
+            result.append(currentChar);
+            i++;
         }
 
         return result.toString();
     }
 
-    private static boolean isValidHexColor(String string, int startIndex) {
-        if (string.length() - startIndex < HEX_COLOR_LENGTH) {
+    private static boolean isAltHexColor(String string, int beginIndex) {
+        if (string.length() - beginIndex < ALT_HEX_COLOR_LENGTH) {
             return false;
         }
 
-        for (int i = 0; i < HEX_COLOR_LENGTH; i++) {
-            if (!isHexCode(string.charAt(startIndex + i))) {
+        for (int i = 0; i < ALT_HEX_COLOR_LENGTH; i++) {
+            char hexCode = string.charAt(beginIndex + i);
+            if (!ALT_HEX_CODES.contains(hexCode)) {
                 return false;
             }
         }
@@ -67,12 +77,78 @@ public final class Colors {
         return true;
     }
 
-    private static boolean isHexCode(char c) {
-        return "0123456789AaBbCcDdEeFf".indexOf(c) > -1;
+    private static void translateAltHexColor(String string, int beginIndex, StringBuilder output) {
+        for (int i = 0; i < ALT_HEX_COLOR_LENGTH; i++) {
+            char hexCode = string.charAt(beginIndex + i);
+            output.append(ChatColor.COLOR_CHAR);
+            output.append(Character.toLowerCase(hexCode));
+        }
     }
 
-    private static boolean isColorCode(char c) {
-        return "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(c) > -1;
+    /**
+     * Replaces standard chat color codes with alternate color codes, the opposite of {@link #colorize(String)}.
+     */
+    public static String uncolorize(@Nullable String string) {
+        if (Strings.isEmpty(string) || string.indexOf(ChatColor.COLOR_CHAR) < 0) {
+            return string;
+        }
+
+        StringBuilder result = new StringBuilder(string.length());
+
+        int i = 0;
+        while (i < string.length()) {
+            char currentChar = string.charAt(i);
+
+            if (currentChar == ChatColor.COLOR_CHAR && i + 1 < string.length()) {
+                char nextChar = string.charAt(i + 1);
+
+                if (nextChar == 'x' && FeatureSupport.HEX_CHAT_COLORS && isStandardHexColor(string, i + 2)) {
+                    result.append(ALT_COLOR_CHAR);
+                    result.append('#');
+                    untranslateStandardHexColor(string, i + 2, result);
+
+                    i += 2 + STANDARD_HEX_COLOR_LENGTH; // Skip prefix and hex string
+                    continue;
+                }
+
+                if (STANDARD_COLOR_CODES.contains(nextChar)) {
+                    result.append(ALT_COLOR_CHAR);
+                    result.append(nextChar);
+
+                    i += 2; // Skip color char and color code
+                    continue;
+                }
+            }
+
+            // Normal char
+            result.append(currentChar);
+            i++;
+        }
+
+        return result.toString();
+    }
+
+    private static boolean isStandardHexColor(String string, int startIndex) {
+        if (string.length() - startIndex < STANDARD_HEX_COLOR_LENGTH) {
+            return false;
+        }
+
+        for (int i = 0; i < STANDARD_HEX_COLOR_LENGTH; i += 2) {
+            char colorChar = string.charAt(startIndex + i);
+            char hexCode = string.charAt(startIndex + i + 1);
+
+            if (colorChar != ChatColor.COLOR_CHAR || !STANDARD_HEX_CODES.contains(hexCode)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static void untranslateStandardHexColor(String string, int beginIndex, StringBuilder output) {
+        for (int i = 0; i < STANDARD_HEX_COLOR_LENGTH; i += 2) {
+            output.append(string.charAt(beginIndex + i + 1)); // Ignore color char, only get hex codes
+        }
     }
 
     /**
@@ -97,8 +173,9 @@ public final class Colors {
 
             if (currentChar == ' ' && !whitespaceVisible) {
                 // Not visible, space if it's fully transparent
+
             } else if (currentChar == ChatColor.COLOR_CHAR) {
-                // Not visible, COLOR_CHAR is not rendered
+                // Not visible, color char is not rendered
 
                 if (i < length - 1) {
                     ChatColor chatColor = ChatColor.getByChar(string.charAt(i + 1));
@@ -113,9 +190,10 @@ public final class Colors {
                         }
                     }
 
-                    // Skip the next character because COLOR_CHAR prevents if from rendering, even if it's not a valid color or format
+                    // Skip the next character because color char prevents if from rendering, even if it's not a valid color code
                     i++;
                 }
+
             } else {
                 // Visible character
 
@@ -158,7 +236,7 @@ public final class Colors {
      * Removes repeated combinations of color and formats from a string without changing how the string is rendered.
      */
     public static String optimize(@Nullable String string) {
-        if (Strings.isEmpty(string) || string.indexOf(ChatColor.COLOR_CHAR) == -1) {
+        if (Strings.isEmpty(string) || string.indexOf(ChatColor.COLOR_CHAR) < 0) {
             return string;
         }
 
@@ -214,6 +292,27 @@ public final class Colors {
         }
 
         return true;
+    }
+
+
+    private static class CharArray {
+
+        private final char[] chars;
+
+        CharArray(String chars) {
+            this.chars = chars.toCharArray();
+        }
+
+        boolean contains(char c) {
+            for (char element : chars) {
+                if (c == element) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 
 }

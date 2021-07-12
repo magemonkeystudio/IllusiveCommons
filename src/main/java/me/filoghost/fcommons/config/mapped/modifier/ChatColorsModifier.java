@@ -11,7 +11,7 @@ public class ChatColorsModifier implements FieldValueModifier<String, ChatColors
 
     @Override
     public String transform(ChatColors annotation, String fieldValue) {
-        return Colors.addColors(fieldValue);
+        return Colors.colorize(fieldValue);
     }
 
     @Override
