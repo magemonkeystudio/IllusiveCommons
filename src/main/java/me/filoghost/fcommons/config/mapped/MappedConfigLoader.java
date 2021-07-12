@@ -68,8 +68,9 @@ public class MappedConfigLoader<T extends MappedConfig> {
 
             getMapper().setFieldsFromConfig(mappedObject, config);
 
-            boolean fileSaveRequired = modifiedBeforeLoad || addedNewDefaultValues;
-            saveInternal(mappedObject, config, false, fileSaveRequired);
+            if (modifiedBeforeLoad || addedNewDefaultValues) {
+                saveInternal(mappedObject, config, false);
+            }
 
             return mappedObject;
 
@@ -100,20 +101,22 @@ public class MappedConfigLoader<T extends MappedConfig> {
         Config config = configLoader.load();
 
         try {
-            boolean fileSaveRequired = !getMapper().equalsConfig(newMappedObject, config);
-            return saveInternal(newMappedObject, config, true, fileSaveRequired);
+            if (getMapper().equalsConfig(newMappedObject, config)) {
+                return false;
+            } else {
+                saveInternal(newMappedObject, config, true);
+                return true;
+            }
         } catch (ConfigMappingException e) {
             throw new ConfigLoadException(e.getMessage(), e);
         }
     }
 
     public void save(T mappedObject) throws ConfigSaveException {
-        saveInternal(mappedObject, new Config(), true, true);
+        saveInternal(mappedObject, new Config(), true);
     }
 
-    private boolean saveInternal(T mappedObject, Config config, boolean writeMappedObject, boolean fileSaveRequired)
-            throws ConfigSaveException {
-
+    private void saveInternal(T mappedObject, Config config, boolean writeMappedObject) throws ConfigSaveException {
         if (writeMappedObject) {
             try {
                 getMapper().setConfigFromFields(mappedObject, config);
@@ -123,15 +126,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
 
         config.setHeader(mappedObject.getHeader());
-        if (mappedObject.beforeSave(config)) {
-            fileSaveRequired = true;
-        }
-
-        if (fileSaveRequired) {
-            configLoader.save(config);
-        }
-
-        return fileSaveRequired;
+        configLoader.save(config);
     }
 
     public Path getFile() {
