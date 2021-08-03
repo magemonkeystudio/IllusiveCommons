@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public final class Strings {
@@ -217,6 +218,24 @@ public final class Strings {
 
         char lastChar = string.charAt(string.length() - 1);
         return lastChar == '.' || lastChar == '?' || lastChar == '!';
+    }
+
+    public static boolean containsIgnoreCase(@NotNull String[] array, @NotNull String target) {
+        for (String element : array) {
+            if (target.equalsIgnoreCase(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean containsIgnoreCase(@NotNull Collection<String> collection, @NotNull String target) {
+        for (String element : collection) {
+            if (target.equalsIgnoreCase(element)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
