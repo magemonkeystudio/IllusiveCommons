@@ -27,7 +27,7 @@ public final class ConfigValue {
         return new ConfigValue(null, type.toRawValue(value));
     }
 
-    protected static ConfigValue wrapRawValue(ConfigPath configPath, @Nullable Object rawValue) {
+    static ConfigValue wrapRawValue(ConfigPath configPath, @Nullable Object rawValue) {
         return new ConfigValue(configPath, rawValue);
     }
 
@@ -55,7 +55,7 @@ public final class ConfigValue {
         return type.isConvertibleRawValue(rawValue);
     }
 
-    protected Object getRawValue() {
+    Object getRawValue() {
         return rawValue;
     }
 
