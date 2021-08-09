@@ -48,8 +48,7 @@ public class ReflectUtils {
         return clazz;
     }
 
-    @Nullable
-    public static Class<?> getClassFromType(Type type) {
+    public static @Nullable Class<?> getClassFromType(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {

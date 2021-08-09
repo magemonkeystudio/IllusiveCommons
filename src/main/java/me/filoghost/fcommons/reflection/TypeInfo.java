@@ -30,13 +30,11 @@ public class TypeInfo<T> {
         return type;
     }
 
-    @Nullable
-    public Class<T> getTypeClass() {
+    public @Nullable Class<T> getTypeClass() {
         return typeClass;
     }
 
-    @Nullable
-    public Type[] getTypeArguments() {
+    public @Nullable Type[] getTypeArguments() {
         return typeArguments;
     }
 

@@ -73,9 +73,8 @@ public class ForwardingMap<K, V> implements Map<K, V> {
         return delegate.get(key);
     }
 
-    @Nullable
     @Override
-    public V put(K key, V value) {
+    public @Nullable V put(K key, V value) {
         return delegate.put(key, value);
     }
 
@@ -94,21 +93,18 @@ public class ForwardingMap<K, V> implements Map<K, V> {
         delegate.clear();
     }
 
-    @NotNull
     @Override
-    public Set<K> keySet() {
+    public @NotNull Set<K> keySet() {
         return delegate.keySet();
     }
 
-    @NotNull
     @Override
-    public Collection<V> values() {
+    public @NotNull Collection<V> values() {
         return delegate.values();
     }
 
-    @NotNull
     @Override
-    public Set<Entry<K, V>> entrySet() {
+    public @NotNull Set<Entry<K, V>> entrySet() {
         return delegate.entrySet();
     }
 
@@ -127,9 +123,8 @@ public class ForwardingMap<K, V> implements Map<K, V> {
         delegate.replaceAll(function);
     }
 
-    @Nullable
     @Override
-    public V putIfAbsent(K key, V value) {
+    public @Nullable V putIfAbsent(K key, V value) {
         return delegate.putIfAbsent(key, value);
     }
 
@@ -143,9 +138,8 @@ public class ForwardingMap<K, V> implements Map<K, V> {
         return delegate.replace(key, oldValue, newValue);
     }
 
-    @Nullable
     @Override
-    public V replace(K key, V value) {
+    public @Nullable V replace(K key, V value) {
         return delegate.replace(key, value);
     }
 

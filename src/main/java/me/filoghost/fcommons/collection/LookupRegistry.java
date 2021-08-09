@@ -32,8 +32,7 @@ public class LookupRegistry<V> {
         this.valuesMap = new CaseInsensitiveHashMap<>();
     }
 
-    @Nullable
-    public V lookup(String key) {
+    public @Nullable V lookup(String key) {
         if (key == null) {
             return null;
         }

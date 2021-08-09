@@ -63,9 +63,8 @@ public class ForwardingSet<E> implements Set<E> {
         return delegate.contains(element);
     }
 
-    @NotNull
     @Override
-    public Iterator<E> iterator() {
+    public @NotNull Iterator<E> iterator() {
         return delegate.iterator();
     }
 

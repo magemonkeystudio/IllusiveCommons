@@ -17,8 +17,7 @@ public abstract class ConfigValueException extends ConfigException {
         this.configPath = configPath;
     }
 
-    @Nullable
-    public ConfigPath getConfigPath() {
+    public @Nullable ConfigPath getConfigPath() {
         return configPath;
     }
 

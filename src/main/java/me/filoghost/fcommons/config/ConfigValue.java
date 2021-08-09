@@ -36,13 +36,11 @@ public final class ConfigValue {
         this.rawValue = rawValue;
     }
 
-    @Nullable
-    public <T> T as(ConfigType<T> type) {
+    public <T> @Nullable T as(ConfigType<T> type) {
         return type.fromRawValueOrNull(rawValue);
     }
 
-    @NotNull
-    public <T> T asRequired(ConfigType<T> type) throws MissingConfigValueException, InvalidConfigValueException {
+    public <T> @NotNull T asRequired(ConfigType<T> type) throws MissingConfigValueException, InvalidConfigValueException {
         return type.fromRawValueRequired(rawValue, sourcePath);
     }
 

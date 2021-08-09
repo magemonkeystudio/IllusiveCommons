@@ -53,8 +53,7 @@ public abstract class ConfigType<T> {
 
     protected abstract T fromRawValue(@NotNull Object rawValue);
 
-    @Nullable
-    protected T fromRawValueOrNull(@Nullable Object rawValue) {
+    protected @Nullable T fromRawValueOrNull(@Nullable Object rawValue) {
         return fromRawValueOrDefault(rawValue, null);
     }
 
@@ -67,8 +66,7 @@ public abstract class ConfigType<T> {
         }
     }
 
-    @NotNull
-    protected T fromRawValueRequired(@Nullable Object rawValue, @Nullable ConfigPath configPath)
+    protected @NotNull T fromRawValueRequired(@Nullable Object rawValue, @Nullable ConfigPath configPath)
             throws InvalidConfigValueException, MissingConfigValueException {
         if (isConvertibleRawValue(rawValue)) {
             return fromRawValue(rawValue);

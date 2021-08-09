@@ -88,8 +88,7 @@ public final class MaterialsHelper {
         return materialsRegistry;
     }
 
-    @Nullable
-    public static Material matchMaterial(String materialName) {
+    public static @Nullable Material matchMaterial(String materialName) {
         return MATERIALS_REGISTRY.lookup(materialName);
     }
 

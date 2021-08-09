@@ -31,13 +31,11 @@ abstract class BaseConfigSection {
         return rawValues;
     }
 
-    @NotNull
-    public ConfigValue get(ConfigPath path) {
+    public @NotNull ConfigValue get(ConfigPath path) {
         return ConfigValue.wrapRawValue(path, getRawValue(path));
     }
 
-    @Nullable
-    public <T> T get(ConfigPath path, @NotNull ConfigType<T> type) {
+    public <T> @Nullable T get(ConfigPath path, @NotNull ConfigType<T> type) {
         return getOrDefault(path, type, null);
     }
 
@@ -45,8 +43,7 @@ abstract class BaseConfigSection {
         return type.fromRawValueOrDefault(getRawValue(path), defaultValue);
     }
 
-    @NotNull
-    public <T> T getRequired(ConfigPath path, @NotNull ConfigType<T> type)
+    public <T> @NotNull T getRequired(ConfigPath path, @NotNull ConfigType<T> type)
             throws MissingConfigValueException, InvalidConfigValueException {
         return type.fromRawValueRequired(getRawValue(path), path);
     }
@@ -73,8 +70,7 @@ abstract class BaseConfigSection {
         setRawValue(path, null);
     }
 
-    @Nullable
-    private Object getRawValue(ConfigPath path) {
+    private @Nullable Object getRawValue(ConfigPath path) {
         Preconditions.notNull(path, "path");
 
         BaseConfigSection targetSection = getParentSectionForPath(path);
@@ -98,13 +94,11 @@ abstract class BaseConfigSection {
         }
     }
 
-    @Nullable
-    private BaseConfigSection getParentSectionForPath(ConfigPath path) {
+    private @Nullable BaseConfigSection getParentSectionForPath(ConfigPath path) {
         return getParentSectionForPath(path, false);
     }
 
-    @NotNull
-    protected BaseConfigSection getOrCreateParentSectionForPath(ConfigPath path) {
+    protected @NotNull BaseConfigSection getOrCreateParentSectionForPath(ConfigPath path) {
         return getParentSectionForPath(path, true);
     }
 
