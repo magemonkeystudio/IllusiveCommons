@@ -12,10 +12,14 @@ import me.filoghost.fcommons.config.exception.ConfigValidateException;
 
 public abstract class Converter<F, C> {
 
-    protected final ConfigType<C> configType;
+    private final ConfigType<C> configType;
 
     protected Converter(ConfigType<C> configType) {
         this.configType = configType;
+    }
+
+    protected final boolean isValidConfigValue(ConfigValue configValue) {
+        return configValue.isPresentAs(configType);
     }
 
     public final ConfigValue toConfigValue(F fieldValue) throws ConfigMappingException {

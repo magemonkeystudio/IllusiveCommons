@@ -41,7 +41,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     protected List<E> toFieldValue0(List<ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
         List<E> fieldList = new ArrayList<>();
         for (ConfigValue configElement : configList) {
-            if (isValidConfigListElement(configElement)) {
+            if (elementConverter.isValidConfigValue(configElement)) {
                 E fieldValue = elementConverter.toFieldValue(configElement);
                 fieldList.add(fieldValue);
             }
@@ -61,7 +61,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
         // Skip elements that would be skipped during read
         List<ConfigValue> filteredConfigList = new ArrayList<>();
         for (ConfigValue configValue : configList) {
-            if (isValidConfigListElement(configValue)) {
+            if (elementConverter.isValidConfigValue(configValue)) {
                 filteredConfigList.add(configValue);
             }
         }
@@ -80,10 +80,6 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
         }
 
         return true;
-    }
-
-    private boolean isValidConfigListElement(ConfigValue configElement) {
-        return configElement.isPresentAs(elementConverter.configType);
     }
 
     public static boolean supports(Class<?> typeClass) {
