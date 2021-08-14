@@ -43,8 +43,8 @@ public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
         printCriticalError(errorMessageLines, throwable);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
-            Bukkit.getConsoleSender().sendMessage(getFatalErrorPrefix()
-                    + "Fatal error while enabling the plugin. Check previous logs for more information.");
+            Bukkit.getConsoleSender().sendMessage(
+                    getFatalErrorPrefix() + "Fatal error while enabling the plugin. Check previous logs for more information.");
         }, 10);
 
         setEnabled(false);
@@ -54,9 +54,9 @@ public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
         List<String> output = new ArrayList<>();
 
         if (errorMessageLines != null) {
-            output.add(getFatalErrorPrefix() + "Fatal error while enabling plugin:");
+            output.add(getFatalErrorPrefix() + "Fatal error while enabling " + getNameWithVersion() + ":");
         } else {
-            output.add(getFatalErrorPrefix() + "Fatal unexpected error while enabling plugin:");
+            output.add(getFatalErrorPrefix() + "Fatal unexpected error while enabling " + getNameWithVersion() + ":");
         }
         if (errorMessageLines != null) {
             output.add("");
@@ -67,10 +67,14 @@ public abstract class FCommonsPlugin extends EnhancedJavaPlugin {
             output.addAll(ExceptionUtils.getStackTraceOutputLines(throwable));
             output.add("");
         }
-        output.add(getDescription().getName() + " has been disabled.");
+        output.add("The plugin has been disabled.");
         output.add("");
 
         Bukkit.getConsoleSender().sendMessage(String.join("\n", output));
+    }
+
+    private String getNameWithVersion() {
+        return getDescription().getName() + " v" + getDescription().getVersion();
     }
 
     private String getFatalErrorPrefix() {
