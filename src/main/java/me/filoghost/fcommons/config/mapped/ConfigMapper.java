@@ -14,6 +14,7 @@ import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ public class ConfigMapper<T extends MappedConfigSection> {
         return MappingUtils.createInstance(mappedTypeInfo);
     }
 
-    public Map<ConfigPath, ConfigValue> getFieldsAsConfigValues(T mappedObject) throws ConfigMappingException {
+    public Map<ConfigPath, ConfigValue> getFieldsAsConfigValues(@NotNull T mappedObject) throws ConfigMappingException {
         Map<ConfigPath, ConfigValue> configValues = new LinkedHashMap<>();
 
         for (MappedField<?> mappedField : mappedFields) {
@@ -55,14 +56,14 @@ public class ConfigMapper<T extends MappedConfigSection> {
         return configValues;
     }
 
-    public void setConfigFromFields(T mappedObject, ConfigSection config) throws ConfigMappingException {
+    public void setConfigFromFields(@NotNull T mappedObject, @NotNull ConfigSection config) throws ConfigMappingException {
         for (MappedField<?> mappedField : mappedFields) {
             ConfigValue configValue = mappedField.readConfigValueFromObject(mappedObject);
             config.set(mappedField.getConfigPath(), configValue);
         }
     }
 
-    public void setFieldsFromConfig(T mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
+    public void setFieldsFromConfig(@NotNull T mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         for (MappedField<?> mappedField : mappedFields) {
             mappedField.setFieldValueFromConfig(mappedObject, config);
         }
@@ -77,7 +78,7 @@ public class ConfigMapper<T extends MappedConfigSection> {
                 && !Modifier.isFinal(modifiers);
     }
 
-    public boolean equalsConfig(T mappedObject, ConfigSection config) throws ConfigMappingException {
+    public boolean equalsConfig(@NotNull T mappedObject, @NotNull ConfigSection config) throws ConfigMappingException {
         for (MappedField<?> mappedField : mappedFields) {
             if (!mappedField.equalsConfigValue(mappedObject, config)) {
                 return false;

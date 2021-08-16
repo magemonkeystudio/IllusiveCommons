@@ -49,9 +49,9 @@ public abstract class ConfigType<T> {
     @Contract("null -> false")
     protected abstract boolean isConvertibleRawValue(@Nullable Object rawValue);
 
-    protected abstract Object toRawValue(@NotNull T configValue);
+    protected abstract @NotNull Object toRawValue(@NotNull T configValue);
 
-    protected abstract T fromRawValue(@NotNull Object rawValue);
+    protected abstract @NotNull T fromRawValue(@NotNull Object rawValue);
 
     protected @Nullable T fromRawValueOrNull(@Nullable Object rawValue) {
         return fromRawValueOrDefault(rawValue, null);
@@ -80,22 +80,22 @@ public abstract class ConfigType<T> {
     }
 
     // Access for subclasses
-    protected static ConfigValue wrapRawValue(Object rawValue) {
+    protected static ConfigValue wrapRawValue(@Nullable Object rawValue) {
         return ConfigValue.wrapRawValue(null, rawValue);
     }
 
     // Access for subclasses
-    protected static Object getRawValue(ConfigValue configValue) {
+    protected static Object getRawValue(@NotNull ConfigValue configValue) {
         return configValue.getRawValue();
     }
 
     // Access for subclasses
-    protected static <T> Object toRawValue(ConfigType<T> type, T configValue) {
+    protected static <T> Object toRawValue(@NotNull ConfigType<T> type, @NotNull T configValue) {
         return type.toRawValue(configValue);
     }
 
     // Access for subclasses
-    protected static <T> T fromRawValueOrNull(ConfigType<T> type, Object rawValue) {
+    protected static <T> T fromRawValueOrNull(@NotNull ConfigType<T> type, @Nullable Object rawValue) {
         return type.fromRawValueOrNull(rawValue);
     }
 

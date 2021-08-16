@@ -22,12 +22,12 @@ public class BooleanConfigType extends ConfigType<Boolean> {
     }
 
     @Override
-    protected Boolean fromRawValue(@NotNull Object rawValue) {
+    protected @NotNull Boolean fromRawValue(@NotNull Object rawValue) {
         return (Boolean) rawValue;
     }
 
     @Override
-    protected Object toRawValue(@NotNull Boolean configValue) {
+    protected @NotNull Object toRawValue(@NotNull Boolean configValue) {
         return configValue;
     }
 

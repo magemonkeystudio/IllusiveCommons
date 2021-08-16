@@ -28,8 +28,8 @@ public class ListConfigType<E> extends ConfigType<List<E>> {
     }
 
     @Override
-    protected List<E> fromRawValue(@NotNull Object rawValue) {
-        List<E> configValue = new ArrayList<>();
+    protected @NotNull List<@NotNull E> fromRawValue(@NotNull Object rawValue) {
+        List<@NotNull E> configValue = new ArrayList<>();
 
         for (Object rawElement : (List<?>) rawValue) {
             E configElement = fromRawValueOrNull(elementType, rawElement);
@@ -42,7 +42,7 @@ public class ListConfigType<E> extends ConfigType<List<E>> {
     }
 
     @Override
-    protected Object toRawValue(@NotNull List<E> configValue) {
+    protected @NotNull Object toRawValue(@NotNull List<@Nullable E> configValue) {
         List<Object> rawValue = new ArrayList<>();
 
         for (E configElement : configValue) {

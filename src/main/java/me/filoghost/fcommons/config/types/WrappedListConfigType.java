@@ -26,7 +26,7 @@ public class WrappedListConfigType extends ConfigType<List<ConfigValue>> {
     }
 
     @Override
-    protected List<ConfigValue> fromRawValue(@NotNull Object rawValue) {
+    protected @NotNull List<ConfigValue> fromRawValue(@NotNull Object rawValue) {
         List<ConfigValue> configValue = new ArrayList<>();
 
         for (Object element : (List<?>) rawValue) {
@@ -37,7 +37,7 @@ public class WrappedListConfigType extends ConfigType<List<ConfigValue>> {
     }
 
     @Override
-    protected Object toRawValue(@NotNull List<ConfigValue> configValue) {
+    protected @NotNull Object toRawValue(@NotNull List<ConfigValue> configValue) {
         List<Object> rawValue = new ArrayList<>();
 
         for (ConfigValue element : configValue) {

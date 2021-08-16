@@ -9,6 +9,7 @@ import me.filoghost.fcommons.Preconditions;
 import me.filoghost.fcommons.Strings;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSyntaxException;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -75,7 +76,7 @@ class YamlSerializer {
         return headerLines;
     }
 
-    public String serializeHeader(List<String> header) {
+    public String serializeHeader(@Nullable List<String> header) {
         if (header != null && !header.isEmpty()) {
             return header.stream().map(s -> COMMENT_PREFIX + " " + s + "\n").collect(Collectors.joining()) + "\n";
         } else {

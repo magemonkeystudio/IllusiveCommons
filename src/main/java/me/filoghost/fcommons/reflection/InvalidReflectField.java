@@ -5,6 +5,8 @@
  */
 package me.filoghost.fcommons.reflection;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
@@ -43,22 +45,22 @@ public class InvalidReflectField<T> implements ReflectField<T> {
     }
 
     @Override
-    public T get(Object instance) throws ReflectiveOperationException {
+    public @Nullable T get(Object instance) throws ReflectiveOperationException {
         throw error;
     }
 
     @Override
-    public T getStatic() throws ReflectiveOperationException {
+    public @Nullable T getStatic() throws ReflectiveOperationException {
         throw error;
     }
 
     @Override
-    public void set(Object instance, T value) throws ReflectiveOperationException {
+    public void set(Object instance, @Nullable T value) throws ReflectiveOperationException {
         throw error;
     }
 
     @Override
-    public void setStatic(T value) throws ReflectiveOperationException {
+    public void setStatic(@Nullable T value) throws ReflectiveOperationException {
         throw error;
     }
 

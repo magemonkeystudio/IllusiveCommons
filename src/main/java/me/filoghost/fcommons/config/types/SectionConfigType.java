@@ -23,12 +23,12 @@ public class SectionConfigType extends ConfigType<ConfigSection> {
     }
 
     @Override
-    protected ConfigSection fromRawValue(@NotNull Object rawValue) {
+    protected @NotNull ConfigSection fromRawValue(@NotNull Object rawValue) {
         return (ConfigSection) rawValue;
     }
 
     @Override
-    protected Object toRawValue(@NotNull ConfigSection configValue) {
+    protected @NotNull Object toRawValue(@NotNull ConfigSection configValue) {
         return configValue;
     }
 

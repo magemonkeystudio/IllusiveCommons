@@ -12,6 +12,7 @@ import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
 import me.filoghost.fcommons.test.AssertExtra;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -291,7 +292,7 @@ class MappedConfigTest {
         private int integer = 1;
 
         @Override
-        public List<String> getHeader() {
+        public @NotNull List<String> getHeader() {
             return Arrays.asList("Header line");
         }
 

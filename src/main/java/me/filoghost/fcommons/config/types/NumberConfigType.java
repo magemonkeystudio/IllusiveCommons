@@ -27,12 +27,12 @@ public class NumberConfigType<T extends Number> extends ConfigType<T> {
     }
 
     @Override
-    protected T fromRawValue(@NotNull Object rawValue) {
+    protected @NotNull T fromRawValue(@NotNull Object rawValue) {
         return toTypeFunction.apply((Number) rawValue);
     }
 
     @Override
-    protected Object toRawValue(@NotNull T configValue) {
+    protected @NotNull Object toRawValue(@NotNull T configValue) {
         return configValue;
     }
 

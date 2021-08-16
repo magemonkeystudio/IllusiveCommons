@@ -5,13 +5,15 @@
  */
 package me.filoghost.fcommons.config.mapped.converter;
 
-import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.ConfigType;
+import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
 import me.filoghost.fcommons.config.mapped.MappingUtils;
 import me.filoghost.fcommons.reflection.TypeInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +30,8 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected List<ConfigValue> toConfigValue0(List<E> fieldValue) throws ConfigMappingException {
-        List<ConfigValue> configList = new ArrayList<>();
+    protected @NotNull List<@NotNull ConfigValue> toConfigValue0(@NotNull List<@Nullable E> fieldValue) throws ConfigMappingException {
+        List<@NotNull ConfigValue> configList = new ArrayList<>();
         for (E fieldElement : fieldValue) {
             configList.add(elementConverter.toConfigValue(fieldElement));
         }
@@ -38,8 +40,8 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected List<E> toFieldValue0(List<ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
-        List<E> fieldList = new ArrayList<>();
+    protected @NotNull List<@Nullable E> toFieldValue0(@NotNull List<@NotNull ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
+        List<@Nullable E> fieldList = new ArrayList<>();
         for (ConfigValue configElement : configList) {
             if (elementConverter.isValidConfigValue(configElement)) {
                 E fieldValue = elementConverter.toFieldValue(configElement);
@@ -51,7 +53,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected boolean equalsConfig0(List<E> fieldList, List<ConfigValue> configList) throws ConfigMappingException {
+    protected boolean equalsConfig0(@Nullable List<E> fieldList, @Nullable List<ConfigValue> configList) throws ConfigMappingException {
         if (fieldList == null && configList == null) {
             return true;
         } else if (fieldList == null || configList == null) {

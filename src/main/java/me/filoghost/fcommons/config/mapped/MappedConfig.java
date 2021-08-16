@@ -6,13 +6,14 @@
 package me.filoghost.fcommons.config.mapped;
 
 import me.filoghost.fcommons.config.Config;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 
 public interface MappedConfig extends MappedConfigSection {
 
-    default List<String> getHeader() {
+    default @NotNull List<String> getHeader() {
         return Collections.emptyList();
     }
 

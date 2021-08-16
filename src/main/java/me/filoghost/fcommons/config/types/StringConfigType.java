@@ -22,12 +22,12 @@ public class StringConfigType extends ConfigType<String> {
     }
 
     @Override
-    protected String fromRawValue(@NotNull Object rawValue) {
+    protected @NotNull String fromRawValue(@NotNull Object rawValue) {
         return rawValue.toString();
     }
 
     @Override
-    protected Object toRawValue(@NotNull String configValue) {
+    protected @NotNull Object toRawValue(@NotNull String configValue) {
         return configValue;
     }
 

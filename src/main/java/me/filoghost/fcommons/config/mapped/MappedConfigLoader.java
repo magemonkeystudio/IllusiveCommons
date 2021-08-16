@@ -14,6 +14,7 @@ import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
 import me.filoghost.fcommons.reflection.TypeInfo;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         return configMapper;
     }
 
-    public T load() throws ConfigLoadException {
+    public @NotNull T load() throws ConfigLoadException {
         Config config = configLoader.load();
 
         try {
@@ -52,7 +53,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
     }
 
-    public T init() throws ConfigLoadException, ConfigSaveException {
+    public @NotNull T init() throws ConfigLoadException, ConfigSaveException {
         Config config = configLoader.init();
 
         try {
@@ -92,7 +93,7 @@ public class MappedConfigLoader<T extends MappedConfig> {
         return modified;
     }
 
-    public boolean saveIfDifferent(T newMappedObject) throws ConfigLoadException, ConfigSaveException {
+    public boolean saveIfDifferent(@NotNull T newMappedObject) throws ConfigLoadException, ConfigSaveException {
         if (!configLoader.fileExists()) {
             save(newMappedObject);
             return true;
@@ -112,11 +113,11 @@ public class MappedConfigLoader<T extends MappedConfig> {
         }
     }
 
-    public void save(T mappedObject) throws ConfigSaveException {
+    public void save(@NotNull T mappedObject) throws ConfigSaveException {
         saveInternal(mappedObject, new Config(), true);
     }
 
-    private void saveInternal(T mappedObject, Config config, boolean writeMappedObject) throws ConfigSaveException {
+    private void saveInternal(@NotNull T mappedObject, @NotNull Config config, boolean writeMappedObject) throws ConfigSaveException {
         if (writeMappedObject) {
             try {
                 getMapper().setConfigFromFields(mappedObject, config);

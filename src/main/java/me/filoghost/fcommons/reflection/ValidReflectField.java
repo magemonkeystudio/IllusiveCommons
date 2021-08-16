@@ -6,6 +6,7 @@
 package me.filoghost.fcommons.reflection;
 
 import me.filoghost.fcommons.Preconditions;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -36,12 +37,12 @@ public class ValidReflectField<T> implements ReflectField<T> {
     }
 
     @Override
-    public T getStatic() throws ReflectiveOperationException {
+    public @Nullable T getStatic() throws ReflectiveOperationException {
         return get(null);
     }
 
     @Override
-    public T get(Object instance) throws ReflectiveOperationException {
+    public @Nullable T get(Object instance) throws ReflectiveOperationException {
         checkInstance(instance);
 
         try {
@@ -54,12 +55,12 @@ public class ValidReflectField<T> implements ReflectField<T> {
     }
 
     @Override
-    public void setStatic(T value) throws ReflectiveOperationException {
+    public void setStatic(@Nullable T value) throws ReflectiveOperationException {
         set(null, value);
     }
 
     @Override
-    public void set(Object instance, T value) throws ReflectiveOperationException {
+    public void set(Object instance, @Nullable T value) throws ReflectiveOperationException {
         checkInstance(instance);
 
         try {

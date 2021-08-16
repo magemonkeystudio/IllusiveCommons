@@ -18,6 +18,8 @@ import me.filoghost.fcommons.config.mapped.modifier.FieldValueModifier;
 import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import me.filoghost.fcommons.reflection.UnexpectedActualClassException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -61,14 +63,14 @@ public class MappedField<T> {
         }
     }
 
-    public boolean equalsConfigValue(Object mappedObject, ConfigSection config) throws ConfigMappingException {
+    public boolean equalsConfigValue(@NotNull Object mappedObject, @NotNull ConfigSection config) throws ConfigMappingException {
         T fieldValue = readFromObject(mappedObject);
         ConfigValue configValue = config.get(configPath);
 
         return converter.equalsConfig(fieldValue, configValue);
     }
 
-    public ConfigValue readConfigValueFromObject(Object mappedObject) throws ConfigMappingException {
+    public @NotNull ConfigValue readConfigValueFromObject(@NotNull Object mappedObject) throws ConfigMappingException {
         try {
             T fieldValue = readFromObject(mappedObject);
 
@@ -84,7 +86,7 @@ public class MappedField<T> {
         }
     }
 
-    public void setFieldValueFromConfig(Object mappedObject, ConfigSection config) throws ConfigMappingException, ConfigValidateException {
+    public void setFieldValueFromConfig(@NotNull Object mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException {
         ConfigValue configValue = config.get(configPath);
 
         try {
@@ -106,7 +108,7 @@ public class MappedField<T> {
         }
     }
 
-    private T readFromObject(Object mappedObject) throws ConfigMappingException {
+    private @Nullable T readFromObject(@NotNull Object mappedObject) throws ConfigMappingException {
         try {
             return field.get(mappedObject);
         } catch (ReflectiveOperationException e) {
@@ -114,7 +116,7 @@ public class MappedField<T> {
         }
     }
 
-    private void writeToObject(Object mappedObject, T fieldValue) throws ConfigMappingException {
+    private void writeToObject(@NotNull Object mappedObject, @Nullable T fieldValue) throws ConfigMappingException {
         try {
             field.set(mappedObject, fieldValue);
         } catch (ReflectiveOperationException e) {
@@ -123,7 +125,7 @@ public class MappedField<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private <F, A extends Annotation> F applyFieldValueModifiers(F fieldValue, A annotation) {
+    private <F, A extends Annotation> F applyFieldValueModifiers(@NotNull F fieldValue, @NotNull A annotation) {
         for (FieldValueModifier<?, ?> modifier : VALUE_MODIFIERS) {
             if (modifier.isApplicable(annotation, fieldValue)) {
                 fieldValue = ((FieldValueModifier<F, A>) modifier).transform(annotation, fieldValue);

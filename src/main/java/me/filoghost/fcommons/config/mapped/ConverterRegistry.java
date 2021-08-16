@@ -14,6 +14,7 @@ import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.converter.ListConverter;
 import me.filoghost.fcommons.config.mapped.converter.MappedConfigSectionConverter;
 import me.filoghost.fcommons.reflection.TypeInfo;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class ConverterRegistry {
     );
 
     @SuppressWarnings("unchecked")
-    public static <T> Converter<T, ?> fromObjectType(TypeInfo<T> typeInfo) throws ConfigMappingException {
+    public static <T> @NotNull Converter<T, ?> fromObjectType(TypeInfo<T> typeInfo) throws ConfigMappingException {
         Class<T> typeClass = typeInfo.getTypeClass();
 
         if (typeClass != null) {

@@ -12,6 +12,8 @@ import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConfigMapper;
 import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 import me.filoghost.fcommons.reflection.TypeInfo;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MappedConfigSectionConverter<T extends MappedConfigSection> extends Converter<T, ConfigSection> {
 
@@ -23,21 +25,21 @@ public class MappedConfigSectionConverter<T extends MappedConfigSection> extends
     }
 
     @Override
-    protected ConfigSection toConfigValue0(T mappedObject) throws ConfigMappingException {
+    protected @NotNull ConfigSection toConfigValue0(@NotNull T mappedObject) throws ConfigMappingException {
         ConfigSection configSection = new ConfigSection();
         configMapper.setConfigFromFields(mappedObject, configSection);
         return configSection;
     }
 
     @Override
-    protected T toFieldValue0(ConfigSection configSection) throws ConfigMappingException, ConfigValidateException {
+    protected @NotNull T toFieldValue0(@NotNull ConfigSection configSection) throws ConfigMappingException, ConfigValidateException {
         T mappedObject = configMapper.newMappedObjectInstance();
         configMapper.setFieldsFromConfig(mappedObject, configSection);
         return mappedObject;
     }
 
     @Override
-    protected boolean equalsConfig0(T fieldValue, ConfigSection configSection) throws ConfigMappingException {
+    protected boolean equalsConfig0(@Nullable T fieldValue, @Nullable ConfigSection configSection) throws ConfigMappingException {
         if (fieldValue == null && configSection == null) {
             return true;
         } else if (fieldValue == null || configSection == null) {

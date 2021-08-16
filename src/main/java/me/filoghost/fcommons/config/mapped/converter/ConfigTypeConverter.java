@@ -6,6 +6,8 @@
 package me.filoghost.fcommons.config.mapped.converter;
 
 import me.filoghost.fcommons.config.ConfigType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -25,17 +27,17 @@ public class ConfigTypeConverter<T> extends Converter<T, T> {
     }
 
     @Override
-    protected T toConfigValue0(T fieldValue) {
+    protected @NotNull T toConfigValue0(@NotNull T fieldValue) {
         return fieldValue;
     }
 
     @Override
-    protected T toFieldValue0(T configValue) {
+    protected @NotNull T toFieldValue0(@NotNull T configValue) {
         return configValue;
     }
 
     @Override
-    protected boolean equalsConfig0(T fieldValue, T configValue) {
+    protected boolean equalsConfig0(@Nullable T fieldValue, @Nullable T configValue) {
         return Objects.equals(fieldValue, configValue);
     }
 

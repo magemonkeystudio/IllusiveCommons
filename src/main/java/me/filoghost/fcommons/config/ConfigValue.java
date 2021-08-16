@@ -21,35 +21,35 @@ public final class ConfigValue {
     private final ConfigPath sourcePath;
     private final Object rawValue;
 
-    public static <T> ConfigValue of(ConfigType<T> type, @NotNull T value) {
+    public static <T> ConfigValue of(@NotNull ConfigType<T> type, @NotNull T value) {
         Preconditions.notNull(type, "type");
         Preconditions.notNull(value, "value");
         return new ConfigValue(null, type.toRawValue(value));
     }
 
-    static ConfigValue wrapRawValue(ConfigPath configPath, @Nullable Object rawValue) {
+    static ConfigValue wrapRawValue(@Nullable ConfigPath configPath, @Nullable Object rawValue) {
         return new ConfigValue(configPath, rawValue);
     }
 
-    private ConfigValue(@Nullable ConfigPath sourcePath, Object rawValue) {
+    private ConfigValue(@Nullable ConfigPath sourcePath, @Nullable Object rawValue) {
         this.sourcePath = sourcePath;
         this.rawValue = rawValue;
     }
 
-    public <T> @Nullable T as(ConfigType<T> type) {
+    public <T> @Nullable T as(@NotNull ConfigType<T> type) {
         return type.fromRawValueOrNull(rawValue);
     }
 
-    public <T> @NotNull T asRequired(ConfigType<T> type) throws MissingConfigValueException, InvalidConfigValueException {
+    public <T> @NotNull T asRequired(@NotNull ConfigType<T> type) throws MissingConfigValueException, InvalidConfigValueException {
         return type.fromRawValueRequired(rawValue, sourcePath);
     }
 
     @Contract("_, !null -> !null")
-    public <T> T asOrDefault(ConfigType<T> type, @Nullable T defaultValue) {
+    public <T> T asOrDefault(@NotNull ConfigType<T> type, @Nullable T defaultValue) {
         return type.fromRawValueOrDefault(rawValue, defaultValue);
     }
 
-    public boolean isPresentAs(ConfigType<?> type) {
+    public boolean isPresentAs(@NotNull ConfigType<?> type) {
         return type.isConvertibleRawValue(rawValue);
     }
 
