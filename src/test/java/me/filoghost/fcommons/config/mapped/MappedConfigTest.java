@@ -218,6 +218,12 @@ class MappedConfigTest {
                 "- a",
                 "- null",
                 "- c",
+                "listOfListWithNull:",
+                "- - a",
+                "  - b",
+                "- null",
+                "- - c",
+                "  - d",
                 "sectionWithNull:",
                 "  key1: value1"
         );
@@ -355,6 +361,10 @@ class MappedConfigTest {
         private List<Integer> list;
         private ConfigSection section;
         private List<String> listWithNull = Arrays.asList("a", null, "c");
+        private List<List<String>> listOfListWithNull = Arrays.asList(
+                Arrays.asList("a", "b"),
+                null,
+                Arrays.asList("c", "d"));
         private ConfigSection sectionWithNull;
 
         NullConfig() {

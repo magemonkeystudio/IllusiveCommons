@@ -33,7 +33,11 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     protected @NotNull List<@NotNull ConfigValue> toConfigValue0(@NotNull List<@Nullable E> fieldValue) throws ConfigMappingException {
         List<@NotNull ConfigValue> configList = new ArrayList<>();
         for (E fieldElement : fieldValue) {
-            configList.add(elementConverter.toConfigValue(fieldElement));
+            if (fieldElement != null) {
+                configList.add(elementConverter.toConfigValue(fieldElement));
+            } else {
+                configList.add(ConfigValue.NULL);
+            }
         }
 
         return configList;

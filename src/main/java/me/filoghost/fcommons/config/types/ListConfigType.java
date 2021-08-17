@@ -46,8 +46,11 @@ public class ListConfigType<E> extends ConfigType<List<E>> {
         List<Object> rawValue = new ArrayList<>();
 
         for (E configElement : configValue) {
-            Object rawElement = toRawValue(elementType, configElement);
-            rawValue.add(rawElement);
+            if (configElement != null) {
+                rawValue.add(toRawValue(elementType, configElement));
+            } else {
+                rawValue.add(null);
+            }
         }
 
         return rawValue;

@@ -26,11 +26,7 @@ public abstract class Converter<F, C> {
 
     public final @NotNull ConfigValue toConfigValue(@NotNull F fieldValue) throws ConfigMappingException {
         C configValue = toConfigValue0(fieldValue);
-        if (configValue != null) {
-            return ConfigValue.of(configType, configValue);
-        } else {
-            return ConfigValue.NULL;
-        }
+        return ConfigValue.of(configType, configValue);
     }
 
     protected abstract @NotNull C toConfigValue0(@NotNull F fieldValue) throws ConfigMappingException;
