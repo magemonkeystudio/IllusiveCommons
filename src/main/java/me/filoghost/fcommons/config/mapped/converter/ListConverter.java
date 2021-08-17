@@ -10,7 +10,6 @@ import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
-import me.filoghost.fcommons.config.mapped.MappingUtils;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,13 +24,14 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     @SuppressWarnings("unchecked")
     public ListConverter(TypeInfo<List<E>> fieldTypeInfo) throws ConfigMappingException {
         super(ConfigType.LIST);
-        TypeInfo<E> elementTypeInfo = (TypeInfo<E>) MappingUtils.getSingleGenericType(fieldTypeInfo);
+        TypeInfo<E> elementTypeInfo = (TypeInfo<E>) ConverterHelper.getSingleGenericType(fieldTypeInfo);
         this.elementConverter = ConverterRegistry.fromObjectType(elementTypeInfo);
     }
 
     @Override
     protected @NotNull List<@NotNull ConfigValue> toConfigValue0(@NotNull List<@Nullable E> fieldValue) throws ConfigMappingException {
         List<@NotNull ConfigValue> configList = new ArrayList<>();
+
         for (E fieldElement : fieldValue) {
             if (fieldElement != null) {
                 configList.add(elementConverter.toConfigValue(fieldElement));
@@ -46,6 +46,7 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     @Override
     protected @NotNull List<@Nullable E> toFieldValue0(@NotNull List<@NotNull ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
         List<@Nullable E> fieldList = new ArrayList<>();
+
         for (ConfigValue configElement : configList) {
             if (elementConverter.isValidConfigValue(configElement)) {
                 E fieldValue = elementConverter.toFieldValue(configElement);
@@ -57,15 +58,10 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected boolean equalsConfig0(@Nullable List<E> fieldList, @Nullable List<ConfigValue> configList) throws ConfigMappingException {
-        if (fieldList == null && configList == null) {
-            return true;
-        } else if (fieldList == null || configList == null) {
-            return false;
-        }
-
+    protected boolean equalsConfig0(@NotNull List<@Nullable E> fieldList, @NotNull List<@NotNull ConfigValue> configList) throws ConfigMappingException {
         // Skip elements that would be skipped during read
         List<ConfigValue> filteredConfigList = new ArrayList<>();
+
         for (ConfigValue configValue : configList) {
             if (elementConverter.isValidConfigValue(configValue)) {
                 filteredConfigList.add(configValue);

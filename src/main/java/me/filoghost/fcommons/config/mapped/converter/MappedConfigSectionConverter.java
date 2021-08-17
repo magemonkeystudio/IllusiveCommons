@@ -13,7 +13,6 @@ import me.filoghost.fcommons.config.mapped.ConfigMapper;
 import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class MappedConfigSectionConverter<T extends MappedConfigSection> extends Converter<T, ConfigSection> {
 
@@ -39,13 +38,7 @@ public class MappedConfigSectionConverter<T extends MappedConfigSection> extends
     }
 
     @Override
-    protected boolean equalsConfig0(@Nullable T fieldValue, @Nullable ConfigSection configSection) throws ConfigMappingException {
-        if (fieldValue == null && configSection == null) {
-            return true;
-        } else if (fieldValue == null || configSection == null) {
-            return false;
-        }
-
+    protected boolean equalsConfig0(@NotNull T fieldValue, @NotNull ConfigSection configSection) throws ConfigMappingException {
         return configMapper.equalsConfig(fieldValue, configSection);
     }
 

@@ -42,7 +42,13 @@ public class ConfigMapper<T extends MappedConfigSection> {
     }
 
     public T newMappedObjectInstance() throws ConfigMappingException {
-        return MappingUtils.createInstance(mappedTypeInfo);
+        try {
+            return mappedTypeInfo.newInstance();
+        } catch (NoSuchMethodException e) {
+            throw new ConfigMappingException(ConfigErrors.noEmptyConstructor(mappedTypeInfo));
+        } catch (ReflectiveOperationException e) {
+            throw new ConfigMappingException(ConfigErrors.cannotCreateInstance(mappedTypeInfo), e);
+        }
     }
 
     public Map<ConfigPath, ConfigValue> getFieldsAsConfigValues(@NotNull T mappedObject) throws ConfigMappingException {

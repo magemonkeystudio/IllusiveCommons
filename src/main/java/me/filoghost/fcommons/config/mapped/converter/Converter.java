@@ -44,9 +44,18 @@ public abstract class Converter<F, C> {
 
     public final boolean equalsConfig(@Nullable F fieldValue, @NotNull ConfigValue wrappedConfigValue) throws ConfigMappingException {
         C configValue = wrappedConfigValue.as(configType);
-        return equalsConfig0(fieldValue, configValue);
+
+        if (fieldValue == null && configValue == null) {
+            // Both null, they are considered equal
+            return true;
+        } else if (fieldValue == null || configValue == null) {
+            // One is null and the other is not, they cannot be equal
+            return false;
+        } else {
+            return equalsConfig0(fieldValue, configValue);
+        }
     }
 
-    protected abstract boolean equalsConfig0(@Nullable F fieldValue, @Nullable C configValue) throws ConfigMappingException;
+    protected abstract boolean equalsConfig0(@NotNull F fieldValue, @NotNull C configValue) throws ConfigMappingException;
 
 }
