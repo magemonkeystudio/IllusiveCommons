@@ -5,8 +5,6 @@
  */
 package me.filoghost.fcommons.reflection;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
@@ -47,13 +45,13 @@ public interface ReflectField<T> extends ReflectElement {
 
     Field getRawField() throws ReflectiveOperationException;
 
-    @Nullable T get(Object instance) throws ReflectiveOperationException;
+    T get(Object instance) throws ReflectiveOperationException;
 
-    @Nullable T getStatic() throws ReflectiveOperationException;
+    T getStatic() throws ReflectiveOperationException;
 
-    void set(Object instance, @Nullable T value) throws ReflectiveOperationException;
+    void set(Object instance, T value) throws ReflectiveOperationException;
 
-    void setStatic(@Nullable T value) throws ReflectiveOperationException;
+    void setStatic(T value) throws ReflectiveOperationException;
 
     int getModifiers();
 
