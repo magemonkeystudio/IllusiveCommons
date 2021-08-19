@@ -5,6 +5,7 @@
  */
 package me.filoghost.fcommons;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.Collection;
@@ -85,6 +86,10 @@ public final class Preconditions {
         if (MaterialsHelper.isAir(material)) {
             throw new IllegalArgumentException(objectName + " cannot be " + material);
         }
+    }
+
+    public static void checkMainThread(String errorMessage) {
+        checkState(Bukkit.isPrimaryThread(), errorMessage);
     }
 
 }
