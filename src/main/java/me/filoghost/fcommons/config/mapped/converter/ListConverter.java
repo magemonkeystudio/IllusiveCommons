@@ -9,6 +9,7 @@ import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.config.mapped.ConverterRegistry;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import org.jetbrains.annotations.NotNull;
@@ -44,12 +45,13 @@ public class ListConverter<E> extends Converter<List<E>, List<ConfigValue>> {
     }
 
     @Override
-    protected @NotNull List<@Nullable E> toFieldValue0(@NotNull List<@NotNull ConfigValue> configList) throws ConfigMappingException, ConfigValidateException {
+    protected @NotNull List<@Nullable E> toFieldValue0(@NotNull List<@NotNull ConfigValue> configList, boolean required)
+            throws ConfigMappingException, ConfigValidateException, ConfigValueException {
         List<@Nullable E> fieldList = new ArrayList<>();
 
         for (ConfigValue configElement : configList) {
             if (elementConverter.isValidConfigValue(configElement)) {
-                E fieldValue = elementConverter.toFieldValue(configElement);
+                E fieldValue = elementConverter.toFieldValue(configElement, false);
                 fieldList.add(fieldValue);
             }
         }

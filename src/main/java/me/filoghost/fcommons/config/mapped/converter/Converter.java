@@ -11,6 +11,7 @@ import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 
 public abstract class Converter<F, C> {
 
@@ -31,16 +32,23 @@ public abstract class Converter<F, C> {
 
     protected abstract @NotNull C toConfigValue0(@NotNull F fieldValue) throws ConfigMappingException;
 
-    public final @Nullable F toFieldValue(@NotNull ConfigValue wrappedConfigValue) throws ConfigMappingException, ConfigValidateException {
-        C configValue = wrappedConfigValue.as(configType);
+    public final @Nullable F toFieldValue(@NotNull ConfigValue wrappedConfigValue, boolean required)
+            throws ConfigMappingException, ConfigValidateException, ConfigValueException {
+        C configValue;
+        if (required) {
+            configValue = wrappedConfigValue.asRequired(configType);
+        } else {
+            configValue = wrappedConfigValue.as(configType);
+        }
         if (configValue != null) {
-            return toFieldValue0(configValue);
+            return toFieldValue0(configValue, required);
         } else {
             return null;
         }
     }
 
-    protected abstract @NotNull F toFieldValue0(@NotNull C configValue) throws ConfigMappingException, ConfigValidateException;
+    protected abstract @NotNull F toFieldValue0(@NotNull C configValue, boolean required)
+            throws ConfigMappingException, ConfigValidateException, ConfigValueException;
 
     public final boolean equalsConfig(@Nullable F fieldValue, @NotNull ConfigValue wrappedConfigValue) throws ConfigMappingException {
         C configValue = wrappedConfigValue.as(configType);

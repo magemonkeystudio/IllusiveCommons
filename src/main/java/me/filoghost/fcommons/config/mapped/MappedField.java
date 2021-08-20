@@ -12,6 +12,7 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.config.mapped.converter.Converter;
 import me.filoghost.fcommons.config.mapped.modifier.ChatColorsModifier;
 import me.filoghost.fcommons.config.mapped.modifier.FieldValueModifier;
@@ -36,6 +37,7 @@ public class MappedField<T> {
     private final ReflectField<T> field;
     private final Converter<T, ?> converter;
     private final ConfigPath configPath;
+    private final boolean required;
     private final List<Annotation> annotations;
 
     public MappedField(ReflectField<T> field) throws ReflectiveOperationException, ConfigMappingException {
@@ -46,6 +48,7 @@ public class MappedField<T> {
         } else {
             this.configPath = ConfigPath.delimitedBy(field.getName(), "__").replace("_", "-");
         }
+        this.required = field.isAnnotationPresent(Required.class);
         this.annotations = Stream.concat(
                 Arrays.stream(field.getAnnotations()),
                 Arrays.stream(field.getDeclaringClass().getDeclaredAnnotations()))
@@ -86,11 +89,11 @@ public class MappedField<T> {
         }
     }
 
-    public void setFieldValueFromConfig(@NotNull Object mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException {
+    public void setFieldValueFromConfig(@NotNull Object mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException, ConfigValueException {
         ConfigValue configValue = config.get(configPath);
 
         try {
-            T fieldValue = converter.toFieldValue(configValue);
+            T fieldValue = converter.toFieldValue(configValue, required);
             if (fieldValue == null) {
                 return;
             }

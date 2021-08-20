@@ -12,6 +12,7 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.reflection.ReflectField;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +70,7 @@ public class ConfigMapper<T extends MappedConfigSection> {
         }
     }
 
-    public void setFieldsFromConfig(@NotNull T mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException {
+    public void setFieldsFromConfig(@NotNull T mappedObject, @NotNull ConfigSection config) throws ConfigMappingException, ConfigValidateException, ConfigValueException {
         for (MappedField<?> mappedField : mappedFields) {
             mappedField.setFieldValueFromConfig(mappedObject, config);
         }

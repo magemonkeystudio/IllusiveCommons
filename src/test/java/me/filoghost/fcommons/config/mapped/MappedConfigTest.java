@@ -11,6 +11,7 @@ import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.test.AssertExtra;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -100,7 +101,7 @@ class MappedConfigTest {
     }
 
     @Test
-    void testBeforeLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException {
+    void testBeforeLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException, ConfigValueException {
         MappedConfigLoader<BeforeLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, BeforeLoadConfig.class,
                 "oldString: oldValue"
         );
@@ -114,7 +115,7 @@ class MappedConfigTest {
     }
 
     @Test
-    void testBeforeLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException, IOException {
+    void testBeforeLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException, IOException, ConfigValueException {
         MappedConfigLoader<BeforeLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, BeforeLoadConfig.class,
                 "oldString: oldValue"
         );

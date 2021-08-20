@@ -29,7 +29,7 @@ public class ConfigTypeConverter<T> extends Converter<T, T> {
     }
 
     @Override
-    protected @NotNull T toFieldValue0(@NotNull T configValue) {
+    protected @NotNull T toFieldValue0(@NotNull T configValue, boolean required) {
         return configValue;
     }
 

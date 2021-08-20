@@ -9,6 +9,7 @@ import me.filoghost.fcommons.config.ConfigSection;
 import me.filoghost.fcommons.config.ConfigType;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.config.mapped.ConfigMapper;
 import me.filoghost.fcommons.config.mapped.MappedConfigSection;
 import me.filoghost.fcommons.reflection.TypeInfo;
@@ -31,7 +32,7 @@ public class MappedConfigSectionConverter<T extends MappedConfigSection> extends
     }
 
     @Override
-    protected @NotNull T toFieldValue0(@NotNull ConfigSection configSection) throws ConfigMappingException, ConfigValidateException {
+    protected @NotNull T toFieldValue0(@NotNull ConfigSection configSection, boolean required) throws ConfigMappingException, ConfigValidateException, ConfigValueException {
         T mappedObject = configMapper.newMappedObjectInstance();
         configMapper.setFieldsFromConfig(mappedObject, configSection);
         return mappedObject;

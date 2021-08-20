@@ -9,6 +9,7 @@ import me.filoghost.fcommons.config.exception.ConfigException;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
 import me.filoghost.fcommons.config.exception.ConfigValidateException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 class MappedConfigSectionTest {
 
     @Test
-    void testAfterLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException {
+    void testAfterLoadWithLoad(@TempDir Path tempDir) throws ConfigLoadException, IOException, ConfigValueException {
         MappedConfigLoader<AfterLoadConfig> configLoader = MappedTestCommons.newExistingConfig(tempDir, AfterLoadConfig.class,
                 "string: xyz"
         );
@@ -31,7 +32,7 @@ class MappedConfigSectionTest {
     }
 
     @Test
-    void testAfterLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException {
+    void testAfterLoadWithInit(@TempDir Path tempDir) throws ConfigLoadException, ConfigSaveException, ConfigValueException {
         MappedConfigLoader<AfterLoadConfig> configLoader = MappedTestCommons.newNonExistingConfig(tempDir, AfterLoadConfig.class);
 
         AfterLoadConfig config = configLoader.init();

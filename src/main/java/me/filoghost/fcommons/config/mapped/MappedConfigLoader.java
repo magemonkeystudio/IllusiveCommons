@@ -13,6 +13,7 @@ import me.filoghost.fcommons.config.ConfigValue;
 import me.filoghost.fcommons.config.exception.ConfigLoadException;
 import me.filoghost.fcommons.config.exception.ConfigMappingException;
 import me.filoghost.fcommons.config.exception.ConfigSaveException;
+import me.filoghost.fcommons.config.exception.ConfigValueException;
 import me.filoghost.fcommons.reflection.TypeInfo;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +51,8 @@ public class MappedConfigLoader<T extends MappedConfig> {
             return mappedObject;
         } catch (ConfigMappingException e) {
             throw new ConfigLoadException(e.getMessage(), e);
+        } catch (ConfigValueException e) {
+            throw new ConfigLoadException("Invalid \"" + e.getConfigPath() + "\", " + e.getMessage());
         }
     }
 
@@ -77,6 +80,8 @@ public class MappedConfigLoader<T extends MappedConfig> {
 
         } catch (ConfigMappingException e) {
             throw new ConfigLoadException(e.getMessage(), e);
+        } catch (ConfigValueException e) {
+            throw new ConfigLoadException("Invalid \"" + e.getConfigPath() + "\", " + e.getMessage());
         }
     }
 
