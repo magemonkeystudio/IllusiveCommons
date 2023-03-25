@@ -24,6 +24,22 @@ public interface ReflectField<T> extends ReflectElement {
         return wrap(expectedClass, field);
     }
 
+    static <T> ReflectField<T> lookup(Class<T> expectedClass, Class<?> declaringClass, int index) {
+        Field[] fields = declaringClass.getDeclaredFields();
+
+        int currentIndex = 0;
+        for (Field field : fields) {
+            if (expectedClass == field.getType()) {
+                if (currentIndex == index) {
+                    return wrap(expectedClass, field);
+                }
+            }
+        }
+
+        NoSuchFieldError e = new NoSuchFieldError("Could not find the field at index " + index + " of type " + expectedClass.getName());
+        return new InvalidReflectField<>(expectedClass, declaringClass, null, e);
+    }
+
     static ReflectField<?> wrap(Field field) {
         return wrap(field.getType(), field);
     }
