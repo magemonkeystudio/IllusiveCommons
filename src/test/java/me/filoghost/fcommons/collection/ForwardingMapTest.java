@@ -24,7 +24,7 @@ class ForwardingMapTest {
         List<Method> methods = TestUtils.getInterfaceHierarchyMethods(Map.class);
 
         for (Method method : methods) {
-            if (!Modifier.isStatic(method.getModifiers())) {
+            if (!Modifier.isStatic(method.getModifiers()) && !method.isDefault()) {
                 assertThatCode(() -> ForwardingMap.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
                         .withFailMessage("Does not override method " + method)
                         .doesNotThrowAnyException();

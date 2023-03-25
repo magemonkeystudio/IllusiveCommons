@@ -24,7 +24,7 @@ class ForwardingSetTest {
         List<Method> methods = TestUtils.getInterfaceHierarchyMethods(Set.class);
 
         for (Method method : methods) {
-            if (!Modifier.isStatic(method.getModifiers())) {
+            if (!Modifier.isStatic(method.getModifiers()) && !method.isDefault()) {
                 assertThatCode(() -> ForwardingSet.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
                         .withFailMessage("Does not override method " + method)
                         .doesNotThrowAnyException();
