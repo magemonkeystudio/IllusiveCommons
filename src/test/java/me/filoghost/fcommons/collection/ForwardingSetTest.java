@@ -9,6 +9,7 @@ import me.filoghost.fcommons.test.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,9 +24,11 @@ class ForwardingSetTest {
         List<Method> methods = TestUtils.getInterfaceHierarchyMethods(Set.class);
 
         for (Method method : methods) {
-            assertThatCode(() -> ForwardingSet.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
-                    .withFailMessage("Does not override method " + method)
-                    .doesNotThrowAnyException();
+            if (!Modifier.isStatic(method.getModifiers())) {
+                assertThatCode(() -> ForwardingSet.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
+                        .withFailMessage("Does not override method " + method)
+                        .doesNotThrowAnyException();
+            }
         }
     }
 

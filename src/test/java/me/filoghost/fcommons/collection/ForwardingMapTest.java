@@ -9,6 +9,7 @@ import me.filoghost.fcommons.test.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,9 +24,11 @@ class ForwardingMapTest {
         List<Method> methods = TestUtils.getInterfaceHierarchyMethods(Map.class);
 
         for (Method method : methods) {
-            assertThatCode(() -> ForwardingMap.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
-                    .withFailMessage("Does not override method " + method)
-                    .doesNotThrowAnyException();
+            if (!Modifier.isStatic(method.getModifiers())) {
+                assertThatCode(() -> ForwardingMap.class.getDeclaredMethod(method.getName(), method.getParameterTypes()))
+                        .withFailMessage("Does not override method " + method)
+                        .doesNotThrowAnyException();
+            }
         }
     }
 
