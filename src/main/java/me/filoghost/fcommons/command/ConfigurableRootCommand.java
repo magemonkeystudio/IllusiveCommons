@@ -8,12 +8,10 @@ package me.filoghost.fcommons.command;
 import me.filoghost.fcommons.command.validation.CommandException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.command.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.logging.Level;
 
 public abstract class ConfigurableRootCommand extends ConfigurableCommandProperties implements RootCommand {
@@ -35,7 +33,9 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
             pluginCommand.setPermissionMessage(ChatColor.RED + "You don't have permission for this command.");
         }
 
-        pluginCommand.setExecutor(new BukkitCommandExecutorAdapter(this));
+        BukkitCommandExecutorAdapter executor = new BukkitCommandExecutorAdapter(this);
+        pluginCommand.setExecutor(executor);
+        pluginCommand.setTabCompleter(executor);
         return true;
     }
 
@@ -49,7 +49,7 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
     }
 
 
-    private static class BukkitCommandExecutorAdapter implements CommandExecutor {
+    private static class BukkitCommandExecutorAdapter implements CommandExecutor, TabCompleter {
 
         private final ConfigurableRootCommand command;
 
@@ -71,6 +71,10 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
             return true;
         }
 
+        @Override
+        public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+            System.out.println("AAAG");
+            return this.command.onTabComplete(sender, command, alias, args);
+        }
     }
-
 }

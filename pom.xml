@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.filoghost.fcommons</groupId>
-    <artifactId>fcommons</artifactId>
-    <name>FCommons</name>
+    <groupId>studio.magemonkey</groupId>
+    <artifactId>illusive-commons</artifactId>
+    <name>IllusiveCommons</name>
     <version>1.2.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -21,16 +21,23 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <nexus.url>https://s01.oss.sonatype.org</nexus.url>
     </properties>
+
+    <scm>
+        <connection>scm:git:git://github.com/magemonkeystudio/${project.name}.git</connection>
+        <developerConnection>scm:git:ssh://github.com:magemonkeystudio/${project.name}.git</developerConnection>
+        <url>https://github.com/magemonkeystudio/${project.name}</url>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
-            <id>codemc-snapshots</id>
-            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+            <id>ossrh</id>
+            <url>${nexus.url}/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
+            <id>ossrh</id>
+            <url>${nexus.url}/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -58,7 +65,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>20.1.0</version>
+            <version>26.0.1</version>
             <scope>provided</scope>
         </dependency>
         

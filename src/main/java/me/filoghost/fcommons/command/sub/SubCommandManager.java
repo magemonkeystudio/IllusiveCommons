@@ -7,9 +7,10 @@ package me.filoghost.fcommons.command.sub;
 
 import me.filoghost.fcommons.command.CommandContext;
 import me.filoghost.fcommons.command.CommandHelper;
-import me.filoghost.fcommons.command.validation.CommandException;
 import me.filoghost.fcommons.command.ConfigurableRootCommand;
+import me.filoghost.fcommons.command.validation.CommandException;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permissible;
 
@@ -29,9 +30,9 @@ public abstract class SubCommandManager extends ConfigurableRootCommand {
             return;
         }
 
-        String subLabel = args[0];
-        SubCommand subCommand = getSubCommandByName(subLabel);
-        String[] subCommandArgs = CommandHelper.getArgsFromIndex(args, 1);
+        String     subLabel       = args[0];
+        SubCommand subCommand     = getSubCommandByName(subLabel);
+        String[]   subCommandArgs = CommandHelper.getArgsFromIndex(args, 1);
         SubCommandContext subContext = new SubCommandContext(
                 context.getSender(),
                 context.getRootLabel(),
@@ -60,6 +61,24 @@ public abstract class SubCommandManager extends ConfigurableRootCommand {
         }
 
         subCommand.execute(subContext.getSender(), subContext.getArgs(), subContext);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> subCommandNames = new ArrayList<>();
+            for (SubCommand subCommand : getAccessibleSubCommands(sender)) {
+                subCommandNames.add(subCommand.getName());
+            }
+            return CommandHelper.filterStartingWith(args[0], subCommandNames);
+        }
+
+        SubCommand subCommand = getSubCommandByName(args[0]);
+        if (subCommand != null) {
+            return subCommand.onTabComplete(sender, command, alias, CommandHelper.getArgsFromIndex(args, 1));
+        }
+
+        return new ArrayList<>();
     }
 
     protected Iterable<? extends SubCommand> getAccessibleSubCommands(Permissible sender) {
