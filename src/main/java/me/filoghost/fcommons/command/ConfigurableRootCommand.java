@@ -73,7 +73,6 @@ public abstract class ConfigurableRootCommand extends ConfigurableCommandPropert
 
         @Override
         public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-            System.out.println("AAAG");
             return this.command.onTabComplete(sender, command, alias, args);
         }
     }
