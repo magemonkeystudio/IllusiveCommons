@@ -21,7 +21,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <nexus.url>https://s01.oss.sonatype.org</nexus.url>
     </properties>
 
     <scm>
@@ -30,18 +29,11 @@
         <url>https://github.com/magemonkeystudio/${project.name}</url>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>${nexus.url}/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>${nexus.url}/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <repositories>
+        <repository>
+            <id>sonatype</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </repository>
         <repository>
             <id>bukkit-repo</id>
             <url>https://repo.codemc.io/repository/nms/</url>
@@ -102,6 +94,17 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
